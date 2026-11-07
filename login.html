@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b3d5c">
+<title>تسجيل الدخول · أدوات التشغيل</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* نفس صورة الباصات المستخدمة في الهب — غيّر اسم الملف إن لزم */
+    --bg-image: url('bus.jpg');
+    --navy:#0b3d5c; --navy-2:#082c43; --accent:#f59e0b; --err:#b91c1c; --ok:#15803d;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:Tajawal,system-ui,sans-serif;color:#0f172a;
+    background:linear-gradient(160deg,rgba(8,44,67,.88),rgba(11,61,92,.70)),var(--bg-image) center/cover no-repeat fixed, var(--navy);
+    display:flex;align-items:center;justify-content:center;padding:24px 16px;
+    min-height:100vh;padding-top:max(24px,env(safe-area-inset-top));
+  }
+  .card{
+    width:100%;max-width:400px;background:rgba(255,255,255,.97);border-radius:20px;
+    box-shadow:0 20px 50px rgba(0,0,0,.35);padding:28px 24px 22px;
+  }
+  .brand{text-align:center;margin-bottom:20px}
+  .logo{width:64px;height:64px;border-radius:18px;background:var(--navy);color:#fff;
+    display:inline-flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:10px}
+  h1{margin:0;font-size:22px;font-weight:800;color:var(--navy)}
+  .sub{margin:4px 0 0;color:#64748b;font-size:14px}
+  .en{display:block;font-size:12px;color:#94a3b8;font-weight:500}
+  label{display:block;font-weight:700;font-size:14px;margin:14px 0 6px;color:#1e293b}
+  .field{position:relative}
+  input{
+    width:100%;padding:13px 14px;border:1.5px solid #cbd5e1;border-radius:12px;font:inherit;font-size:16px;
+    background:#f8fafc;outline:none;transition:border-color .15s, box-shadow .15s
+  }
+  input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(11,61,92,.15);background:#fff}
+  input[dir=ltr]{text-align:right}
+  .eye{position:absolute;inset-inline-end:8px;top:50%;transform:translateY(-50%);border:0;background:none;
+    font-size:18px;cursor:pointer;padding:6px;color:#64748b}
+  .btn{
+    width:100%;margin-top:20px;padding:14px;border:0;border-radius:12px;background:var(--navy);color:#fff;
+    font:inherit;font-size:17px;font-weight:800;cursor:pointer;transition:background .15s
+  }
+  .btn:hover{background:var(--navy-2)}
+  .btn:disabled{opacity:.6;cursor:wait}
+  .msg{margin-top:14px;padding:10px 12px;border-radius:10px;font-size:14px;display:none}
+  .msg.err{display:block;background:#fef2f2;color:var(--err);border:1px solid #fecaca}
+  .msg.ok{display:block;background:#f0fdf4;color:var(--ok);border:1px solid #bbf7d0}
+  .link{display:block;text-align:center;margin-top:16px;color:var(--navy);font-size:14px;font-weight:700;
+    background:none;border:0;width:100%;cursor:pointer;font-family:inherit}
+  .hidden{display:none}
+  .foot{text-align:center;color:#94a3b8;font-size:12px;margin-top:18px}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="brand">
+    <div class="logo">🚌</div>
+    <h1>أدوات التشغيل</h1>
+    <p class="sub">Northwest Bus<span class="en">Operations Tools</span></p>
+  </div>
+
+  <!-- تسجيل الدخول -->
+  <form id="loginForm" autocomplete="on" novalidate>
+    <label for="u">اسم المستخدم <span class="en">Username</span></label>
+    <input id="u" name="username" dir="ltr" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false" required>
+
+    <label for="p">كلمة المرور <span class="en">Password</span></label>
+    <div class="field">
+      <input id="p" name="password" type="password" dir="ltr" autocomplete="current-password" required>
+      <button type="button" class="eye" data-for="p" aria-label="إظهار كلمة المرور">👁</button>
+    </div>
+
+    <button class="btn" id="loginBtn" type="submit">دخول · Sign in</button>
+    <div class="msg" id="loginMsg"></div>
+    <button type="button" class="link" id="toChange">تغيير كلمة المرور</button>
+  </form>
+
+  <!-- تغيير كلمة المرور -->
+  <form id="changeForm" class="hidden" novalidate>
+    <label for="cu">اسم المستخدم <span class="en">Username</span></label>
+    <input id="cu" dir="ltr" autocomplete="username" autocapitalize="off" spellcheck="false" required>
+
+    <label for="op">كلمة المرور الحالية <span class="en">Current password</span></label>
+    <div class="field">
+      <input id="op" type="password" dir="ltr" autocomplete="current-password" required>
+      <button type="button" class="eye" data-for="op">👁</button>
+    </div>
+
+    <label for="np">كلمة المرور الجديدة <span class="en">New password</span></label>
+    <div class="field">
+      <input id="np" type="password" dir="ltr" autocomplete="new-password" required>
+      <button type="button" class="eye" data-for="np">👁</button>
+    </div>
+
+    <label for="np2">تأكيد كلمة المرور الجديدة <span class="en">Confirm</span></label>
+    <input id="np2" type="password" dir="ltr" autocomplete="new-password" required>
+
+    <button class="btn" id="changeBtn" type="submit">حفظ كلمة المرور</button>
+    <div class="msg" id="changeMsg"></div>
+    <button type="button" class="link" id="toLogin">← رجوع لتسجيل الدخول</button>
+  </form>
+
+  <div class="foot">Northwest Bus · Operations</div>
+</main>
+
+<script>
+  /* ====== الإعدادات ====== */
+  const AUTH_URL = 'الصق_رابط_تطبيق_الويب_هنا';   // رابط Apps Script لشيت المستخدمين (ينتهي بـ /exec)
+  const HOME     = './';                          // صفحة الهب بعد الدخول
+  const KEY      = 'nw_auth_v1';
+  const ALLOWED_PREFIX = 'https://hanode40-sketch.github.io/';
+
+  const $ = id => document.getElementById(id);
+  const params = new URLSearchParams(location.search);
+  const NEXT = (() => {
+    const n = params.get('next');
+    if (n === 'close') return 'close';
+    if (n && n.startsWith(ALLOWED_PREFIX)) return n;
+    return HOME;
+  })();
+
+  function store(token) { try { localStorage.setItem(KEY, JSON.stringify({ token, at: Date.now() })); } catch (e) {} }
+  function stored() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; } }
+  function decode(token) {
+    try {
+      let b = token.split('.')[0].replace(/-/g, '+').replace(/_/g, '/');
+      while (b.length % 4) b += '=';
+      const bin = atob(b);
+      return JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0))));
+    } catch (e) { return null; }
+  }
+
+  // إذا كان مسجّل دخول مسبقًا، ادخله مباشرة
+  (function () {
+    const s = stored(), p = s && s.token && decode(s.token);
+    if (p && p.exp > Date.now() && NEXT !== 'close') location.replace(NEXT);
+    if (p) { $('u').value = p.u; $('cu').value = p.u; }
+  })();
+
+  const ERRORS = {
+    MISSING:  'اكتب اسم المستخدم وكلمة المرور',
+    INVALID:  'اسم المستخدم أو كلمة المرور غير صحيحة',
+    LOCKED:   'تم إيقاف المحاولات مؤقتًا بسبب كثرة الأخطاء، حاول بعد 15 دقيقة',
+    DISABLED: 'هذا الحساب موقوف، راجع الإدارة',
+    SHORT:    'كلمة المرور الجديدة قصيرة جدًا',
+    SERVER:   'حدث خطأ في الخادم، حاول مرة ثانية',
+    NETWORK:  'تعذّر الاتصال — تأكد من الإنترنت وحاول مرة ثانية'
+  };
+  function errText(r) {
+    let t = ERRORS[r.error] || ERRORS.SERVER;
+    if (r.error === 'INVALID' && r.left > 0 && r.left <= 3) t += ` (باقي ${r.left} محاولات)`;
+    if (r.error === 'SHORT' && r.min) t += ` (أقل شيء ${r.min} أحرف)`;
+    return t;
+  }
+  function show(el, text, type) { el.textContent = text; el.className = 'msg ' + type; }
+
+  async function post(body) {
+    try {
+      const res = await fetch(AUTH_URL, { method: 'POST', body: JSON.stringify(body) });
+      return await res.json();
+    } catch (e) { return { ok: false, error: 'NETWORK' }; }
+  }
+
+  // إظهار/إخفاء كلمة المرور
+  document.querySelectorAll('.eye').forEach(b => b.addEventListener('click', () => {
+    const i = $(b.dataset.for); i.type = i.type === 'password' ? 'text' : 'password';
+  }));
+
+  // تبديل النماذج
+  $('toChange').onclick = () => { $('loginForm').classList.add('hidden'); $('changeForm').classList.remove('hidden'); $('cu').value ||= $('u').value; };
+  $('toLogin').onclick  = () => { $('changeForm').classList.add('hidden'); $('loginForm').classList.remove('hidden'); };
+
+  // الدخول
+  $('loginForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const msg = $('loginMsg'), btn = $('loginBtn');
+    const username = $('u').value.trim(), password = $('p').value;
+    if (!username || !password) return show(msg, ERRORS.MISSING, 'err');
+
+    btn.disabled = true; btn.textContent = 'جاري التحقق...';
+    const r = await post({ action: 'login', username, password });
+    btn.disabled = false; btn.textContent = 'دخول · Sign in';
+
+    if (!r.ok) { show(msg, errText(r), 'err'); $('p').select(); return; }
+    store(r.token);
+    show(msg, `أهلًا ${r.user.name} 👋`, 'ok');
+
+    if (NEXT === 'close') {
+      show(msg, 'تم تسجيل الدخول ✅ ارجع للصفحة السابقة وأكمل عملك', 'ok');
+      setTimeout(() => window.close(), 1200);
+    } else {
+      setTimeout(() => location.replace(NEXT), 400);
+    }
+  });
+
+  // تغيير كلمة المرور
+  $('changeForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const msg = $('changeMsg'), btn = $('changeBtn');
+    const username = $('cu').value.trim(), oldPassword = $('op').value, newPassword = $('np').value;
+    if (!username || !oldPassword || !newPassword) return show(msg, 'عبّئ كل الخانات', 'err');
+    if (newPassword !== $('np2').value) return show(msg, 'كلمتا المرور الجديدتان غير متطابقتين', 'err');
+
+    btn.disabled = true; btn.textContent = 'جاري الحفظ...';
+    const r = await post({ action: 'changePassword', username, oldPassword, newPassword });
+    btn.disabled = false; btn.textContent = 'حفظ كلمة المرور';
+
+    if (!r.ok) return show(msg, errText(r), 'err');
+    show(msg, 'تم تغيير كلمة المرور ✅ سجّل الدخول بالكلمة الجديدة', 'ok');
+    $('op').value = $('np').value = $('np2').value = '';
+    setTimeout(() => { $('toLogin').click(); $('u').value = username; $('p').value = ''; $('p').focus(); }, 1500);
+  });
+</script>
+</body>
+</html>
