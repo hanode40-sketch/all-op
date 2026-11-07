@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<script>try{var t=localStorage.getItem('nwTheme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<script src="https://hanode40-sketch.github.io/all-op/auth.js" data-tool="performance"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2c4a7a">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<title>أداء الموظفين · أدوات التشغيل</title>
+<style>
+  :root{
+    --navy:#1f3f7a; --ink:#1a1a1a; --muted:#64748b; --line:#e5e7eb; --bg:#f4f6f9;
+    --ok:#15803d; --okbg:#e7f5ed; --bad:#b91c1c; --badbg:#fdecea; --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Tahoma,Arial,sans-serif;color:var(--ink);
+    background:linear-gradient(180deg,#2c4a7a 0,#2c4a7a 220px,var(--bg) 220px);min-height:100vh;padding:20px 14px 90px}
+  .wrap{max-width:980px;margin:0 auto}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#fff;margin-bottom:18px}
+  .top h1{margin:0;font-size:21px}
+  .top .en{font-size:13px;opacity:.75}
+  .back{color:#fff;text-decoration:none;font-size:14px;background:rgba(255,255,255,.15);padding:8px 14px;border-radius:999px;white-space:nowrap}
+  .filters{background:#fff;border-radius:var(--radius);padding:14px;display:grid;grid-template-columns:repeat(3,1fr) auto;gap:10px;align-items:end;box-shadow:0 6px 18px rgba(10,25,55,.12)}
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600}
+  select,input{width:100%;font:inherit;font-size:15px;padding:10px;border:1px solid var(--line);border-radius:10px;background:#f8fafc}
+  .btn{font:inherit;font-size:14px;font-weight:700;border:0;border-radius:10px;padding:11px 14px;cursor:pointer;background:var(--navy);color:#fff;white-space:nowrap}
+  .btn.light{background:#eef2f7;color:var(--navy)}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+  .kpi{background:#fff;border-radius:var(--radius);padding:14px;border:1px solid var(--line)}
+  .kpi b{display:block;font-size:28px;color:var(--navy);line-height:1.1}
+  .kpi span{font-size:13px;color:var(--muted)}
+  .kpi.bad b{color:var(--bad)}
+  .card{background:#fff;border-radius:var(--radius);border:1px solid var(--line);padding:16px;margin-top:14px}
+  .card h2{margin:0 0 12px;font-size:17px;color:var(--navy);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .card h2 small{font-size:12px;color:var(--muted);font-weight:500}
+  .card h2 .sp{margin-inline-start:auto}
+  .scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+  th{font-size:12px;color:var(--muted);font-weight:700;background:#f8fafc;position:sticky;top:0}
+  td.num,th.num{text-align:center}
+  tr.emp{cursor:pointer}
+  tr.emp:hover td{background:#f8fafc}
+  tr.emp.sel td{background:#eaf0fa}
+  .rank{display:inline-flex;width:24px;height:24px;border-radius:50%;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:#eef2f7;color:var(--navy)}
+  .rank.g1{background:#fde68a;color:#78350f}.rank.g2{background:#e5e7eb;color:#374151}.rank.g3{background:#fed7aa;color:#7c2d12}
+  .bar{display:flex;align-items:center;gap:8px;min-width:140px}
+  .bar i{display:block;height:8px;border-radius:4px;background:var(--navy);min-width:2px}
+  .bar b{font-size:14px}
+  .zero{color:#cbd5e1}
+  .tag{font-size:12px;padding:2px 8px;border-radius:999px;background:#eef2f7;color:var(--navy);font-weight:600}
+  .tag.ok{background:var(--okbg);color:var(--ok)}.tag.bad{background:var(--badbg);color:var(--bad)}
+  .muted{color:var(--muted)}
+  .msg{text-align:center;padding:30px 10px;color:var(--muted)}
+  .msg.err{color:var(--bad);font-weight:700}
+  /* الوضع الليلي */
+  html[data-theme="dark"]{--ink:#e5e7eb;--muted:#9aa6b8;--line:#263042;--bg:#0b1220;--okbg:#12301f;--badbg:#3a1e22}
+  html[data-theme="dark"] body{background:linear-gradient(180deg,#15233f 0,#15233f 220px,var(--bg) 220px)}
+  html[data-theme="dark"] .filters,html[data-theme="dark"] .kpi,html[data-theme="dark"] .card{background:#151c2b;border-color:var(--line)}
+  html[data-theme="dark"] select,html[data-theme="dark"] input{background:#0f1624;color:var(--ink);border-color:var(--line)}
+  html[data-theme="dark"] th{background:#111827}
+  html[data-theme="dark"] tr.emp:hover td{background:#1b2436}
+  html[data-theme="dark"] tr.emp.sel td{background:#1e2a44}
+  html[data-theme="dark"] .kpi b,html[data-theme="dark"] .card h2{color:#9ec1ff}
+  html[data-theme="dark"] .bar i{background:#6b9cff}
+  html[data-theme="dark"] .btn.light,html[data-theme="dark"] .tag,html[data-theme="dark"] .rank{background:#1e2a44;color:#c7d7f5}
+  html[data-theme="dark"] .zero{color:#3b4558}
+  @media (max-width:700px){
+    .filters{grid-template-columns:1fr 1fr}
+    .filters .btn{grid-column:span 1}
+    .kpis{grid-template-columns:1fr 1fr}
+    .top h1{font-size:18px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><h1>📊 أداء الموظفين</h1><div class="en">Staff Performance</div></div>
+    <a class="back" href="./">← أدوات التشغيل</a>
+  </div>
+
+  <div class="filters">
+    <div><label>الشهر</label><select id="fMonth"></select></div>
+    <div><label>الموظف</label><select id="fUser"><option value="">كل الموظفين</option></select></div>
+    <div><label>البرنامج</label><select id="fTool"><option value="">كل البرامج</option></select></div>
+    <div style="display:flex;gap:8px"><button class="btn light" onclick="load()">↻ تحديث</button><button class="btn" onclick="exportCsv()">تصدير</button></div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><b id="kOps">–</b><span>إجمالي العمليات</span></div>
+    <div class="kpi"><b id="kUsers">–</b><span>موظف نشط</span></div>
+    <div class="kpi"><b id="kLogins">–</b><span>مرات الدخول</span></div>
+    <div class="kpi bad"><b id="kFail">–</b><span>محاولات دخول فاشلة</span></div>
+  </div>
+
+  <div class="card">
+    <h2>ترتيب الموظفين <small>اضغط على الموظف لعرض نشاطه</small></h2>
+    <div class="scroll" id="rankBox"><div class="msg">جاري التحميل...</div></div>
+  </div>
+
+  <div class="card">
+    <h2>آخر النشاطات <small id="actHint"></small><span class="sp"></span></h2>
+    <div class="scroll" id="actBox"><div class="msg">جاري التحميل...</div></div>
+  </div>
+</div>
+
+<script>
+  /* ====== الإعدادات ====== */
+  const AUTH_URL = 'الصق_رابط_تطبيق_الويب_هنا';   // نفس الرابط الموجود في login.html
+
+  const LOGIN_TOOL = 'الدخول';
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const fmt = iso => { try { return new Date(iso).toLocaleString('ar-SA-u-ca-gregory-nu-latn',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}); } catch(e){ return iso; } };
+  const pad = n => String(n).padStart(2,'0');
+  const thisMonth = () => { const d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1); };
+  const MONTHS_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const monthLabel = m => { const [y,mm]=m.split('-'); return (MONTHS_AR[+mm-1]||mm)+' '+y; };
+
+  let DATA = null, selUser = '';
+
+  async function load() {
+    const month = $('fMonth').value || thisMonth();
+    $('rankBox').innerHTML = $('actBox').innerHTML = '<div class="msg">جاري التحميل...</div>';
+    let j;
+    try {
+      const r = await fetch(AUTH_URL, { method:'POST', body: JSON.stringify({ action:'activity', token: NWAuth.token(), month }) });
+      j = await r.json();
+    } catch (e) { return fail('تعذّر الاتصال — تأكد من الإنترنت ومن الرابط في الإعدادات'); }
+    if (j.error === 'AUTH') { NWAuth.relogin(); return fail('انتهت مدة الدخول — سجّل دخول ثم اضغط تحديث'); }
+    if (j.error === 'FORBIDDEN') return fail('هذه الصفحة للمدير فقط');
+    if (!j.ok) return fail('حدث خطأ: ' + (j.message || j.error));
+    DATA = j;
+    fillMonths(j.months, month);
+    fillFilters();
+    render();
+  }
+  function fail(m) { $('rankBox').innerHTML = $('actBox').innerHTML = `<div class="msg err">${esc(m)}</div>`; }
+
+  function fillMonths(list, cur) {
+    const set = new Set(list); set.add(thisMonth()); if (cur !== 'all') set.add(cur);
+    const ms = [...set].sort().reverse();
+    $('fMonth').innerHTML = ms.map(m => `<option value="${m}">${monthLabel(m)}</option>`).join('') + '<option value="all">كل الأشهر</option>';
+    $('fMonth').value = cur;
+  }
+  function fillFilters() {
+    const u = $('fUser').value, t = $('fTool').value;
+    const names = new Map();
+    DATA.users.forEach(x => names.set(x.u, x.n));
+    DATA.rows.forEach(r => { if (r[1] && r[2]) names.set(r[1], r[2]); });
+    $('fUser').innerHTML = '<option value="">كل الموظفين</option>' +
+      [...names].sort((a,b)=>a[1].localeCompare(b[1],'ar')).map(([k,v]) => `<option value="${esc(k)}">${esc(v)}</option>`).join('');
+    const tools = [...new Set(DATA.rows.map(r => r[3]).filter(x => x && x !== LOGIN_TOOL))].sort();
+    $('fTool').innerHTML = '<option value="">كل البرامج</option>' + tools.map(x => `<option>${esc(x)}</option>`).join('');
+    $('fUser').value = [...names.keys()].includes(u) ? u : '';
+    $('fTool').value = tools.includes(t) ? t : '';
+    selUser = $('fUser').value;
+  }
+
+  function filtered() {
+    const u = $('fUser').value, t = $('fTool').value;
+    return DATA.rows.filter(r => (!u || r[1] === u) && (!t || r[3] === t || r[3] === LOGIN_TOOL));
+  }
+
+  function render() {
+    if (!DATA) return;
+    const rows = filtered();
+    const ops = rows.filter(r => r[3] !== LOGIN_TOOL);
+    const logins = rows.filter(r => r[4] === 'تسجيل دخول');
+    const fails = rows.filter(r => r[4] === 'محاولة دخول فاشلة');
+
+    $('kOps').textContent = ops.length;
+    $('kUsers').textContent = new Set(ops.map(r => r[1])).size;
+    $('kLogins').textContent = logins.length;
+    $('kFail').textContent = fails.length;
+
+    // ترتيب الموظفين
+    const tools = [...new Set(ops.map(r => r[3]))].sort();
+    const by = new Map();
+    const get = (u, n) => { if (!by.has(u)) by.set(u, { u, n: n || u, total: 0, tools: {}, logins: 0, last: '' }); const o = by.get(u); if (n) o.n = n; return o; };
+    const fu = $('fUser').value;
+    DATA.users.filter(x => x.active && (!fu || x.u === fu)).forEach(x => get(x.u, x.n));
+    ops.forEach(r => { const o = get(r[1], r[2]); o.total++; o.tools[r[3]] = (o.tools[r[3]] || 0) + 1; if (r[0] > o.last) o.last = r[0]; });
+    logins.forEach(r => { const o = get(r[1], r[2]); o.logins++; if (r[0] > o.last) o.last = r[0]; });
+    const list = [...by.values()].filter(o => o.u).sort((a, b) => b.total - a.total || b.logins - a.logins || a.n.localeCompare(b.n, 'ar'));
+    const max = Math.max(1, ...list.map(o => o.total));
+
+    $('rankBox').innerHTML = !list.length ? '<div class="msg">لا توجد بيانات لهذه الفترة</div>' :
+      `<table><thead><tr><th class="num">#</th><th>الموظف</th><th>إجمالي العمليات</th>
+        ${tools.map(t => `<th class="num">${esc(t)}</th>`).join('')}
+        <th class="num">مرات الدخول</th><th>آخر نشاط</th></tr></thead><tbody>
+      ${list.map((o, i) => `<tr class="emp ${selUser === o.u ? 'sel' : ''}" onclick="pickUser('${esc(o.u)}')">
+        <td class="num"><span class="rank ${o.total && i < 3 ? 'g' + (i + 1) : ''}">${i + 1}</span></td>
+        <td><b>${esc(o.n)}</b><div class="muted" style="font-size:12px" dir="ltr">${esc(o.u)}</div></td>
+        <td><div class="bar"><i style="width:${Math.round(o.total / max * 110)}px;${o.total ? '' : 'background:#e5e7eb'}"></i><b class="${o.total ? '' : 'zero'}">${o.total}</b></div></td>
+        ${tools.map(t => `<td class="num ${o.tools[t] ? '' : 'zero'}">${o.tools[t] || 0}</td>`).join('')}
+        <td class="num ${o.logins ? '' : 'zero'}">${o.logins}</td>
+        <td class="muted">${o.last ? esc(fmt(o.last)) : '—'}</td></tr>`).join('')}
+      </tbody></table>`;
+
+    // آخر النشاطات
+    const act = rows.filter(r => !selUser || r[1] === selUser).sort((a, b) => b[0].localeCompare(a[0])).slice(0, 150);
+    $('actHint').textContent = selUser ? '— ' + ((by.get(selUser) || {}).n || selUser) : '(آخر 150)';
+    $('actBox').innerHTML = !act.length ? '<div class="msg">لا توجد نشاطات</div>' :
+      `<table><thead><tr><th>الوقت</th><th>الموظف</th><th>البرنامج</th><th>العملية</th><th>المرجع</th><th>تفاصيل</th></tr></thead><tbody>
+      ${act.map(r => `<tr><td class="muted">${esc(fmt(r[0]))}</td><td>${esc(r[2] || r[1])}</td><td>${esc(r[3])}</td>
+        <td><span class="tag ${r[4] === 'محاولة دخول فاشلة' ? 'bad' : r[3] === LOGIN_TOOL ? '' : 'ok'}">${esc(r[4])}</span></td>
+        <td dir="ltr" style="text-align:right">${esc(r[5])}</td><td class="muted" style="white-space:normal;min-width:160px">${esc(r[6])}</td></tr>`).join('')}
+      </tbody></table>`;
+  }
+
+  function pickUser(u) {
+    selUser = selUser === u ? '' : u;
+    render();
+    if (selUser) $('actBox').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function exportCsv() {
+    if (!DATA) return;
+    const rows = filtered();
+    const head = ['الوقت', 'اسم المستخدم', 'الاسم', 'البرنامج', 'العملية', 'المرجع', 'تفاصيل'];
+    const csv = '﻿' + [head, ...rows.map(r => [fmt(r[0]), ...r.slice(1)])]
+      .map(r => r.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    a.download = `أداء_الموظفين_${$('fMonth').value}.csv`;
+    a.click();
+  }
+
+  $('fMonth').addEventListener('change', load);
+  $('fUser').addEventListener('change', () => { selUser = $('fUser').value; render(); });
+  $('fTool').addEventListener('change', render);
+
+  $('fMonth').innerHTML = `<option value="${thisMonth()}">${monthLabel(thisMonth())}</option>`;
+  if (window.NWAuth) load();
+</script>
+</body>
+</html>
