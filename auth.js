@@ -1,0 +1,282 @@
+/******************************************************************
+ *  حارس الدخول — Northwest Bus · أدوات التشغيل
+ *  يوضع في مستودع all-op، ويُضاف في <head> كل برنامج:
+ *
+ *  <script src="https://hanode40-sketch.github.io/all-op/auth.js" data-tool="shift"></script>
+ *
+ *  data-tool = رمز البرنامج (accident, violation, shift, evaluation, trip, uniform, dashboard)
+ *  في صفحة الهب الرئيسية اتركه بدون data-tool.
+ ******************************************************************/
+(function () {
+  'use strict';
+
+  var LOGIN_URL = 'https://hanode40-sketch.github.io/all-op/login.html';
+  var HOME_URL  = 'https://hanode40-sketch.github.io/all-op/';
+  var KEY = 'nw_auth_v1';
+  var IDLE_KEY = 'nw_last_active';
+  var IDLE_MS = 2 * 60 * 60 * 1000;   // يقفل بعد ساعتين بدون أي نشاط (غيّر الرقم 2 لتغيير المدة)
+
+  var script = document.currentScript;
+  var TOOL = (script && script.getAttribute('data-tool')) || '';
+  // شريط اسم الموظف وزر الخروج: يظهر في الصفحة الرئيسية فقط (البرامج بدون شريط)
+  var BAR_ATTR = script && script.getAttribute('data-bar');
+  var SHOW_BAR = BAR_ATTR === 'on' || (!TOOL && BAR_ATTR !== 'off');
+
+  /* ---------- الوضع الليلي: يتبع اختيار الصفحة الرئيسية ---------- */
+  var THEME_KEY = 'nwTheme';
+  var root = document.documentElement;
+  var NATIVE_THEME = root.hasAttribute('data-theme');   // صفحات لها تصميم ليلي خاص (الهب، الأداء)
+  function themeNow() {
+    try {
+      return localStorage.getItem(THEME_KEY) ||
+        (window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    } catch (e) { return 'light'; }
+  }
+  function applyTheme() {
+    var t = themeNow();
+    if (NATIVE_THEME) { root.setAttribute('data-theme', t); return; }
+    if (t === 'dark') root.setAttribute('data-nw-dark', ''); else root.removeAttribute('data-nw-dark');
+  }
+  (function () {
+    var st = document.createElement('style');
+    var re = 'filter:invert(1) hue-rotate(180deg)';
+    st.textContent =
+      'html[data-nw-dark]{' + re + '}' +
+      'html[data-nw-dark] img,html[data-nw-dark] video,html[data-nw-dark] canvas,html[data-nw-dark] iframe,' +
+      'html[data-nw-dark] body::before,html[data-nw-dark] .nwa-bar,html[data-nw-dark] .nwa-ban,html[data-nw-dark] .nwa-deny{' + re + '}' +
+      '@media print{html[data-nw-dark]{filter:none}html[data-nw-dark] img,html[data-nw-dark] canvas{filter:none}}';
+    (document.head || root).appendChild(st);
+    applyTheme();
+    window.addEventListener('storage', function (ev) { if (ev.key === THEME_KEY) applyTheme(); });
+    try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme); } catch (e) {}
+  })();
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; }
+  }
+  function decode(token) {
+    try {
+      var b = String(token).split('.')[0].replace(/-/g, '+').replace(/_/g, '/');
+      while (b.length % 4) b += '=';
+      var bin = atob(b), bytes = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return JSON.parse(new TextDecoder('utf-8').decode(bytes));
+    } catch (e) { return null; }
+  }
+  function lastActive() {
+    var s = load(), a = 0;
+    try { a = Number(localStorage.getItem(IDLE_KEY) || 0); } catch (e) {}
+    return Math.max(a, (s && s.at) || 0);   // وقت الدخول يُحسب كنشاط
+  }
+  function idleExpired() { return Date.now() - lastActive() > IDLE_MS; }
+  function current() {
+    var s = load();
+    if (!s || !s.token) return null;
+    var p = decode(s.token);
+    if (!p || !p.exp || p.exp <= Date.now()) return null;
+    if (idleExpired()) {                      // خمول أكثر من المدة المحددة: خروج
+      try { localStorage.removeItem(KEY); } catch (e) {}
+      return null;
+    }
+    return p;
+  }
+  function can(user, tool) {
+    if (!tool) return true;
+    var t = (user && user.t) || [];
+    return t.indexOf('all') > -1 || t.indexOf(String(tool).toLowerCase()) > -1;
+  }
+  function toLogin() {
+    location.replace(LOGIN_URL + '?next=' + encodeURIComponent(location.href));
+  }
+  function logout() {
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    location.replace(LOGIN_URL);
+  }
+
+  // رابط نظام الدخول يُقرأ من login.html (مكان واحد للرابط)
+  var authUrlP = null;
+  function getAuthUrl() {
+    if (!authUrlP) authUrlP = fetch(LOGIN_URL).then(function (r) { return r.text(); })
+      .then(function (t) { var m = t.match(/AUTH_URL\s*=\s*'([^']+)'/); return m ? m[1] : ''; })
+      .catch(function () { return ''; });
+    return authUrlP;
+  }
+
+  var user = current();
+  if (!user) {
+    document.documentElement.style.visibility = 'hidden';
+    toLogin();
+    return;
+  }
+
+  var api = {
+    user: user,
+    name: user.n,
+    username: user.u,
+    role: user.r,
+    garages: user.g || [],                 // كراجات الموظف (فاضي = الكل)
+    token: function () { var s = load(); return (s && s.token) || ''; },
+    /** يضيف التوكن واسم الموظف للبيانات قبل إرسالها لـ Apps Script */
+    attach: function (obj) {
+      obj = obj || {};
+      obj.authToken = api.token();
+      obj.authUser = user.n;
+      return obj;
+    },
+    can: function (tool) { return can(user, tool); },
+    /** تسجيل عملية في «سجل النشاط» (لصفحة أداء الموظفين) — للبرامج اللي ما لها Apps Script */
+    log: function (act, ref, details, tool) {
+      return getAuthUrl().then(function (u) {
+        if (!u) return;
+        return fetch(u, { method: 'POST', keepalive: true, body: JSON.stringify({
+          action: 'log', token: api.token(), tool: tool || TOOL, act: act || '', ref: ref || '', details: details || '' }) })
+          .catch(function () {});
+      });
+    },
+    isAuthError: function (res) { return !!res && res.error === 'AUTH'; },
+    relogin: function () { showExpired(); },
+    logout: logout
+  };
+  window.NWAuth = api;
+
+  /* ---------- الواجهة ---------- */
+
+  var css =
+    '.nwa-bar{position:fixed;bottom:12px;inset-inline-start:12px;z-index:99999;display:flex;align-items:center;gap:8px;' +
+    'background:rgba(11,61,92,.92);color:#fff;font:13px/1.2 Tajawal,system-ui,sans-serif;padding:6px 6px 6px 12px;' +
+    'border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.25);direction:rtl;margin-bottom:env(safe-area-inset-bottom)}' +
+    '.nwa-bar button,.nwa-ban button{border:0;border-radius:999px;padding:6px 12px;font:inherit;cursor:pointer}' +
+    '.nwa-bar button{background:#fff;color:#0b3d5c;font-weight:700}' +
+    '.nwa-ban{position:fixed;top:0;left:0;right:0;z-index:100000;background:#b91c1c;color:#fff;direction:rtl;' +
+    'font:14px/1.4 Tajawal,system-ui,sans-serif;padding:10px 14px;display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}' +
+    '.nwa-ban button{background:#fff;color:#b91c1c;font-weight:700}' +
+    '.nwa-deny{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;direction:rtl;' +
+    'font-family:Tajawal,system-ui,sans-serif;background:#0b3d5c;color:#fff;text-align:center}' +
+    '.nwa-deny a{display:inline-block;margin-top:16px;background:#fff;color:#0b3d5c;padding:10px 20px;border-radius:999px;text-decoration:none;font-weight:700}' +
+    '.nwa-inline{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.94);color:#1a1a1a;border:1px solid rgba(255,255,255,.6);' +
+    'border-radius:999px;padding:4px 4px 4px 12px;font:600 13px/1.2 inherit;box-shadow:0 4px 12px rgba(10,25,55,.15);min-width:0;flex:0 1 auto;overflow:hidden}' +
+    '.nwa-inline span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}' +
+    '.nwa-inline button{border:0;border-radius:999px;padding:5px 12px;font:inherit;cursor:pointer;background:#fdecea;color:#b3261e;font-weight:700}' +
+    'html[data-theme="dark"] .nwa-inline{background:rgba(22,28,40,.92);color:#e5e7eb;border-color:rgba(255,255,255,.12)}' +
+    'html[data-theme="dark"] .nwa-inline button{background:#3a1e22;color:#f87171}' +
+    '@media print{.nwa-bar,.nwa-ban,.nwa-inline{display:none!important}}';
+
+  function el(tag, cls, html) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (html != null) n.innerHTML = html;
+    return n;
+  }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  var banner = null;
+  function showExpired() {
+    if (banner || !document.body) return;
+    banner = el('div', 'nwa-ban',
+      '<span>انتهت مدة الدخول — سجّل الدخول مرة ثانية ولن تفقد البيانات المكتوبة · Session expired</span>');
+    var b = el('button', '', 'تسجيل الدخول');
+    b.onclick = function () { window.open(LOGIN_URL + '?next=close', '_blank'); };
+    banner.appendChild(b);
+    document.body.appendChild(banner);
+  }
+
+  // عند تسجيل الدخول من تبويب آخر: إخفاء التنبيه وتحديث البيانات
+  window.addEventListener('storage', function (ev) {
+    if (ev.key !== KEY) return;
+    var u = current();
+    if (u) {
+      user = u; api.user = u; api.name = u.n; api.username = u.u; api.role = u.r; api.garages = u.g || [];
+      if (banner) { banner.remove(); banner = null; }
+      scheduleExpiry();
+    } else {
+      showExpired();
+    }
+  });
+
+  var timer = null;
+  function scheduleExpiry() {
+    clearTimeout(timer);
+    var ms = user.exp - Date.now();
+    if (ms > 0 && ms < 2147483647) timer = setTimeout(showExpired, ms);
+  }
+
+  /* ---------- القفل بعد الخمول ---------- */
+  var lastWrite = 0;
+  function markActive() {
+    if (banner) return;                        // بعد انتهاء الجلسة لا نجدد النشاط
+    var now = Date.now();
+    if (now - lastWrite < 30000) return;       // تسجيل مرة كل 30 ثانية كحد أقصى
+    lastWrite = now;
+    try { localStorage.setItem(IDLE_KEY, String(now)); } catch (e) {}
+  }
+  function checkIdle() {
+    if (banner || !load()) return;
+    if (idleExpired()) {
+      try { localStorage.removeItem(KEY); } catch (e) {}
+      showExpired();                           // البيانات المكتوبة تبقى في الصفحة
+    }
+  }
+  function startIdleWatch() {
+    ['click', 'keydown', 'touchstart', 'scroll', 'input'].forEach(function (ev) {
+      window.addEventListener(ev, markActive, { passive: true, capture: true });
+    });
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'visible') checkIdle();   // عند الرجوع للتبويب
+    });
+    setInterval(checkIdle, 60000);
+    markActive();
+  }
+
+  function init() {
+    var style = el('style'); style.textContent = css;
+    document.head.appendChild(style);
+
+    if (TOOL && !can(user, TOOL)) {
+      document.body.innerHTML =
+        '<div class="nwa-deny"><div><div style="font-size:48px">🔒</div>' +
+        '<h2 style="margin:8px 0">ليس لديك صلاحية لهذا البرنامج</h2>' +
+        '<div style="opacity:.8">No permission for this tool · ' + esc(user.n) + '</div>' +
+        '<a href="' + HOME_URL + '">الرجوع لأدوات التشغيل</a></div></div>';
+      return;
+    }
+
+    // إخفاء بطاقات الأدوات غير المسموحة (في الهب): <a data-tool="shift">
+    document.querySelectorAll('[data-tool]').forEach(function (n) {
+      if (n !== script && !can(user, n.getAttribute('data-tool'))) n.style.display = 'none';
+    });
+
+    // تعبئة اسم الموظف تلقائيًا: <input data-auth="name"> أو <span data-auth="name">
+    document.querySelectorAll('[data-auth]').forEach(function (n) {
+      var key = n.getAttribute('data-auth');
+      var val = key === 'name' ? user.n : key === 'username' ? user.u : key === 'role' ? user.r : '';
+      if ('value' in n && n.tagName !== 'BUTTON') { n.value = val; n.readOnly = true; }
+      else n.textContent = val;
+    });
+
+    var slot = document.getElementById('nw-user-slot');   // مكان مخصص في الصفحة (مثل الصفحة الرئيسية)
+    if (slot && SHOW_BAR) {
+      slot.classList.add('nwa-inline');
+      slot.innerHTML = '👤<span dir="auto">' + esc(user.n) + '</span>';
+      var out2 = el('button', '', 'خروج');
+      out2.type = 'button';
+      out2.onclick = function () { if (confirm('تسجيل الخروج؟')) logout(); };
+      slot.appendChild(out2);
+    } else if (SHOW_BAR) {
+      var bar = el('div', 'nwa-bar', '<span>👤 ' + esc(user.n) + '</span>');
+      var out = el('button', '', 'خروج');
+      out.onclick = function () { if (confirm('تسجيل الخروج؟')) logout(); };
+      bar.appendChild(out);
+      document.body.appendChild(bar);
+    }
+
+    scheduleExpiry();
+    startIdleWatch();
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
