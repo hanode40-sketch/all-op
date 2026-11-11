@@ -43,7 +43,7 @@
     st.textContent =
       'html[data-nw-dark]{' + re + '}' +
       'html[data-nw-dark] img,html[data-nw-dark] video,html[data-nw-dark] canvas,html[data-nw-dark] iframe,' +
-      'html[data-nw-dark] body::before,html[data-nw-dark] .nwa-bar,html[data-nw-dark] .nwa-ban,html[data-nw-dark] .nwa-deny{' + re + '}' +
+      'html[data-nw-dark] body::before,html[data-nw-dark] .nws,html[data-nw-dark] .nwa-bar,html[data-nw-dark] .nwa-ban,html[data-nw-dark] .nwa-deny{' + re + '}' +
       '@media print{html[data-nw-dark]{filter:none}html[data-nw-dark] img,html[data-nw-dark] canvas{filter:none}}';
     (document.head || root).appendChild(st);
     applyTheme();
@@ -231,6 +231,98 @@
     markActive();
   }
 
+
+  /* ================= القائمة الجانبية (الكمبيوتر فقط ≥ 1100px) ================= */
+  var SIDE_KEY = 'nwSideMini';
+  var SIDE_ITEMS = [
+    { g: 0, t: '',            ic: '🏠', ar: 'الرئيسية',            en: 'Home',              url: HOME_URL },
+    { g: 1, t: 'shift',       ic: '🔄', ar: 'تسليم الوردية',       en: 'Shift Handover',    url: 'https://hanode40-sketch.github.io/shift_handover/' },
+    { g: 1, t: 'tasks',       ic: '✅', ar: 'المهام',              en: 'Tasks',             url: 'https://hanode40-sketch.github.io/tasks/' },
+    { g: 1, t: 'trip',        ic: '🚌', ar: 'مسار الرحلة',         en: 'Trip Route',        url: 'https://hanode40-sketch.github.io/trip/' },
+    { g: 2, t: 'violation',   ic: '📝', ar: 'محضر مخالفة',         en: 'Violation Report',  url: 'https://hanode40-sketch.github.io/violation/' },
+    { g: 2, t: 'accident',    ic: '🚨', ar: 'تقرير حادث',          en: 'Accident Report',   url: 'https://hanode40-sketch.github.io/accident_report/' },
+    { g: 2, t: 'evaluation',  ic: '⭐', ar: 'تقييم السائقين',      en: 'Driver Evaluation', url: 'https://hanode40-sketch.github.io/OP/' },
+    { g: 3, t: 'performance', ic: '📊', ar: 'أداء الموظفين',       en: 'Staff Performance', url: HOME_URL + 'performance.html' }
+  ];
+  var SIDE_GROUPS = [null, ['التشغيل اليومي', 'Daily operations'], ['التقارير والسلامة', 'Reports & safety'], ['الإدارة', 'Management']];
+  var ROLE_EN = { 'مدير': 'Manager', 'مشرف': 'Supervisor', 'مرحّل': 'Dispatcher', 'مرحل': 'Dispatcher', 'موظف': 'Employee' };
+  var sideCss =
+    '.nws{display:none}' +
+    '@media screen and (min-width:1100px){' +
+      'html.nws-on .nws{display:flex}' +
+      'html.nws-on .nwa-bar,html.nws-on #nw-user-slot{display:none!important}' +
+      'html.nws-on.nws-r body{margin-right:248px!important}html.nws-on.nws-l body{margin-left:248px!important}' +
+      'html.nws-on.nws-mini.nws-r body{margin-right:76px!important}html.nws-on.nws-mini.nws-l body{margin-left:76px!important}' +
+    '}' +
+    '.nws{position:fixed;top:0;bottom:0;width:248px;z-index:99990;flex-direction:column;background:linear-gradient(180deg,#0f1d38 0%,#0b1529 100%);' +
+      'color:#cbd5e1;font:14px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;box-shadow:0 0 0 1px rgba(255,255,255,.04),0 10px 30px rgba(0,0,0,.25);transition:width .2s}' +
+    'html.nws-r .nws{right:0}html.nws-l .nws{left:0}html.nws-mini .nws{width:76px}' +
+    '.nws *{box-sizing:border-box}' +
+    '.nws-head{display:flex;align-items:center;gap:10px;padding:18px 16px 16px;border-bottom:1px solid rgba(255,255,255,.07)}' +
+    '.nws-logo{width:42px;height:42px;flex-shrink:0;border-radius:12px;background:linear-gradient(135deg,#f28c28,#e8611a);color:#fff;font-weight:900;font-size:16px;display:flex;align-items:center;justify-content:center;letter-spacing:.5px}' +
+    '.nws-brand{flex:1;min-width:0}.nws-brand b{display:block;color:#fff;font-size:15px}.nws-brand small{color:#7f8ea8;font-size:12px}' +
+    '.nws-tog{background:rgba(255,255,255,.06);border:0;color:#9fb0c9;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:14px;flex-shrink:0}' +
+    '.nws-tog:hover{background:rgba(255,255,255,.12);color:#fff}' +
+    '.nws-nav{flex:1;overflow-y:auto;padding:10px 10px}' +
+    '.nws-g{font-size:11px;font-weight:700;color:#5f6f8a;text-transform:uppercase;letter-spacing:.5px;padding:16px 10px 6px}' +
+    '.nws-i{display:flex;align-items:center;gap:12px;padding:10px 12px;margin:2px 0;border-radius:10px;color:#cbd5e1;text-decoration:none;font-weight:600;position:relative;transition:background .15s,color .15s}' +
+    '.nws-i:hover{background:rgba(255,255,255,.06);color:#fff}' +
+    '.nws-i .ic{width:30px;height:30px;flex-shrink:0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(255,255,255,.05)}' +
+    '.nws-i.on{background:rgba(242,140,40,.14);color:#fff}.nws-i.on .ic{background:#f28c28}' +
+    '.nws-i.on::before{content:"";position:absolute;top:8px;bottom:8px;width:3px;border-radius:3px;background:#f28c28}' +
+    'html.nws-r .nws-i.on::before{right:-10px}html.nws-l .nws-i.on::before{left:-10px}' +
+    '.nws-foot{display:flex;align-items:center;gap:10px;padding:14px 14px 16px;border-top:1px solid rgba(255,255,255,.07)}' +
+    '.nws-av{width:38px;height:38px;flex-shrink:0;border-radius:50%;background:#1f3f7a;color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center}' +
+    '.nws-u{flex:1;min-width:0}.nws-u b{display:block;color:#fff;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nws-u small{color:#7f8ea8;font-size:12px}' +
+    '.nws-out{background:rgba(239,68,68,.12);color:#fca5a5;border:0;border-radius:8px;padding:7px 10px;cursor:pointer;font:inherit;font-size:12px;font-weight:700;flex-shrink:0}' +
+    '.nws-out:hover{background:rgba(239,68,68,.25);color:#fff}' +
+    'html.nws-mini .nws .tx,html.nws-mini .nws-brand,html.nws-mini .nws-u,html.nws-mini .nws-out{display:none}' +
+    'html.nws-mini .nws-head{flex-direction:column;padding:16px 8px}html.nws-mini .nws-g{font-size:0;padding:8px 0;margin:6px 10px;border-top:1px solid rgba(255,255,255,.08)}' +
+    'html.nws-mini .nws-i{justify-content:center;padding:8px 0}html.nws-mini .nws-foot{justify-content:center}' +
+    '@media print{.nws{display:none!important}html.nws-on body{margin:0!important}}';
+
+  function buildSide(user) {
+    var st = el('style'); st.textContent = sideCss; document.head.appendChild(st);
+    var nav = el('nav', 'nws'); nav.setAttribute('aria-label', 'menu');
+    document.body.appendChild(nav);
+    var here = location.href.split('#')[0].split('?')[0];
+    function isOn(it) {
+      if (TOOL) return it.t === TOOL;
+      if (!it.t) return /\/all-op\/(index\.html)?$/.test(here);
+      return false;
+    }
+    function render() {
+      var en = false; try { en = localStorage.getItem('hubLang') === 'en'; } catch (e) {}
+      var dirR = (document.documentElement.getAttribute('dir') || document.dir || 'rtl') !== 'ltr';
+      root.classList.toggle('nws-r', dirR); root.classList.toggle('nws-l', !dirR);
+      nav.setAttribute('dir', en ? 'ltr' : 'rtl');
+      var h = '<div class="nws-head"><div class="nws-logo">NW</div><div class="nws-brand"><b>' + (en ? 'Operations Tools' : 'أدوات التشغيل') +
+        '</b><small>Northwest Bus</small></div><button class="nws-tog" type="button" title="' + (en ? 'Collapse' : 'تصغير') + '">☰</button></div><div class="nws-nav">';
+      var lastG = -1;
+      SIDE_ITEMS.forEach(function (it) {
+        if (it.t && !can(user, it.t)) return;
+        if (it.g !== lastG && SIDE_GROUPS[it.g]) h += '<div class="nws-g">' + SIDE_GROUPS[it.g][en ? 1 : 0] + '</div>';
+        lastG = it.g;
+        var name = en ? it.en : it.ar;
+        h += '<a class="nws-i' + (isOn(it) ? ' on' : '') + '" href="' + it.url + '" title="' + esc(name) + '"><span class="ic">' + it.ic + '</span><span class="tx">' + esc(name) + '</span></a>';
+      });
+      var nm = String(user.n || ''), role = user.r || '';
+      h += '</div><div class="nws-foot"><div class="nws-av">' + esc(nm.trim().charAt(0).toUpperCase() || '؟') + '</div><div class="nws-u"><b dir="auto" title="' + esc(nm) + '">' + esc(nm) +
+        '</b><small>' + esc(en ? (ROLE_EN[role] || role) : role) + '</small></div><button class="nws-out" type="button">' + (en ? 'Sign out' : 'خروج') + '</button></div>';
+      nav.innerHTML = h;
+      nav.querySelector('.nws-out').onclick = function () { if (confirm(en ? 'Sign out?' : 'تسجيل الخروج؟')) logout(); };
+      nav.querySelector('.nws-tog').onclick = function () {
+        var mini = !root.classList.contains('nws-mini'); root.classList.toggle('nws-mini', mini);
+        try { localStorage.setItem(SIDE_KEY, mini ? '1' : '0'); } catch (e) {}
+      };
+    }
+    try { if (localStorage.getItem(SIDE_KEY) === '1') root.classList.add('nws-mini'); } catch (e) {}
+    root.classList.add('nws-on');
+    render();
+    window.addEventListener('storage', function (ev) { if (ev.key === 'hubLang') setTimeout(render, 50); });
+    new MutationObserver(function () { render(); }).observe(root, { attributes: true, attributeFilter: ['dir', 'lang'] });
+  }
+
   function init() {
     var style = el('style'); style.textContent = css;
     document.head.appendChild(style);
@@ -248,6 +340,9 @@
     document.querySelectorAll('[data-tool]').forEach(function (n) {
       if (n !== script && !can(user, n.getAttribute('data-tool'))) n.style.display = 'none';
     });
+
+    // القائمة الجانبية على الكمبيوتر (مكان واحد لكل البرامج) — تُلغى بـ data-side="off"
+    if (!(script && script.getAttribute('data-side') === 'off')) { try { buildSide(user); } catch (e) { console.error(e); } }
 
     // تعبئة اسم الموظف تلقائيًا: <input data-auth="name"> أو <span data-auth="name">
     document.querySelectorAll('[data-auth]').forEach(function (n) {
