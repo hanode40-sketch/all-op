@@ -250,7 +250,7 @@
     '.nws{display:none}' +
     '@media screen and (min-width:1100px){' +
       'html.nws-on .nws{display:flex}' +
-      'html.nws-on .nwa-bar,html.nws-on #nw-user-slot{display:none!important}' +
+      'html.nws-on .nwa-bar,html.nws-on #nw-user-slot,html.nws-on .lang-bar{display:none!important}' +
       'html.nws-on.nws-r body{margin-right:248px!important}html.nws-on.nws-l body{margin-left:248px!important}' +
       'html.nws-on.nws-mini.nws-r body{margin-right:76px!important}html.nws-on.nws-mini.nws-l body{margin-left:76px!important}' +
     '}' +
@@ -258,6 +258,11 @@
       'color:#cbd5e1;font:14px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;box-shadow:0 0 0 1px rgba(255,255,255,.04),0 10px 30px rgba(0,0,0,.25);transition:width .2s}' +
     'html.nws-r .nws{right:0}html.nws-l .nws{left:0}html.nws-mini .nws{width:76px}' +
     '.nws *{box-sizing:border-box}' +
+    '.nws-top{display:flex;gap:8px;padding:14px 16px 0}' +
+    '.nws-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.08);color:#dbe4f0;' +
+      'border-radius:9px;padding:7px 8px;cursor:pointer;font:inherit;font-size:12.5px;font-weight:700;transition:background .15s}' +
+    '.nws-btn:hover{background:rgba(255,255,255,.14);color:#fff}' +
+    'html.nws-mini .nws-top{flex-direction:column;padding:12px 10px 0}html.nws-mini .nws-btn .bt{display:none}' +
     '.nws-head{display:flex;align-items:center;gap:10px;padding:18px 16px 16px;border-bottom:1px solid rgba(255,255,255,.07)}' +
     '.nws-logo{width:42px;height:42px;flex-shrink:0;border-radius:12px;background:linear-gradient(135deg,#f28c28,#e8611a);color:#fff;font-weight:900;font-size:16px;display:flex;align-items:center;justify-content:center;letter-spacing:.5px}' +
     '.nws-brand{flex:1;min-width:0}.nws-brand b{display:block;color:#fff;font-size:15px}.nws-brand small{color:#7f8ea8;font-size:12px}' +
@@ -296,7 +301,11 @@
       var dirR = (document.documentElement.getAttribute('dir') || document.dir || 'rtl') !== 'ltr';
       root.classList.toggle('nws-r', dirR); root.classList.toggle('nws-l', !dirR);
       nav.setAttribute('dir', en ? 'ltr' : 'rtl');
-      var h = '<div class="nws-head"><div class="nws-logo">NW</div><div class="nws-brand"><b>' + (en ? 'Operations Tools' : 'أدوات التشغيل') +
+      var dark = themeNow() === 'dark';
+      var h = '<div class="nws-top"><button class="nws-btn nws-theme" type="button" title="' + (dark ? (en ? 'Light mode' : 'الوضع النهاري') : (en ? 'Dark mode' : 'الوضع الليلي')) + '">' +
+        (dark ? '☀️' : '🌙') + '<span class="bt">' + (dark ? (en ? 'Light' : 'نهاري') : (en ? 'Dark' : 'ليلي')) + '</span></button>' +
+        '<button class="nws-btn nws-lang" type="button" title="' + (en ? 'العربية' : 'English') + '">🌐<span class="bt">' + (en ? 'العربية' : 'English') + '</span></button></div>' +
+        '<div class="nws-head"><div class="nws-logo">NW</div><div class="nws-brand"><b>' + (en ? 'Operations Tools' : 'أدوات التشغيل') +
         '</b><small>Northwest Bus</small></div><button class="nws-tog" type="button" title="' + (en ? 'Collapse' : 'تصغير') + '">☰</button></div><div class="nws-nav">';
       var lastG = -1;
       SIDE_ITEMS.forEach(function (it) {
@@ -311,6 +320,22 @@
         '</b><small>' + esc(en ? (ROLE_EN[role] || role) : role) + '</small></div><button class="nws-out" type="button">' + (en ? 'Sign out' : 'خروج') + '</button></div>';
       nav.innerHTML = h;
       nav.querySelector('.nws-out').onclick = function () { if (confirm(en ? 'Sign out?' : 'تسجيل الخروج؟')) logout(); };
+      nav.querySelector('.nws-theme').onclick = function () {
+        var pb = document.getElementById('theme-btn');           // الصفحة الرئيسية لها زرها الخاص
+        if (pb) pb.click();
+        else { var t = themeNow() === 'dark' ? 'light' : 'dark'; try { localStorage.setItem(THEME_KEY, t); } catch (e) {} applyTheme(); }
+        setTimeout(render, 30);
+      };
+      nav.querySelector('.nws-lang').onclick = function () {
+        var pb = document.getElementById('lang-btn');
+        if (pb) { pb.click(); }
+        else {
+          var v = en ? 'ar' : 'en'; try { localStorage.setItem('hubLang', v); } catch (e) {}
+          // نفس التبويب ما يوصله حدث storage تلقائياً — نرسله للبرنامج عشان يغيّر لغته
+          try { window.dispatchEvent(new StorageEvent('storage', { key: 'hubLang', newValue: v })); } catch (e) {}
+        }
+        setTimeout(render, 60);
+      };
       nav.querySelector('.nws-tog').onclick = function () {
         var mini = !root.classList.contains('nws-mini'); root.classList.toggle('nws-mini', mini);
         try { localStorage.setItem(SIDE_KEY, mini ? '1' : '0'); } catch (e) {}
