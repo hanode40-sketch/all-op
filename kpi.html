@@ -414,7 +414,7 @@ async function load(force) {
   if (a.error === 'AUTH') { NWAuth.relogin(); return fail(t_('eAuth')); }
   if (a.error === 'FORBIDDEN') return fail(t_('eForbidden'));
   if (!a.ok) return fail(t_('eErr') + (a.message || a.error));
-  ALL = a.rows || []; USERS = a.users || []; NWStats.setUsers(USERS);
+  ALL = (a.rows || []).filter(r => !NWStats.isRemoved(r)); USERS = a.users || []; NWStats.setUsers(USERS);
   const months = new Set(ALL.map(monthOf)); months.add(thisMonth());
   const cur = $('fMonth').value || thisMonth();
   $('fMonth').innerHTML = [...months].sort().reverse().map(m => `<option value="${m}">${monthLabel(m)}</option>`).join('');

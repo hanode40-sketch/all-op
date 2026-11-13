@@ -71,11 +71,16 @@
   function fetchMonth(month, force) {
     if (!force && cache[month] && Date.now() - cache[month].at < 60000) return cache[month].p;
     var p = fetch(AUTH_URL, { method:'POST', body: JSON.stringify({ action:'activity', token: window.NWAuth ? NWAuth.token() : '', month: month }) })
-      .then(function (r) { return r.json(); });
+      .then(function (r) { return r.json(); }).then(function (j) { regDel(j); return j; });
     cache[month] = { at: Date.now(), p: p };
     p.catch(function () { delete cache[month]; });
     return p;
   }
+  /* السجلات المحذوفة أو الملغاة: تنشال من كل الإحصائيات (التسليم + استلامه، المهمة الملغاة، التقييم المحذوف) */
+  var DEL = {};
+  var DEL_RE = /حذف|إلغاء|delete|cancel/i;
+  function regDel(j) { ((j && j.rows) || []).forEach(function (r) { if (r[5] && DEL_RE.test(act(r))) DEL[r[3] + '|' + String(r[5]).trim()] = 1; }); }
+  function isRemoved(r) { return DEL_RE.test(act(r)) || (r[5] && DEL[r[3] + '|' + String(r[5]).trim()] === 1); }
   var USERS = [];
   function setUsers(u) { if (u && u.length) USERS = u; }
   function userGarages(u) {
@@ -86,7 +91,7 @@
   function opsRows(data, f) {
     f = f || {};
     return ((data && data.rows) || []).filter(function (r) {
-      return r[3] && r[3] !== LOGIN_TOOL && (!f.tool || r[3] === f.tool) && (!f.garage || userGarages(r[1]).indexOf(f.garage) > -1);
+      return r[3] && r[3] !== LOGIN_TOOL && !isRemoved(r) && (!f.tool || r[3] === f.tool) && (!f.garage || userGarages(r[1]).indexOf(f.garage) > -1);
     });
   }
 
@@ -384,7 +389,7 @@
 
   window.NWStats = {
     AUTH_URL: AUTH_URL, TOOLS: TOOLS, fetchMonth: fetchMonth, setUsers: setUsers, userGarages: userGarages, allGarages: allGarages,
-    opsRows: opsRows, kpis: kpis, tileHtml: tileHtml, reg: reg, details: details, exportCsv: exportCsv,
+    opsRows: opsRows, isRemoved: isRemoved, kpis: kpis, tileHtml: tileHtml, reg: reg, details: details, exportCsv: exportCsv,
     toolName: toolName, opName: opName, toolColor: toolColor, t: t, thisMonth: thisMonth, prevMonth: prevMonth, mountHub: mountHub
   };
 

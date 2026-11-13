@@ -253,7 +253,7 @@
     ['daily','byTool','heat','topActs','byGarage'].forEach(id => $(id).innerHTML = `<div class="msg">${t_('loading')}</div>`);
     let a, b = null;
     try {
-      [a, b] = await Promise.all([fetchMonth(month), month==='all' ? Promise.resolve(null) : fetchMonth(prevMonth(month)).catch(()=>null)]);
+      [a, b] = await Promise.all([NWStats.fetchMonth(month, true), month==='all' ? Promise.resolve(null) : NWStats.fetchMonth(prevMonth(month), true).catch(()=>null)]);
     } catch (e) { return fail(t_('eNet')); }
     if (a.error === 'AUTH') { NWAuth.relogin(); return fail(t_('eAuth')); }
     if (a.error === 'FORBIDDEN') return fail(t_('eForbidden'));
@@ -276,7 +276,7 @@
   }
 
   /* كراجات الموظف: من شيت المستخدمين (g) إن وُجدت */
-  const userGarages = u => { const x = USERS.find(v => v.u === u); const g = x && (x.g || x.garages); return Array.isArray(g) ? g : (g ? String(g).split(/[,،]/).map(s=>s.trim()).filter(Boolean) : []); };
+  const userGarages = u => { const x = USERS.find(v => v.u === u); const g = x && (x.g || x.garages || x.garage || x.gr || x.depot || x['الكراج']); return Array.isArray(g) ? g : (g ? String(g).split(/[,،]/).map(s=>s.trim()).filter(Boolean) : []); };
   function allGarages() { const s = new Set(); USERS.forEach(x => userGarages(x.u).forEach(g => s.add(g))); return [...s].sort(); }
 
   function fillFilters() {
@@ -293,7 +293,7 @@
   function ops(data) {
     if (!data) return [];
     const g = $('fGarage').value, t = $('fTool').value;
-    return (data.rows || []).filter(r => r[3] && r[3] !== LOGIN_TOOL && (!t || r[3] === t) && (!g || userGarages(r[1]).includes(g)));
+    return (data.rows || []).filter(r => r[3] && r[3] !== LOGIN_TOOL && !NWStats.isRemoved(r) && (!t || r[3] === t) && (!g || userGarages(r[1]).includes(g)));
   }
   const cnt = (rows, act) => rows.filter(r => String(r[4]).trim() === act).length;
   const cntTool = (rows, tool, ex) => rows.filter(r => r[3] === tool && !/حذف|delete/i.test(r[4]) && (!ex || !ex.includes(String(r[4]).trim()))).length;
