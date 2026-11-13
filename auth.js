@@ -14,7 +14,7 @@
   var HOME_URL  = 'https://hanode40-sketch.github.io/all-op/';
   var KEY = 'nw_auth_v1';
   var IDLE_KEY = 'nw_last_active';
-  var AUTH_VERSION = '2026-11-13.4';   // غيّره عند كل تعديل على هذا الملف (يجبر الأجهزة على التحديث)
+  var AUTH_VERSION = '2026-11-13.5';   // غيّره عند كل تعديل على هذا الملف (يجبر الأجهزة على التحديث)
   var IDLE_MS = 2 * 60 * 60 * 1000;   // يقفل بعد ساعتين بدون أي نشاط (غيّر الرقم 2 لتغيير المدة)
 
   var script = document.currentScript;
@@ -132,6 +132,15 @@
         return fetch(u, { method: 'POST', keepalive: true, body: JSON.stringify({
           action: 'log', token: api.token(), tool: tool || TOOL, act: act || '', ref: ref || '', details: details || '' }) })
           .catch(function () {});
+      });
+    },
+    /** استدعاء عملية في نظام الدخول (مثل الروستر) — يرجع JSON */
+    call: function (action, data) {
+      return getAuthUrl().then(function (u) {
+        if (!u) throw new Error('NO_URL');
+        var body = { action: action, token: api.token() };
+        for (var k in (data || {})) body[k] = data[k];
+        return fetch(u, { method: 'POST', body: JSON.stringify(body) }).then(function (r) { return r.json(); });
       });
     },
     isAuthError: function (res) { return !!res && res.error === 'AUTH'; },
