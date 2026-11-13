@@ -32,7 +32,7 @@
       vsPrev:'عن نفس الفترة من الشهر السابق', vsYest:'عن أمس', noPrev:'', perDay:'عملية / يوم', ofUsers:'من أصل', ops:'عملية',
       done:'منجزة', of:'من', received:'مستلمة', none:'لا يوجد', tapHint:'اضغط على أي مؤشر لعرض التفاصيل', loading:'جاري التحميل...',
       eNet:'تعذّر تحميل الإحصائيات — تأكد من الإنترنت', eAuth:'انتهت مدة الدخول — سجّل دخول من جديد', retry:'إعادة المحاولة',
-      close:'إغلاق', search:'بحث بالاسم أو المرجع أو التفاصيل...', export:'تصدير Excel', records:'سجل', more:'عرض المزيد',
+      close:'إغلاق', back:'→ رجوع', search:'بحث بالاسم أو المرجع أو التفاصيل...', export:'تصدير Excel', records:'سجل', more:'عرض المزيد',
       byUser:'حسب الموظف', byGarage:'حسب الكراج', byTool:'حسب البرنامج', byAct:'حسب العملية', list:'السجلات', noRec:'لا توجد سجلات',
       hTime:'الوقت', hEmp:'الموظف', hTool:'البرنامج', hOp:'العملية', hRef:'المرجع', hDetails:'تفاصيل', unassigned:'غير محدد',
       pending:'بانتظار', pendShift:'ورديات مسلّمة لم يتأكد استلامها', pendTask:'مهام مكلّفة لم تُنجز', inactive:'موظفين بدون أي عملية',
@@ -43,7 +43,7 @@
       vsPrev:'vs same period last month', vsYest:'vs yesterday', noPrev:'', perDay:'ops / day', ofUsers:'of', ops:'ops',
       done:'done', of:'of', received:'received', none:'None', tapHint:'Tap any indicator to see the details', loading:'Loading...',
       eNet:'Could not load statistics — check your internet', eAuth:'Session expired — sign in again', retry:'Retry',
-      close:'Close', search:'Search name, reference or details...', export:'Export Excel', records:'records', more:'Show more',
+      close:'Close', back:'← Back', search:'Search name, reference or details...', export:'Export Excel', records:'records', more:'Show more',
       byUser:'By employee', byGarage:'By garage', byTool:'By tool', byAct:'By operation', list:'Records', noRec:'No records',
       hTime:'Time', hEmp:'Employee', hTool:'Tool', hOp:'Operation', hRef:'Reference', hDetails:'Details', unassigned:'Unassigned',
       pending:'Pending', pendShift:'Handed-over shifts not yet confirmed', pendTask:'Assigned tasks not completed', inactive:'Employees with no operations',
@@ -188,20 +188,20 @@
     '@keyframes nstsk{0%{background-position:200% 0}100%{background-position:-200% 0}}' +
     '@media (max-width:820px){.nst-grid{grid-template-columns:1fr 1fr}.nst-v{font-size:24px}.nst-seg{margin-inline-start:0}.nst-head h2{width:100%}}' +
     /* النافذة */
-    '.nst-ov{position:fixed;inset:0;z-index:100000;background:rgba(8,15,30,.55);display:flex;align-items:flex-start;justify-content:center;padding:2vh 2vw;overflow-y:auto;animation:nstf .15s}' +
+    '.nst-ov{position:fixed;inset:0;z-index:100000;background:#e9eef5;display:flex;align-items:flex-start;justify-content:center;padding:0 2vw 30px;overflow-y:auto;animation:nstf .15s}' +
     '@keyframes nstf{from{opacity:0}to{opacity:1}}@keyframes nstu{from{transform:translateY(14px);opacity:.6}to{transform:none;opacity:1}}' +
-    '.nst-md{background:#fff;color:#0f172a;width:100%;max-width:min(1400px,96vw);border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,.35);overflow:hidden;animation:nstu .18s;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Tahoma,Arial,sans-serif}' +
-    '.nst-mh{display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid #e5e7eb;border-top:5px solid var(--acc)}' +
+    '.nst-md{background:#fff;color:#0f172a;width:100%;max-width:1400px;border-radius:0 0 18px 18px;box-shadow:0 10px 40px rgba(10,25,55,.18);overflow:visible;animation:nstu .18s;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Tahoma,Arial,sans-serif}' +
+    '.nst-mh{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid #e5e7eb;border-top:5px solid var(--acc);position:sticky;top:0;z-index:2;background:inherit}' +
     '.nst-mh .ic{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;background:#f1f5f9;flex-shrink:0}' +
     '.nst-mh h3{margin:0;font-size:18px}.nst-mh small{color:#64748b;font-size:13px}' +
-    '.nst-x{all:unset;cursor:pointer;margin-inline-start:auto;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#64748b;background:#f1f5f9}' +
-    '.nst-x:hover{background:#e2e8f0;color:#0f172a}' +
+    '.nst-x{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:12px;font-size:15px;font-weight:700;color:#fff;background:#1f3f7a;white-space:nowrap;flex-shrink:0}' +
+    '.nst-x:hover{background:#16305f}.nst-x:focus-visible{outline:3px solid #f28c28;outline-offset:2px}' +
     '.nst-mb{padding:16px 20px 20px}' +
     '.nst-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:16px}' +
     '.nst-box{background:#f8fafc;border:1px solid #eef2f7;border-radius:12px;padding:12px 14px}.nst-box h4{margin:0 0 8px;font-size:13px;color:#64748b}' +
     '.nst-box.warn{background:#fff7ed;border-color:#fed7aa}.nst-box.warn h4{color:#c2410c}' +
-    '.nst-hb{display:grid;grid-template-columns:minmax(90px,230px) 1fr 40px;gap:8px;align-items:center;font-size:13px;margin:6px 0}' +
-    '.nst-hb span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.nst-hb .tr{height:9px;background:#e2e8f0;border-radius:5px;overflow:hidden}.nst-hb .tr i{display:block;height:100%;border-radius:5px}.nst-hb b{text-align:end}' +
+    '.nst-hb{display:grid;grid-template-columns:minmax(0,max-content) minmax(80px,1fr) 40px;gap:8px;align-items:center;font-size:13px;margin:6px 0}' +
+    '.nst-hb>span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:230px}.nst-hb .tr{height:9px;background:#e2e8f0;border-radius:5px;overflow:hidden}.nst-hb .tr i{display:block;height:100%;border-radius:5px}.nst-hb b{text-align:end}' +
     '.nst-bar{display:flex;gap:8px;align-items:center;margin:4px 0 10px;flex-wrap:wrap}.nst-bar h4{margin:0;font-size:14px}' +
     '.nst-q{flex:1;min-width:180px;font:inherit;font-size:14px;padding:9px 12px;border:1px solid #e5e7eb;border-radius:10px;background:#f8fafc;color:inherit}' +
     '.nst-btn{all:unset;cursor:pointer;font-size:13px;font-weight:700;padding:9px 14px;border-radius:10px;background:#1f3f7a;color:#fff;white-space:nowrap}' +
@@ -218,12 +218,12 @@
     'html[data-theme="dark"] .nst-msg{background:rgba(22,28,40,.92);color:#9aa6b8}html[data-theme="dark"] .nst-skel{background:linear-gradient(90deg,#141b2a,#1c2538,#141b2a);background-size:200% 100%}' +
     'html[data-theme="dark"] .nst-seg button.on{background:#e5e7eb;color:#0f172a}' +
     'html[data-theme="dark"] .nst-md{background:#151c2b;color:#e5e7eb}html[data-theme="dark"] .nst-mh{border-bottom-color:#263042}' +
-    'html[data-theme="dark"] .nst-mh .ic,html[data-theme="dark"] .nst-x{background:#1e2a44;color:#c7d7f5}' +
+    'html[data-theme="dark"] .nst-mh .ic{background:#1e2a44;color:#c7d7f5}html[data-theme="dark"] .nst-x{background:#2b4c86}html[data-theme="dark"] .nst-ov{background:#0b1220}' +
     'html[data-theme="dark"] .nst-box{background:#0f1624;border-color:#263042}html[data-theme="dark"] .nst-box.warn{background:#2e2112;border-color:#5a3b17}' +
     'html[data-theme="dark"] .nst-hb .tr{background:#1e2a44}html[data-theme="dark"] .nst-q{background:#0f1624;border-color:#263042}' +
     'html[data-theme="dark"] .nst-tw{border-color:#263042}html[data-theme="dark"] .nst-t th{background:#111827;color:#9aa6b8}html[data-theme="dark"] .nst-t th,html[data-theme="dark"] .nst-t td{border-color:#263042}' +
     'html[data-theme="dark"] .nst-t tr.pend td{background:#2e2112}html[data-theme="dark"] .nst-tag,html[data-theme="dark"] .nst-more{background:#1e2a44;color:#c7d7f5}' +
-    '@media (max-width:600px){.nst-ov{padding:10px 8px}.nst-mh,.nst-mb{padding-inline:14px}.nst-tw{border:0}.nst-t thead{display:none}.nst-t,.nst-t tbody{display:block}' +
+    '@media (max-width:600px){.nst-ov{padding:0 0 20px}.nst-md{border-radius:0}.nst-mh,.nst-mb{padding-inline:14px}.nst-tw{border:0}.nst-t thead{display:none}.nst-t,.nst-t tbody{display:block}' +
     '.nst-t tr{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;padding:10px 12px;border:1px solid #eef2f7;border-radius:12px;margin-bottom:8px}' +
     '.nst-t td{display:block;border:0!important;padding:0;white-space:normal}.nst-t td:first-child{width:100%;font-size:12px;color:#64748b}.nst-t td.w{min-width:0;width:100%;font-size:12.5px}' +
     'html[data-theme="dark"] .nst-t tr{border-color:#263042}}' +
@@ -272,8 +272,8 @@
     }
     ov.innerHTML =
       '<div class="nst-md" style="--acc:' + spec.c + '">' +
-        '<div class="nst-mh"><div class="ic">' + (spec.ic || '📊') + '</div><div><h3>' + esc(spec.lb) + '</h3><small>' + nf(rows.length) + ' ' + esc(t('records')) + (spec.sub ? ' · ' + esc(spec.sub) : '') + '</small></div>' +
-          '<button class="nst-x" type="button" aria-label="' + esc(t('close')) + '">×</button></div>' +
+        '<div class="nst-mh"><button class="nst-x" type="button">' + esc(t('back')) + '</button><div class="ic">' + (spec.ic || '📊') + '</div><div><h3>' + esc(spec.lb) + '</h3><small>' + nf(rows.length) + ' ' + esc(t('records')) + (spec.sub ? ' · ' + esc(spec.sub) : '') + '</small></div>' +
+          '</div>' +
         '<div class="nst-mb">' + (boxes ? '<div class="nst-cols">' + boxes + '</div>' : '') +
           '<div class="nst-bar"><h4>' + esc(t('list')) + '</h4><input class="nst-q" type="search" placeholder="' + esc(t('search')) + '"><button class="nst-btn" type="button" data-x="csv">' + esc(t('export')) + '</button></div>' +
           '<div class="nst-list"></div></div></div>';
@@ -295,11 +295,20 @@
         }).join('') + '</tbody></table></div>' +
         (list.length > shown ? '<button class="nst-btn nst-more" type="button" data-x="more">' + esc(t('more')) + ' (' + nf(list.length - shown) + ')</button>' : '');
     }
-    function close() { document.removeEventListener('keydown', onKey); document.body.style.overflow = prevOverflow; ov.remove(); }
-    function onKey(e) { if (e.key === 'Escape') close(); }
+    var prevScroll = window.scrollY, closed = false;
+    function cleanup() {
+      if (closed) return; closed = true;
+      document.removeEventListener('keydown', onKey); window.removeEventListener('popstate', onPop);
+      document.body.style.overflow = prevOverflow; ov.remove(); window.scrollTo(0, prevScroll);
+    }
+    function back() { if (history.state && history.state.nstDetail) history.back(); else cleanup(); }   // زر الرجوع = رجوع المتصفح
+    function onPop() { cleanup(); }
+    function onKey(e) { if (e.key === 'Escape') back(); }
+    try { history.pushState({ nstDetail: true }, ''); } catch (x) {}
+    window.addEventListener('popstate', onPop);
     document.addEventListener('keydown', onKey);
     ov.addEventListener('click', function (e) {
-      if (e.target === ov || e.target.closest('.nst-x')) return close();
+      if (e.target.closest('.nst-x')) return back();
       var x = e.target.closest('[data-x]'); if (!x) return;
       if (x.dataset.x === 'more') { shown += 200; draw(); }
       if (x.dataset.x === 'csv') exportCsv(filtered(), spec.lb);
