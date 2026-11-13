@@ -43,7 +43,7 @@
     st.textContent =
       'html[data-nw-dark]{' + re + '}' +
       'html[data-nw-dark] img,html[data-nw-dark] video,html[data-nw-dark] canvas,html[data-nw-dark] iframe,' +
-      'html[data-nw-dark] body::before,html[data-nw-dark] .nws,html[data-nw-dark] .nwa-bar,html[data-nw-dark] .nwa-ban,html[data-nw-dark] .nwa-deny{' + re + '}' +
+      'html[data-nw-dark] body::before,html[data-nw-dark] .nws,html[data-nw-dark] .nwh,html[data-nw-dark] .nwa-bar,html[data-nw-dark] .nwa-ban,html[data-nw-dark] .nwa-deny{' + re + '}' +
       '@media print{html[data-nw-dark]{filter:none}html[data-nw-dark] img,html[data-nw-dark] canvas{filter:none}}';
     (document.head || root).appendChild(st);
     applyTheme();
@@ -371,6 +371,9 @@
     // القائمة الجانبية على الكمبيوتر (مكان واحد لكل البرامج) — تُلغى بـ data-side="off"
     if (!(script && script.getAttribute('data-side') === 'off')) { try { buildSide(user); } catch (e) { console.error(e); } }
 
+    // شريط العنوان الثابت (لكل البرامج) — يُلغى بـ data-head="off"
+    try { buildHead(); } catch (e) { console.error(e); }
+
     // تعبئة اسم الموظف تلقائيًا: <input data-auth="name"> أو <span data-auth="name">
     document.querySelectorAll('[data-auth]').forEach(function (n) {
       var key = n.getAttribute('data-auth');
@@ -397,6 +400,53 @@
 
     scheduleExpiry();
     startIdleWatch();
+  }
+
+  /* ---------- شريط عنوان ثابت موحّد لكل البرامج (نفس شكل صفحة المؤشرات) ---------- */
+  var OWN_HEAD = { stats: 1, kpi: 1, performance: 1 };        // صفحات لها شريطها الخاص
+  // عنوان البرنامج القديم (الشعار + الاسم) يتخفى لأن الشريط الجديد يعرضه
+  var HIDE_OLD = {
+    accident:   '.e-logo,.e-title,.e-sub',
+    violation:  '.wrap>div:first-child:has(>img[alt="Northwest Bus"]),.wrap>h2:first-of-type,.wrap>h2:first-of-type+p',
+    shift:      '.wrap>.top',
+    evaluation: '.wrap>.top>img,.wrap>.top>h1',
+    tasks:      '.wrap>.top',
+    trip:       '.wrap>div:first-child:has(>img[alt="Northwest Bus"]),#page-title'
+  };
+  var headCss =
+    'html,body{overflow-x:clip!important}' +          /* overflow-x:hidden يعطّل التثبيت — clip يمنع التمرير الجانبي بدون ما يعطّله */
+    '.nwh{position:sticky;top:0;z-index:900;display:flex;align-items:center;justify-content:space-between;gap:10px;' +
+      'margin:0 0 16px;padding:12px 16px;border-radius:0 0 16px 16px;color:#fff;direction:rtl;' +
+      'background:rgba(31,63,122,.9);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 6px 20px rgba(0,0,0,.18);' +
+      'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Tahoma,Arial,sans-serif;box-sizing:border-box}' +
+    '.nwh[dir="ltr"]{direction:ltr}' +
+    '.nwh-t{display:flex;align-items:center;gap:10px;min-width:0}' +
+    '.nwh-ic{font-size:22px;line-height:1}' +
+    '.nwh h1{margin:0;font-size:20px;line-height:1.25;font-weight:800;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.35);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+    '.nwh small{display:block;font-size:12px;opacity:.8;font-weight:500}' +
+    '.nwh-back{color:#fff!important;text-decoration:none!important;font-size:14px;font-weight:600;background:rgba(255,255,255,.16);padding:8px 14px;border-radius:999px;white-space:nowrap;flex-shrink:0}' +
+    '.nwh-back:hover{background:rgba(255,255,255,.26)}' +
+    'html[data-nw-dark] .nwh{background:rgba(11,18,32,.92);border-bottom:1px solid #263042}' +
+    '@media (max-width:600px){.nwh{padding:10px 12px}.nwh h1{font-size:17px}.nwh-back{font-size:13px;padding:7px 11px}}' +
+    '@media print{.nwh{display:none!important}}';
+  function buildHead() {
+    if (!TOOL || OWN_HEAD[TOOL] || (script && script.getAttribute('data-head') === 'off')) return;
+    var it = null;
+    SIDE_ITEMS.forEach(function (x) { if (x.t === TOOL) it = x; });
+    if (!it) return;
+    var st = el('style'); st.textContent = headCss + (HIDE_OLD[TOOL] ? HIDE_OLD[TOOL] + '{display:none!important}' : '');
+    document.head.appendChild(st);
+    var h = el('header', 'nwh');
+    function render() {
+      var en = false; try { en = localStorage.getItem('hubLang') === 'en'; } catch (e) {}
+      h.setAttribute('dir', en ? 'ltr' : 'rtl');
+      h.innerHTML = '<div class="nwh-t"><span class="nwh-ic">' + it.ic + '</span><div style="min-width:0"><h1>' + esc(en ? it.en : it.ar) +
+        '</h1><small>' + esc(en ? it.ar : it.en) + '</small></div></div>' +
+        '<a class="nwh-back" href="' + HOME_URL + '">' + (en ? '← Operations Tools' : '← أدوات التشغيل') + '</a>';
+    }
+    render();
+    document.body.insertBefore(h, document.body.firstChild);
+    window.addEventListener('storage', function (ev) { if (ev.key === 'hubLang') render(); });
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
