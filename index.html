@@ -62,6 +62,7 @@
   .icon-viol { background: #FDECEC; }
   .icon-shift { background: #FFF4E0; }
   .icon-perf { background: #EDE9FE; }
+  .icon-stats { background: #E0F2FE; }
   .icon-acc { background: #FFEBE0; }
   .icon-task { background: #E3F2E8; }
   .lang-bar { display:flex; justify-content:flex-end; margin-bottom: 8px; }
@@ -111,6 +112,7 @@
   html[data-theme="dark"] .icon-viol  { background: #3a1e22; }
   html[data-theme="dark"] .icon-shift { background: #3a2e17; }
   html[data-theme="dark"] .icon-perf  { background: #2a2342; }
+  html[data-theme="dark"] .icon-stats { background: #12324a; }
   html[data-theme="dark"] .icon-acc   { background: #3a2418; }
   html[data-theme="dark"] .icon-task  { background: #15301f; }
   html[data-theme="dark"] .lang-btn { background: rgba(22,28,40,.92); color: #e5e7eb; border-color: rgba(255,255,255,.12); }
@@ -173,7 +175,7 @@
     a.card:hover { transform: translateY(-4px); box-shadow: 0 2px 4px rgba(15,23,42,.08), 0 18px 36px rgba(10,25,55,.28) !important; }
     a.card[data-tool="shift"]{--acc:#f59e0b} a.card[data-tool="tasks"]{--acc:#16a34a} a.card[data-tool="trip"]{--acc:#0d9488}
     a.card[data-tool="violation"]{--acc:#dc2626} a.card[data-tool="accident"]{--acc:#ea580c} a.card[data-tool="evaluation"]{--acc:#2563eb}
-    a.card[data-tool="performance"]{--acc:#7c3aed}
+    a.card[data-tool="performance"]{--acc:#7c3aed} a.card[data-tool="stats"]{--acc:#0284c7}
     .icon { width: 54px; height: 54px; font-size: 27px; border-radius: 14px; margin-bottom: 16px; }
     .card-text { flex: 1; }
     .card-title { font-size: 17px; font-weight: 700; margin-bottom: 6px; color:#0f172a; }
@@ -304,6 +306,15 @@
       <div class="card-text">
         <p class="card-title" data-ar="أداء الموظفين" data-en="Staff Performance">أداء الموظفين</p>
         <p class="card-sub" data-ar="متابعة نشاط وإنجاز كل موظف (للمدير)" data-en="Track each employee's activity (managers)">متابعة نشاط وإنجاز كل موظف (للمدير)</p>
+      </div>
+      <div class="arrow">‹</div>
+      <div class="open" data-ar="فتح البرنامج" data-en="Open">فتح البرنامج</div>
+    </a>
+    <a class="card" href="stats.html" data-tool="stats">
+      <div class="icon icon-stats">📈</div>
+      <div class="card-text">
+        <p class="card-title" data-ar="إحصائيات العمل" data-en="Work Statistics">إحصائيات العمل</p>
+        <p class="card-sub" data-ar="أرقام ورسوم بيانية لكل البرامج والكراجات (للمدير)" data-en="Charts and figures across all tools and garages (managers)">أرقام ورسوم بيانية لكل البرامج والكراجات (للمدير)</p>
       </div>
       <div class="arrow">‹</div>
       <div class="open" data-ar="فتح البرنامج" data-en="Open">فتح البرنامج</div>
