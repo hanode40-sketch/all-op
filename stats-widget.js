@@ -252,7 +252,7 @@
     if (spec.box) boxes += '<div class="nst-box' + (spec.box.warn ? ' warn' : '') + '"><h4>' + esc(spec.box.title) + '</h4><div style="font-size:13px;line-height:1.9">' + spec.box.html + '</div></div>';
     if (spec.pending && spec.pending.length) {
       boxes += '<div class="nst-box warn"><h4>⚠️ ' + esc(spec.pendLbl) + ' (' + spec.pending.length + ')</h4>' +
-        spec.pending.slice(0, 6).map(function (r) { return '<div style="font-size:13px;margin:4px 0"><b>' + esc(r[5]) + '</b> · ' + esc(r[2] || r[1]) + ' · <span style="opacity:.7">' + esc(fmt(r[0])) + '</span></div>'; }).join('') + '</div>';
+        spec.pending.slice(0, 6).map(function (r) { return '<div style="font-size:13px;margin:4px 0"><b>' + esc(r[2] || r[1]) + '</b> · <span style="opacity:.7">' + esc(fmt(r[0])) + '</span></div>'; }).join('') + '</div>';
     }
     if (spec.mode === 'users') {
       var actU = {}; rows.forEach(function (r) { actU[r[1]] = 1; });

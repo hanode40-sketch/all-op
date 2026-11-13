@@ -198,6 +198,7 @@ const dkey = d => d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 const MONTHS_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
 const MONTHS_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const monthLabel = (m, short) => { const [y,mm] = m.split('-'); return (LANG==='en' ? MONTHS_EN : MONTHS_AR)[+mm-1] + (short ? '' : ' ' + y); };
+const fmtDT = iso => new Date(iso).toLocaleString(LANG==='en'?'en-GB':'ar-SA-u-ca-gregory-nu-latn',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
 const kName = k => LANG === 'en' ? k.en : k.ar;
 const act = r => String(r[4] ?? '').trim();
 const LOGIN_TOOL = 'الدخول';
@@ -374,7 +375,7 @@ function openKpi(id, g) {
   if (x.missing && x.missing.length) spec.box = { warn:true, title: `${t_('missDays')} (${x.missing.length})`, html: x.missing.map(d => esc(d.slice(5))).join(' · ') };
   if (x.pairs && x.pairs.length) {
     const sl = x.pairs.slice().sort((a,b)=>b.min-a.min).slice(0,6);
-    spec.box = { warn:true, title: t_('slow'), html: sl.map(p => `<b>${esc(p.a[5])}</b> · ${esc(p.a[2]||p.a[1])} · ${p.min >= 120 ? (p.min/60).toFixed(1)+' '+t_('hours') : Math.round(p.min)+' '+t_('mins')}`).join('<br>') };
+    spec.box = { warn:true, title: t_('slow'), html: sl.map(p => `<div style="display:flex;gap:10px;justify-content:space-between;padding:4px 0;border-bottom:1px dashed rgba(148,163,184,.3)"><span>${esc(p.a[2]||p.a[1])} <small style="opacity:.7">· ${esc(fmtDT(p.a[0]))}</small></span><b style="white-space:nowrap">${p.min >= 120 ? (p.min/60).toFixed(1)+' '+t_('hours') : Math.round(p.min)+' '+t_('mins')}</b></div>`).join('') };
   }
   if (x.note) spec.box = { warn:true, title:'ℹ️', html: esc(x.note) };
   if (id === 'staff') { spec.mode = 'users'; }
