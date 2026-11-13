@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <script>try{var t=localStorage.getItem('nwTheme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <script src="https://hanode40-sketch.github.io/all-op/auth.js" data-tool="stats"></script>
+<script src="stats-widget.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#2c4a7a">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -76,6 +77,12 @@
   .insights{list-style:none;margin:0;padding:0}
   .insights li{padding:10px 12px;border-radius:10px;background:var(--soft);margin:7px 0;font-size:14px;line-height:1.6}
   .muted{color:var(--muted)}
+  [data-nst]{cursor:pointer}
+  .hbar[data-nst]{border-radius:8px;padding:2px 4px;margin-inline:-4px}.hbar[data-nst]:hover{background:var(--soft)}
+  tr[data-nst]:hover td{background:var(--soft)}
+  rect[data-nst]:hover{opacity:.75}
+  .heat .c[data-nst]:hover{outline:2px solid #f28c28}
+  .clickhint{font-size:12px;color:rgba(255,255,255,.85);margin:8px 4px 0;text-shadow:0 1px 4px rgba(0,0,0,.4)}
   .stamp{color:rgba(255,255,255,.8);font-size:12px;text-align:center;margin-top:18px}
 
   html[data-theme="dark"]{--ink:#e5e7eb;--muted:#9aa6b8;--line:#263042;--soft:#0f1624;--okbg:#12301f;--badbg:#3a1e22;--warnbg:#3a2e12}
@@ -123,6 +130,7 @@
 
   <div class="sec" data-i="secOps">مؤشرات التشغيل</div>
   <div class="kpis" id="opsKpis"></div>
+  <div class="clickhint" data-i="clickHint">👆 اضغط على أي مؤشر أو عمود أو صف لعرض التفاصيل</div>
 
   <div class="grid2">
     <div class="panel card"><h2><span data-i="dailyTitle">النشاط اليومي</span> <small id="dailyHint"></small></h2><div class="chart" id="daily"><div class="msg" data-i="loading">جاري التحميل...</div></div><div class="legend" id="dailyLeg"></div></div>
@@ -171,7 +179,7 @@
       lMonth:'الفترة', lGarage:'الكراج', lTool:'البرنامج', allGarages:'كل الكراجات', allTools:'كل البرامج', allMonths:'كل الفترات',
       refresh:'↻ تحديث', export:'Excel', print:'طباعة / PDF', loading:'جاري التحميل...', secSummary:'الملخص', secOps:'مؤشرات التشغيل',
       kTotal:'إجمالي العمليات', kAvg:'متوسط يومي', kUsers:'موظف نشط', kPeak:'أكثر يوم عمل', perDay:'عملية / يوم', ofUsers:'من أصل', ops:'عملية',
-      vsPrev:'عن الشهر السابق', noPrev:'لا توجد مقارنة',
+      vsPrev:'عن الشهر السابق', vsPrevP:'عن نفس الفترة من الشهر السابق', noPrev:'لا توجد مقارنة',
       oAcc:'الحوادث', oViol:'المخالفات', oEval:'تقييمات السائقين', oTrip:'رسائل الرحلات', oTasks:'إنجاز المهام', oShift:'تأكيد استلام الورديات',
       done:'منجزة', of:'من', received:'مستلمة', assignedNone:'لا توجد مهام مكلّفة', handNone:'لا توجد ورديات مسلّمة',
       dailyTitle:'النشاط اليومي', toolTitle:'توزيع العمل حسب البرنامج', heatTitle:'أوقات ضغط العمل', heatHint:'اليوم × الساعة',
@@ -188,12 +196,12 @@
       iShift:(n)=>`فيه <b>${n}</b> وردية مسلّمة ما تأكد استلامها.`,
       iIdle:(n)=>`<b>${n}</b> موظف ما سجّل أي عملية في هذه الفترة.`,
       iNone:'لا توجد ملاحظات لهذه الفترة.',
-      csvName:'إحصائيات_العمل', generated:'آخر تحديث: ' },
+      csvName:'إحصائيات_العمل', clickHint:'👆 اضغط على أي مؤشر أو عمود أو صف لعرض التفاصيل', generated:'آخر تحديث: ' },
     en: { pageTitle:'Work Statistics · Operations Tools', title:'Work Statistics', subtitle:'إحصائيات العمل', back:'← Operations Tools',
       lMonth:'Period', lGarage:'Garage', lTool:'Tool', allGarages:'All garages', allTools:'All tools', allMonths:'All periods',
       refresh:'↻ Refresh', export:'Excel', print:'Print / PDF', loading:'Loading...', secSummary:'Summary', secOps:'Operations indicators',
       kTotal:'Total operations', kAvg:'Daily average', kUsers:'Active employees', kPeak:'Busiest day', perDay:'ops / day', ofUsers:'of', ops:'ops',
-      vsPrev:'vs previous month', noPrev:'No comparison',
+      vsPrev:'vs previous month', vsPrevP:'vs same period last month', noPrev:'No comparison',
       oAcc:'Accidents', oViol:'Violations', oEval:'Driver evaluations', oTrip:'Trip messages', oTasks:'Task completion', oShift:'Shift receipt confirmed',
       done:'done', of:'of', received:'received', assignedNone:'No tasks assigned', handNone:'No shifts handed over',
       dailyTitle:'Daily activity', toolTitle:'Workload by tool', heatTitle:'Peak work times', heatHint:'day × hour',
@@ -210,7 +218,7 @@
       iShift:(n)=>`<b>${n}</b> handed-over shifts are not confirmed as received.`,
       iIdle:(n)=>`<b>${n}</b> employees recorded no operations this period.`,
       iNone:'No insights for this period.',
-      csvName:'work_statistics', generated:'Last updated: ' }
+      csvName:'work_statistics', clickHint:'👆 Tap any indicator, bar or row to see its details', generated:'Last updated: ' }
   };
   const t_ = k => (I18N[LANG][k] ?? I18N.ar[k] ?? k);
   const MONTHS_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
@@ -250,7 +258,7 @@
     if (a.error === 'AUTH') { NWAuth.relogin(); return fail(t_('eAuth')); }
     if (a.error === 'FORBIDDEN') return fail(t_('eForbidden'));
     if (!a.ok) return fail(t_('eErr') + (a.message || a.error));
-    CUR = a; PREV = (b && b.ok) ? b : null; USERS = a.users || [];
+    CUR = a; PREV = (b && b.ok) ? b : null; USERS = a.users || []; NWStats.setUsers(USERS);
     fillMonths(a.months || [], month);
     fillFilters();
     render();
@@ -325,12 +333,8 @@
     const byDay = {}; rows.forEach(r => { const d = new Date(r[0]); const k = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); byDay[k] = (byDay[k]||0)+1; });
     const peak = Object.entries(byDay).sort((a,b)=>b[1]-a[1])[0];
     const peakLbl = peak ? new Date(peak[0]+'T12:00').toLocaleDateString(LANG==='en'?'en-GB':'ar-SA-u-ca-gregory-nu-latn',{weekday:'long',day:'numeric',month:'short'}) : '—';
-    $('kpis').innerHTML = [
-      { acc:'#1f3f7a', lb:'📊 '+t_('kTotal'), v:nf(rows.length), sub:deltaHtml(rows.length, prev && prev.length) },
-      { acc:'#0d9488', lb:'📅 '+t_('kAvg'), v:(rows.length/days).toFixed(1), sub:t_('perDay') },
-      { acc:'#7c3aed', lb:'👥 '+t_('kUsers'), v:nf(active), sub: totalUsers ? `${t_('ofUsers')} ${totalUsers}` : '' },
-      { acc:'#f59e0b', lb:'🔥 '+t_('kPeak'), v:`<span style="font-size:20px">${esc(peakLbl)}</span>`, sub: peak ? `${nf(peak[1])} ${t_('ops')}` : '' }
-    ].map(k => `<div class="panel kpi" style="--acc:${k.acc}"><div class="lb">${k.lb}</div><b>${k.v}</b><div class="sub">${k.sub}</div></div>`).join('');
+    const KP = NWStats.kpis(rows, prev, { days, totalUsers, vs: partial ? t_('vsPrevP') : t_('vsPrev') });
+    $('kpis').innerHTML = KP.filter(k => k.grp === 'sum').map(k => NWStats.tileHtml(k)).join('');
 
     /* ----- مؤشرات التشغيل ----- */
     const acc = cnt(rows,'تقرير حادث'), accP = prev && cnt(prev,'تقرير حادث');
@@ -340,27 +344,21 @@
     const tAss = cnt(rows,'تكليف مهمة'), tDone = cnt(rows,'إنجاز مهمة');
     const sH = cnt(rows,'تسليم وردية'), sR = cnt(rows,'استلام وردية');
     const tP = tAss ? Math.round(Math.min(tDone,tAss)/tAss*100) : 0, sP = sH ? Math.round(Math.min(sR,sH)/sH*100) : 0;
-    $('opsKpis').innerHTML = [
-      { acc:'#ea580c', lb:'🚨 '+t_('oAcc'), v:nf(acc), sub:deltaHtml(acc, accP, true) },
-      { acc:'#dc2626', lb:'📝 '+t_('oViol'), v:nf(viol), sub:deltaHtml(viol, violP, true) },
-      { acc:'#2563eb', lb:'⭐ '+t_('oEval'), v:nf(ev), sub:deltaHtml(ev, evP) },
-      { acc:'#0d9488', lb:'🚌 '+t_('oTrip'), v:nf(trip), sub:deltaHtml(trip, tripP) },
-      { acc:'#16a34a', lb:'✅ '+t_('oTasks'), ring: tAss ? ring(tP, tP>=70?'#16a34a':'#f59e0b') : '', v:'', sub: tAss ? `${nf(tDone)} ${t_('done')} ${t_('of')} ${nf(tAss)}` : t_('assignedNone') },
-      { acc:'#f59e0b', lb:'🔄 '+t_('oShift'), ring: sH ? ring(sP, sP>=80?'#16a34a':'#f59e0b') : '', v:'', sub: sH ? `${nf(sR)} ${t_('received')} ${t_('of')} ${nf(sH)}` : t_('handNone') }
-    ].map(k => k.ring !== undefined
-      ? `<div class="panel kpi" style="--acc:${k.acc}"><div class="lb">${k.lb}</div><div class="ring" style="margin-top:8px">${k.ring || '<b>—</b>'}<div class="sub">${k.sub}</div></div></div>`
-      : `<div class="panel kpi" style="--acc:${k.acc}"><div class="lb">${k.lb}</div><b>${k.v}</b><div class="sub">${k.sub}</div></div>`).join('');
+    $('opsKpis').innerHTML = KP.filter(k => k.grp === 'ops').map(k => NWStats.tileHtml(k)).join('');
 
     if (!rows.length) {
       ['daily','byTool','heat','topActs','byGarage'].forEach(id => $(id).innerHTML = `<div class="msg">${t_('noData')}</div>`);
       $('dailyLeg').innerHTML = ''; $('insights').innerHTML = `<li>${t_('iNone')}</li>`; return;
     }
 
+    const D = (lb, ic, c, rs, sub) => NWStats.reg({ lb, ic, c, rows: rs, sub });
+    const dayOf = r => { const d = new Date(r[0]); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); };
+
     /* ----- توزيع حسب البرنامج ----- */
     const byTool = {}; rows.forEach(r => byTool[r[3]] = (byTool[r[3]]||0)+1);
     const toolList = Object.entries(byTool).sort((a,b)=>b[1]-a[1]);
     const tMax = toolList[0][1];
-    $('byTool').innerHTML = toolList.map(([k,v]) => `<div class="hbar"><span class="nm" title="${esc(toolName(k))}">${esc(toolName(k))}</span>
+    $('byTool').innerHTML = toolList.map(([k,v]) => `<div class="hbar" data-nst="${D(toolName(k),'🧩',toolColor(k),rows.filter(r=>r[3]===k))}"><span class="nm" title="${esc(toolName(k))}">${esc(toolName(k))}</span>
       <span class="tr"><i style="width:${Math.max(3,v/tMax*100)}%;background:${toolColor(k)}"></i></span><b>${nf(v)}</b></div>`).join('');
 
     /* ----- النشاط اليومي (أعمدة مكدّسة) ----- */
@@ -378,7 +376,7 @@
     const rev = LANG !== 'en';
     keys.forEach((k,i) => { const idx = rev ? keys.length-1-i : i; const x = padL + idx*bw + bw*0.15; let y = H-padB; const w = bw*0.7;
       order.forEach(t => { const v = (stack[k]||{})[t]||0; if (!v) return; const h = (H-padB-padT)*v/yMax; y -= h;
-        svg += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" fill="${toolColor(t)}" rx="2"><title>${esc(k)} · ${esc(toolName(t))}: ${v}</title></rect>`; });
+        svg += `<rect data-nst="${D(toolName(t),'📅',toolColor(t),rows.filter(r=>r[3]===t&&dayOf(r)===k),k)}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" fill="${toolColor(t)}" rx="2"><title>${esc(k)} · ${esc(toolName(t))}: ${v}</title></rect>`; });
       const dd = +k.slice(8,10);
       if (month==='all' ? (i%Math.ceil(keys.length/12)===0) : (dd===1||dd%5===0)) svg += `<text x="${(x+w/2).toFixed(1)}" y="${H-8}" font-size="10" text-anchor="middle" fill="currentColor">${month==='all'?k.slice(5):dd}</text>`;
     });
@@ -394,7 +392,7 @@
     const dayOrder = [0,1,2,3,4,5,6];
     dayOrder.forEach(di => { hh += `<div class="d" style="direction:${LANG==='en'?'ltr':'rtl'}">${t_('days')[di]}</div>`;
       for (let h=0; h<HRS; h++){ const v = heat[di][h], a = v ? (0.15 + 0.85*v/hMax) : 0;
-        hh += `<div class="c" title="${t_('days')[di]} ${hourLabel(h)}: ${v}" style="${v?`background:rgba(31,63,122,${a.toFixed(2)})`:''}"></div>`; } });
+        hh += `<div class="c" ${v?`data-nst="${D(t_('days')[di]+' · '+hourLabel(h),'🕒','#1f3f7a',rows.filter(r=>{const d=new Date(r[0]);return d.getDay()===di&&d.getHours()===h;}))}"`:''} title="${t_('days')[di]} ${hourLabel(h)}: ${v}" style="${v?`background:rgba(31,63,122,${a.toFixed(2)})`:''}"></div>`; } });
     hh += `<div></div>` + Array.from({length:HRS},(_,h)=>`<div class="h">${cols.includes(h)?h:''}</div>`).join('') + '</div>';
     $('heat').innerHTML = hh + `<div class="tip">${t_('heatTip')}</div>`;
     let best = [0,0,0]; heat.forEach((row,d)=>row.forEach((v,h)=>{ if (v>best[2]) best=[d,h,v]; }));
@@ -403,7 +401,7 @@
     const acts = {}; rows.forEach(r => { const k = r[3]+'|'+String(r[4]).trim(); acts[k]=(acts[k]||0)+1; });
     const actList = Object.entries(acts).sort((a,b)=>b[1]-a[1]).slice(0,8);
     $('topActs').innerHTML = `<table><thead><tr><th>${t_('hAct')}</th><th>${t_('hTool')}</th><th class="num">${t_('hCount')}</th></tr></thead><tbody>` +
-      actList.map(([k,v]) => { const [tl,a] = k.split('|'); return `<tr><td><b>${esc(opName(a))}</b></td><td><span style="color:${toolColor(tl)};font-weight:700">●</span> ${esc(toolName(tl))}</td><td class="num">${nf(v)}</td></tr>`; }).join('') + '</tbody></table>';
+      actList.map(([k,v]) => { const [tl,a] = k.split('|'); return `<tr data-nst="${D(opName(a),'⚙️',toolColor(tl),rows.filter(r=>r[3]===tl&&String(r[4]).trim()===a),toolName(tl))}"><td><b>${esc(opName(a))}</b></td><td><span style="color:${toolColor(tl)};font-weight:700">●</span> ${esc(toolName(tl))}</td><td class="num">${nf(v)}</td></tr>`; }).join('') + '</tbody></table>';
 
     /* ----- المقارنة بين الكراجات ----- */
     const gs = allGarages();
@@ -413,7 +411,7 @@
       rows.forEach(r => { const ug = userGarages(r[1]); (ug.length ? ug : [t_('unassigned')]).forEach(g => add(g, r[1])); });
       const gl = Object.entries(gStat).sort((a,b)=>b[1].n-a[1].n);
       $('byGarage').innerHTML = `<table><thead><tr><th>${t_('hGarage')}</th><th class="num">${t_('kTotal')}</th><th class="num">${t_('hUsers')}</th><th class="num">${t_('hPerUser')}</th></tr></thead><tbody>` +
-        gl.map(([g,o]) => `<tr><td><b>${esc(g)}</b></td><td class="num">${nf(o.n)}</td><td class="num">${o.users.size}</td><td class="num">${(o.n/o.users.size).toFixed(1)}</td></tr>`).join('') + '</tbody></table>';
+        gl.map(([g,o]) => `<tr data-nst="${D(g,'🏢','#64748b',rows.filter(r=>{const ug=userGarages(r[1]);return ug.length?ug.includes(g):g===t_('unassigned');}))}"><td><b>${esc(g)}</b></td><td class="num">${nf(o.n)}</td><td class="num">${o.users.size}</td><td class="num">${(o.n/o.users.size).toFixed(1)}</td></tr>`).join('') + '</tbody></table>';
     }
 
     /* ----- ملاحظات سريعة ----- */
