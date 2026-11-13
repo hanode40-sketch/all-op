@@ -426,7 +426,7 @@
     '.nwh small{display:block;font-size:12px;opacity:.8;font-weight:500}' +
     '.nwh-back{color:#fff!important;text-decoration:none!important;font-size:14px;font-weight:600;background:rgba(255,255,255,.16);padding:8px 14px;border-radius:999px;white-space:nowrap;flex-shrink:0}' +
     '.nwh-back:hover{background:rgba(255,255,255,.26)}' +
-    'html[data-nw-dark] .nwh{background:rgba(11,18,32,.92);border-bottom:1px solid #263042}' +
+    'html[data-nw-dark] .nwh,html[data-theme="dark"] .nwh{background:rgba(11,18,32,.88);border-bottom:1px solid #263042}' +
     '@media (max-width:600px){.nwh{padding:10px 12px}.nwh h1{font-size:17px}.nwh-back{font-size:13px;padding:7px 11px}}' +
     '@media print{.nwh{display:none!important}}';
   function buildHead() {
