@@ -35,7 +35,7 @@
       close:'إغلاق', back:'→ رجوع', search:'بحث بالاسم أو المرجع أو التفاصيل...', export:'تصدير Excel', records:'سجل', more:'عرض المزيد',
       byUser:'حسب الموظف', byGarage:'حسب الكراج', byTool:'حسب البرنامج', byAct:'حسب العملية', list:'السجلات', noRec:'لا توجد سجلات',
       hTime:'الوقت', hEmp:'الموظف', hTool:'البرنامج', hOp:'العملية', hRef:'المرجع', hDetails:'تفاصيل', unassigned:'غير محدد',
-      pending:'بانتظار', pendShift:'ورديات مسلّمة لم يتأكد استلامها', pendTask:'مهام مكلّفة لم تُنجز', inactive:'موظفين بدون أي عملية',
+      pending:'بانتظار', exBtn:'✖ استبعاد', exDone:'✓ تم الاستبعاد', exAsk:'استبعاد هذه العملية من الإحصائيات والمؤشرات؟\n(تسجيل مكرر أو غلط — ما ينحذف من البرنامج نفسه)', exNote:'استبعاد من الإحصائيات', pendShift:'ورديات مسلّمة لم يتأكد استلامها', pendTask:'مهام مكلّفة لم تُنجز', inactive:'موظفين بدون أي عملية',
       days:['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'] },
     en: { secTitle:'Work statistics', allStats:'All statistics →', today:'Today', thisMonth:'This month', lastMonth:'Last month',
       kTotal:'Total operations', kUsers:'Active employees', kAvg:'Daily average', kPeak:'Busiest day',
@@ -46,7 +46,7 @@
       close:'Close', back:'← Back', search:'Search name, reference or details...', export:'Export Excel', records:'records', more:'Show more',
       byUser:'By employee', byGarage:'By garage', byTool:'By tool', byAct:'By operation', list:'Records', noRec:'No records',
       hTime:'Time', hEmp:'Employee', hTool:'Tool', hOp:'Operation', hRef:'Reference', hDetails:'Details', unassigned:'Unassigned',
-      pending:'Pending', pendShift:'Handed-over shifts not yet confirmed', pendTask:'Assigned tasks not completed', inactive:'Employees with no operations',
+      pending:'Pending', exBtn:'✖ Exclude', exDone:'✓ Excluded', exAsk:'Exclude this operation from statistics and KPIs?\n(duplicate or wrong entry — nothing is deleted in the tool itself)', exNote:'Excluded from statistics', pendShift:'Handed-over shifts not yet confirmed', pendTask:'Assigned tasks not completed', inactive:'Employees with no operations',
       days:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'] }
   };
 
@@ -80,6 +80,15 @@
   var DEL = {};
   var DEL_RE = /حذف|إلغاء|delete|cancel/i;
   function regDel(j) { ((j && j.rows) || []).forEach(function (r) { if (r[5] && DEL_RE.test(act(r))) DEL[r[3] + '|' + String(r[5]).trim()] = 1; }); }
+  /* استبعاد عملية معلّقة (تسليم مكرر أو مهمة غلط) — للمدير والمشرف: يسجّل حذف بنفس المرجع */
+  var EXCLUDE = { 'تسليم الوردية': ['shift', 'حذف تسليم'], 'المهام': ['tasks', 'إلغاء مهمة'] };
+  function canExclude() { return !!(window.NWAuth && (NWAuth.role === 'مدير' || NWAuth.role === 'مشرف')); }
+  function exclude(r) {
+    var x = EXCLUDE[r[3]]; if (!x || !r[5] || !window.NWAuth) return Promise.reject();
+    DEL[r[3] + '|' + String(r[5]).trim()] = 1;
+    cache = {};                                   // التحميل الجاي يجيب بيانات جديدة
+    return NWAuth.log(x[1], r[5], t('exNote') + ' — ' + (NWAuth.name || ''), x[0]);
+  }
   function isRemoved(r) { return DEL_RE.test(act(r)) || (r[5] && DEL[r[3] + '|' + String(r[5]).trim()] === 1); }
   var USERS = [];
   function setUsers(u) { if (u && u.length) USERS = u; }
@@ -214,6 +223,7 @@
     '.nst-t{width:100%;border-collapse:collapse;font-size:13.5px}.nst-t th,.nst-t td{padding:9px 10px;border-bottom:1px solid #eef2f7;text-align:start;white-space:nowrap}' +
     '.nst-t th{font-size:12px;color:#64748b;background:#f8fafc;position:sticky;top:0}.nst-t td.w{white-space:normal;min-width:260px;color:#64748b}' +
     '.nst-t tr.pend td{background:#fff7ed}' +
+    '.nst-ex{all:unset;cursor:pointer;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:#dc2626;color:#fff;margin-inline-start:6px}.nst-ex.done{background:#16a34a;cursor:default}.nst-ex:disabled{opacity:.7}' +
     '.nst-tag{font-size:12px;padding:2px 8px;border-radius:999px;font-weight:600;background:#eef2f7}' +
     '.nst-empty{text-align:center;color:#64748b;padding:24px}.nst-more{display:block;margin:12px auto 0;background:#eef2f7;color:#1f3f7a}' +
     'html[data-theme="dark"] .nst-tile{background:#141b2a;border-color:rgba(255,255,255,.07);color:#e5e7eb;box-shadow:0 10px 28px rgba(0,0,0,.45)}' +
@@ -296,7 +306,8 @@
         '<div class="nst-tw"><table class="nst-t"><thead><tr><th>' + esc(t('hTime')) + '</th><th>' + esc(t('hEmp')) + '</th><th>' + esc(t('hTool')) + '</th><th>' + esc(t('hOp')) + '</th><th>' + esc(t('hRef')) + '</th><th>' + esc(t('hDetails')) + '</th></tr></thead><tbody>' +
         part.map(function (r) {
           return '<tr class="' + (pendSet.has(r) ? 'pend' : '') + '"><td>' + esc(fmt(r[0])) + '</td><td><b>' + esc(r[2] || r[1]) + '</b></td><td><span style="color:' + toolColor(r[3]) + '">●</span> ' + esc(toolName(r[3])) + '</td>' +
-            '<td><span class="nst-tag">' + esc(opName(act(r))) + (pendSet.has(r) ? ' · ' + esc(t('pending')) : '') + '</span></td><td dir="ltr">' + esc(r[5]) + '</td><td class="w">' + esc(r[6]) + '</td></tr>';
+            '<td><span class="nst-tag">' + esc(opName(act(r))) + (pendSet.has(r) ? ' · ' + esc(t('pending')) : '') + '</span>' +
+            (pendSet.has(r) && canExclude() && EXCLUDE[r[3]] ? ' <button type="button" class="nst-ex" data-x="ex" data-r="' + rows.indexOf(r) + '">' + esc(t('exBtn')) + '</button>' : '') + '</td><td dir="ltr">' + esc(r[5]) + '</td><td class="w">' + esc(r[6]) + '</td></tr>';
         }).join('') + '</tbody></table></div>' +
         (list.length > shown ? '<button class="nst-btn nst-more" type="button" data-x="more">' + esc(t('more')) + ' (' + nf(list.length - shown) + ')</button>' : '');
     }
@@ -317,6 +328,15 @@
       var x = e.target.closest('[data-x]'); if (!x) return;
       if (x.dataset.x === 'more') { shown += 200; draw(); }
       if (x.dataset.x === 'csv') exportCsv(filtered(), spec.lb);
+      if (x.dataset.x === 'ex') {
+        var row = rows[+x.dataset.r]; if (!row || x.disabled) return;
+        if (!confirm(t('exAsk') + '\n\n' + (row[2] || row[1]) + ' · ' + row[5])) return;
+        x.disabled = true;
+        exclude(row).then(function () {
+          x.textContent = t('exDone'); x.classList.add('done');
+          var tr = x.closest('tr'); if (tr) { tr.classList.remove('pend'); tr.style.opacity = '.45'; }
+        }).catch(function () { x.disabled = false; });
+      }
     });
     ov.querySelector('.nst-q').addEventListener('input', function (e) { q = e.target.value.trim(); shown = 100; draw(); });
     draw();

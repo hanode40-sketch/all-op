@@ -12,15 +12,15 @@
   var REFRESH_MS = 5 * 60 * 1000;
 
   var T = {
-    ar: { mine: function (n) { return 'عندك ' + n + (n === 1 ? ' مهمة' : n === 2 ? ' مهمتين' : ' مهام') + ' ما تأكد إنجازها'; },
+    ar: { mine: function (n) { return 'لديك مهام لم تقم بتأكيد إنجازها (' + n + ')'; },
           over: function (n) { return n + ' متأخرة'; }, high: function (n) { return n + ' عاجلة'; },
           list: function (a, b) { return 'قائمة الوردية اليومية: ' + a + ' من ' + b; },
-          follow: function (n) { return n + (n === 1 ? ' مهمة' : ' مهام') + ' كلّفت بها غيرك ومتأخرة'; },
+          follow: function (n) { return 'لديك مهام كلّفت بها غيرك ولم يتم تأكيد إنجازها (' + n + ' متأخرة)'; },
           due: 'الموعد', open: 'فتح المهام ←', lateTag: 'متأخرة', newTag: 'جديدة', doingTag: 'قيد التنفيذ' },
-    en: { mine: function (n) { return 'You have ' + n + ' task' + (n === 1 ? '' : 's') + ' not confirmed as done'; },
+    en: { mine: function (n) { return 'You have tasks you have not confirmed as done (' + n + ')'; },
           over: function (n) { return n + ' overdue'; }, high: function (n) { return n + ' urgent'; },
           list: function (a, b) { return 'Daily shift checklist: ' + a + ' of ' + b; },
-          follow: function (n) { return n + ' task' + (n === 1 ? '' : 's') + ' you assigned are overdue'; },
+          follow: function (n) { return 'Tasks you assigned have not been confirmed as done (' + n + ' overdue)'; },
           due: 'Due', open: 'Open tasks →', lateTag: 'Overdue', newTag: 'New', doingTag: 'In progress' }
   };
   function lang() { try { return localStorage.getItem('hubLang') === 'en' ? 'en' : 'ar'; } catch (e) { return 'ar'; } }
