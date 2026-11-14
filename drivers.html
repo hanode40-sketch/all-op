@@ -176,7 +176,7 @@ const I18N = {
     natTitle:'السائقون حسب الجنسية والحالة', depTitle:'سائقو التشغيل والاستعداد في الكراجات', search:'بحث بالاسم أو الإقامة أو الرقم الوظيفي...',
     note:'«على الرحلات» = سائقو التشغيل المسجّلون في روستر التاريخ المختار. السائق اللي مو في روستر اليوم: إذا غاب عن روستر أسبوعه (الأحد ← السبت) يومين أو أقل = «راحة»، وإذا أكثر من يومين = «استعداد». و«الاستعداد» اليدوي يبقى استعداد دائماً. ارفع روستر الأسبوع كامل عشان يطلع الحساب دقيق.',
     allDep:'كل الكراجات', allSt:'كل الحالات', allNat:'كل الجنسيات', req:'إجمالي احتياج التشغيل', active:'على رأس العمل', out:'خارج الخدمة / مطلوب تعويضهم',
-    avail:'المتاحين للتشغيل', onLeave:'في إجازات', onTrips:'على الرحلات', standby:'الاستعداد', rest:'راحة', wk:n=>`روستر الأسبوع: ${n}/7 أيام`, total:'إجمالي السائقين', noRoster:'لا يوجد روستر لهذا التاريخ',
+    avail:'المتاحين للتشغيل', onLeave:'في إجازات', onTrips:'على الرحلات', standby:'الاستعداد', rest:'راحة', manual:'يدوي', offN:(n,w)=>`غير مجدول ${n} من ${w} أيام`, wk:n=>`روستر الأسبوع: ${n}/7 أيام`, total:'إجمالي السائقين', noRoster:'لا يوجد روستر لهذا التاريخ',
     nat:'الجنسية', depot:'الكراج', count:'العدد', gt:'الإجمالي', opDrivers:'التشغيل', sbDrivers:'الاستعداد', edit:'تعديل', trip:'رحلة',
     fIq:'رقم الإقامة', fEmp:'الرقم الوظيفي', fName:'اسم السائق', fNat:'الجنسية', fStatus:'الحالة', fDepot:'الكراج', fSb:'🟣 السائق على الاستعداد (Standby)',
     fFrom:'من تاريخ', fTo:'تاريخ العودة المتوقع', fMob:'الجوال', fNote:'ملاحظة', cancel:'إلغاء', save:'حفظ', saving:'جاري الحفظ...',
@@ -191,7 +191,7 @@ const I18N = {
     natTitle:'Drivers by nationality & status', depTitle:'Operational & standby drivers by depot', search:'Search by name, Iqama or employee ID...',
     note:'"On trips" = operational drivers in the roster of the selected date. A driver missing from today\'s roster is a "Rest day" if missing 2 days or fewer in that week (Sun → Sat), otherwise "Standby". Manual standby always counts as standby. Upload the full week\'s roster for accurate figures.',
     allDep:'All depots', allSt:'All statuses', allNat:'All nationalities', req:'Total operational requirement', active:'Active drivers', out:'Out of service / replacement required',
-    avail:'Available for operation', onLeave:'On leave', onTrips:'On trips', standby:'Standby', rest:'Rest day', wk:n=>`Week roster: ${n}/7 days`, total:'Total drivers', noRoster:'No roster for this date',
+    avail:'Available for operation', onLeave:'On leave', onTrips:'On trips', standby:'Standby', rest:'Rest day', manual:'manual', offN:(n,w)=>`off ${n} of ${w} days`, wk:n=>`Week roster: ${n}/7 days`, total:'Total drivers', noRoster:'No roster for this date',
     nat:'Nationality', depot:'Depot', count:'Count', gt:'Grand total', opDrivers:'Operation', sbDrivers:'Standby', edit:'Edit', trip:'Trip',
     fIq:'Iqama number', fEmp:'Employee ID', fName:'Driver name', fNat:'Nationality', fStatus:'Status', fDepot:'Depot', fSb:'🟣 Driver is on standby',
     fFrom:'From', fTo:'Expected return', fMob:'Mobile', fNote:'Note', cancel:'Cancel', save:'Save', saving:'Saving...',
@@ -215,10 +215,10 @@ let D = [], ROSTER = {}, ROSTER_N = 0, ABSENT = {}, WEEK_N = 0, canEdit = false,
 /* ---------- الحسابات ---------- */
 const dep = r => r[C.DEP] || 'Unassigned';
 function filtered(depot) { return D.filter(r => !depot || dep(r) === depot); }
-function isOnTrip(r) { return r[C.ST] === 'operation' && r[C.SB] !== 'نعم' && !!ROSTER[r[C.IQ]]; }
+function isOnTrip(r) { return r[C.ST] === 'operation' && !!ROSTER[r[C.IQ]]; }   // الرحلة في الروستر لها الأولوية على الاستعداد اليدوي
 const offToday = r => r[C.ST] === 'operation' && r[C.SB] !== 'نعم' && ROSTER_N > 0 && !ROSTER[r[C.IQ]];
 function isRest(r) { return offToday(r) && (ABSENT[r[C.IQ]] || 0) <= 2; }
-function isStandby(r) { return r[C.ST] === 'operation' && (r[C.SB] === 'نعم' || (offToday(r) && (ABSENT[r[C.IQ]] || 0) > 2)); }
+function isStandby(r) { return r[C.ST] === 'operation' && !ROSTER[r[C.IQ]] && (r[C.SB] === 'نعم' || (offToday(r) && (ABSENT[r[C.IQ]] || 0) > 2)); }
 const in30 = () => { const d = new Date(); d.setDate(d.getDate() + 30); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); };
 const cardOk = r => r[C.ST] !== 'Termination of services' && r[C.ST] !== 'Absconding';
 function cardExpired(r) { return cardOk(r) && r[C.CARD] && r[C.CARD] < today(); }
@@ -308,7 +308,7 @@ function renderList() {
   $('list').innerHTML = head + rows.slice(0, 300).map(r => {
     const tr = ROSTER[r[C.IQ]];
     const badges = `<span class="chip ${ST[r[C.ST]] ? ST[r[C.ST]].cls : ''}">${esc(stName(r[C.ST]))}</span>` +
-      (isStandby(r) ? ` <span class="chip s-sb">${t_('standby')}</span>` : '') + (isRest(r) ? ` <span class="chip" style="background:var(--nbg);color:var(--n)">😴 ${t_('rest')}</span>` : '') + (isOnTrip(r) ? ` <span class="chip s-trip">🚌 ${esc(tr)}</span>` : '') +
+      (isStandby(r) ? ` <span class="chip s-sb">${t_('standby')}${r[C.SB] === 'نعم' ? ' · ' + t_('manual') : ' · ' + t_('offN')(ABSENT[r[C.IQ]] || 0, WEEK_N)}</span>` : '') + (isRest(r) ? ` <span class="chip" style="background:var(--nbg);color:var(--n)">😴 ${t_('rest')}</span>` : '') + (isOnTrip(r) ? ` <span class="chip s-trip">🚌 ${esc(tr)}</span>` : '') +
       (isLate(r) ? ` <span class="chip s-late">⏰ ${esc(r[C.TO])}</span>` : (r[C.TO] && ST[r[C.ST]] && ST[r[C.ST]].grp === 'leave' ? ` <small style="color:var(--muted)">↩ ${esc(r[C.TO])}</small>` : '')) +
       (cardExpired(r) ? ` <span class="chip s-late">🪪 ${t_('cExp')} ${esc(r[C.CARD])}</span>` : cardSoon(r) ? ` <span class="chip s-emergency">🪪 ${t_('cSoon')} ${esc(r[C.CARD])}</span>` : '');
     return `<div class="row"><div class="nm"><b>${esc(r[C.NAME])}</b><small>${esc(r[C.IQ])}${r[C.EMP] ? ' · ' + esc(r[C.EMP]) : ''}${r[C.MOB] ? ' · 📞 ' + esc(r[C.MOB]) : ''}</small></div>
