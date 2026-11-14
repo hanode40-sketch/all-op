@@ -14,7 +14,7 @@
   var HOME_URL  = 'https://hanode40-sketch.github.io/all-op/';
   var KEY = 'nw_auth_v1';
   var IDLE_KEY = 'nw_last_active';
-  var AUTH_VERSION = '2026-11-15.2';   // غيّره عند كل تعديل على هذا الملف (يجبر الأجهزة على التحديث)
+  var AUTH_VERSION = '2026-11-15.3';   // غيّره عند كل تعديل على هذا الملف (يجبر الأجهزة على التحديث)
   var IDLE_MS = 2 * 60 * 60 * 1000;   // يقفل بعد ساعتين بدون أي نشاط (غيّر الرقم 2 لتغيير المدة)
 
   var script = document.currentScript;
@@ -252,6 +252,7 @@
     { g: 1, t: 'shift',       ic: '🔄', ar: 'تسليم الوردية',       en: 'Shift Handover',    url: 'https://hanode40-sketch.github.io/shift_handover/' },
     { g: 1, t: 'tasks',       ic: '✅', ar: 'المهام',              en: 'Tasks',             url: 'https://hanode40-sketch.github.io/tasks/' },
     { g: 1, t: 'trip',        ic: '🚌', ar: 'مسار الرحلة',         en: 'Trip Route',        url: 'https://hanode40-sketch.github.io/trip/' },
+    { g: 1, t: 'drivers',     ic: '👨‍✈️', ar: 'إدارة السائقين',     en: 'Drivers Management', url: HOME_URL + 'drivers.html' },
     { g: 2, t: 'violation',   ic: '📝', ar: 'محضر مخالفة',         en: 'Violation Report',  url: 'https://hanode40-sketch.github.io/violation/' },
     { g: 2, t: 'accident',    ic: '🚨', ar: 'تقرير حادث',          en: 'Accident Report',   url: 'https://hanode40-sketch.github.io/accident_report/' },
     { g: 2, t: 'evaluation',  ic: '⭐', ar: 'تقييم السائقين',      en: 'Driver Evaluation', url: 'https://hanode40-sketch.github.io/OP/' },
@@ -261,8 +262,7 @@
     { g: 4, t: 'evaluation',  log: 1, ic: '📋', ar: 'سجل التقييمات',  en: 'Evaluation Log',    url: 'https://hanode40-sketch.github.io/OP/#log' },
     { g: 3, t: 'performance', ic: '📊', ar: 'أداء الموظفين',       en: 'Staff Performance', url: HOME_URL + 'performance.html' },
     { g: 3, t: 'stats',       ic: '📈', ar: 'إحصائيات العمل',      en: 'Work Statistics',   url: HOME_URL + 'stats.html' },
-    { g: 3, t: 'kpi',         ic: '🎯', ar: 'المؤشرات التشغيلية',  en: 'Operational KPIs',  url: HOME_URL + 'kpi.html' },
-    { g: 3, t: 'drivers',     ic: '👨‍✈️', ar: 'إدارة السائقين',     en: 'Drivers Management', url: HOME_URL + 'drivers.html' }
+    { g: 3, t: 'kpi',         ic: '🎯', ar: 'المؤشرات التشغيلية',  en: 'Operational KPIs',  url: HOME_URL + 'kpi.html' }
   ];
   var SIDE_GROUPS = [null, ['التشغيل اليومي', 'Daily operations'], ['التقارير والسلامة', 'Reports & safety'], ['الإدارة', 'Management'], ['السجلات', 'Records']];
   var ROLE_EN = { 'مدير': 'Manager', 'مشرف': 'Supervisor', 'مرحّل': 'Dispatcher', 'مرحل': 'Dispatcher', 'موظف': 'Employee' };
