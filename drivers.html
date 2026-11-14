@@ -176,7 +176,7 @@ const I18N = {
     natTitle:'السائقون حسب الجنسية والحالة', depTitle:'سائقو التشغيل والاستعداد في الكراجات', search:'بحث بالاسم أو الإقامة أو الرقم الوظيفي...',
     note:'«على الرحلات» = سائقو التشغيل المسجّلون في روستر التاريخ المختار. السائق اللي مو في روستر اليوم: إذا كان غير مجدول يومين متتاليين أو أقل = «راحة»، وإذا أكثر من يومين متتاليين = «استعداد». و«الاستعداد» اليدوي يبقى استعداد. ارفعوا الروستر يوم بيوم عشان يطلع الحساب دقيق.',
     allDep:'كل الكراجات', allSt:'كل الحالات', allNat:'كل الجنسيات', req:'إجمالي احتياج التشغيل', active:'على رأس العمل', out:'خارج الخدمة / مطلوب تعويضهم',
-    avail:'المتاحين للتشغيل', onLeave:'في إجازات', onTrips:'على الرحلات', standby:'الاستعداد', rest:'راحة', manual:'يدوي', offN:n=>`غير مجدول ${n} أيام متتالية`, wk:n=>`أيام الروستر المرفوعة حول التاريخ: ${n}`, total:'إجمالي السائقين', noRoster:'لا يوجد روستر لهذا التاريخ',
+    avail:'المتاحين للتشغيل', onLeave:'في إجازات', onTrips:'على الرحلات', standby:'الاستعداد', rest:'راحة', manual:'يدوي', offN:n=>`${n} أيام`, since:d=>`من ${d}`, wk:n=>`أيام الروستر المرفوعة حول التاريخ: ${n}`, total:'إجمالي السائقين', noRoster:'لا يوجد روستر لهذا التاريخ',
     nat:'الجنسية', depot:'الكراج', count:'العدد', gt:'الإجمالي', opDrivers:'التشغيل', sbDrivers:'الاستعداد', edit:'تعديل', trip:'رحلة',
     fIq:'رقم الإقامة', fEmp:'الرقم الوظيفي', fName:'اسم السائق', fNat:'الجنسية', fStatus:'الحالة', fDepot:'الكراج', fSb:'🟣 السائق على الاستعداد (Standby)',
     fFrom:'من تاريخ', fTo:'تاريخ العودة المتوقع', fMob:'الجوال', fNote:'ملاحظة', cancel:'إلغاء', save:'حفظ', saving:'جاري الحفظ...',
@@ -191,7 +191,7 @@ const I18N = {
     natTitle:'Drivers by nationality & status', depTitle:'Operational & standby drivers by depot', search:'Search by name, Iqama or employee ID...',
     note:'"On trips" = operational drivers in the roster of the selected date. A driver missing from today\'s roster is on a "Rest day" if unscheduled for 2 consecutive days or fewer, otherwise "Standby". Manual standby always counts as standby.',
     allDep:'All depots', allSt:'All statuses', allNat:'All nationalities', req:'Total operational requirement', active:'Active drivers', out:'Out of service / replacement required',
-    avail:'Available for operation', onLeave:'On leave', onTrips:'On trips', standby:'Standby', rest:'Rest day', manual:'manual', offN:n=>`off ${n} days in a row`, wk:n=>`Roster days uploaded around date: ${n}`, total:'Total drivers', noRoster:'No roster for this date',
+    avail:'Available for operation', onLeave:'On leave', onTrips:'On trips', standby:'Standby', rest:'Rest day', manual:'manual', offN:n=>`${n} days`, since:d=>`since ${d}`, wk:n=>`Roster days uploaded around date: ${n}`, total:'Total drivers', noRoster:'No roster for this date',
     nat:'Nationality', depot:'Depot', count:'Count', gt:'Grand total', opDrivers:'Operation', sbDrivers:'Standby', edit:'Edit', trip:'Trip',
     fIq:'Iqama number', fEmp:'Employee ID', fName:'Driver name', fNat:'Nationality', fStatus:'Status', fDepot:'Depot', fSb:'🟣 Driver is on standby',
     fFrom:'From', fTo:'Expected return', fMob:'Mobile', fNote:'Note', cancel:'Cancel', save:'Save', saving:'Saving...',
@@ -210,7 +210,7 @@ const depName = d => d ? (LANG==='en' ? d : (DEP[d] || d)) : (LANG==='en' ? 'Una
 const pad = n => String(n).padStart(2,'0');
 const today = () => { const d = new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); };
 
-let D = [], ROSTER = {}, ROSTER_N = 0, ABSENT = {}, WEEK_N = 0, canEdit = false, canImport = false, LISTS = {};
+let D = [], ROSTER = {}, ROSTER_N = 0, ABSENT = {}, SINCE = {}, WEEK_N = 0, canEdit = false, canImport = false, LISTS = {};
 
 /* ---------- الحسابات ---------- */
 const dep = r => r[C.DEP] || 'Unassigned';
@@ -308,7 +308,7 @@ function renderList() {
   $('list').innerHTML = head + rows.slice(0, 300).map(r => {
     const tr = ROSTER[r[C.IQ]];
     const badges = `<span class="chip ${ST[r[C.ST]] ? ST[r[C.ST]].cls : ''}">${esc(stName(r[C.ST]))}</span>` +
-      (isStandby(r) ? ` <span class="chip s-sb">${t_('standby')}${r[C.SB] === 'نعم' ? ' · ' + t_('manual') : ' · ' + t_('offN')(ABSENT[r[C.IQ]] || 0)}</span>` : '') + (isRest(r) ? ` <span class="chip" style="background:var(--nbg);color:var(--n)">😴 ${t_('rest')}</span>` : '') + (isOnTrip(r) ? ` <span class="chip s-trip">🚌 ${esc(tr)}</span>` : '') +
+      (isStandby(r) ? ` <span class="chip s-sb">${t_('standby')}${r[C.SB] === 'نعم' ? ' · ' + t_('manual') : ' · ' + t_('since')(SINCE[r[C.IQ]]) + ' · ' + t_('offN')(ABSENT[r[C.IQ]] || 0)}</span>` : '') + (isRest(r) ? ` <span class="chip" style="background:var(--nbg);color:var(--n)">😴 ${t_('rest')}</span>` : '') + (isOnTrip(r) ? ` <span class="chip s-trip">🚌 ${esc(tr)}</span>` : '') +
       (isLate(r) ? ` <span class="chip s-late">⏰ ${esc(r[C.TO])}</span>` : (r[C.TO] && ST[r[C.ST]] && ST[r[C.ST]].grp === 'leave' ? ` <small style="color:var(--muted)">↩ ${esc(r[C.TO])}</small>` : '')) +
       (cardExpired(r) ? ` <span class="chip s-late">🪪 ${t_('cExp')} ${esc(r[C.CARD])}</span>` : cardSoon(r) ? ` <span class="chip s-emergency">🪪 ${t_('cSoon')} ${esc(r[C.CARD])}</span>` : '');
     return `<div class="row"><div class="nm"><b>${esc(r[C.NAME])}</b><small>${esc(r[C.IQ])}${r[C.EMP] ? ' · ' + esc(r[C.EMP]) : ''}${r[C.MOB] ? ' · 📞 ' + esc(r[C.MOB]) : ''}</small></div>
@@ -336,8 +336,8 @@ async function load() {
 const ymd = d => d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 const addD = (ds, n) => { const d = new Date(ds + 'T12:00:00'); d.setDate(d.getDate() + n); return ymd(d); };
 async function loadRoster() {
-  ROSTER = {}; ROSTER_N = 0; ABSENT = {}; WEEK_N = 0;
-  const date = $('fDate').value, from = addD(date, -6), to = addD(date, 6);
+  ROSTER = {}; ROSTER_N = 0; ABSENT = {}; SINCE = {}; WEEK_N = 0;
+  const date = $('fDate').value, from = addD(date, -30), to = addD(date, 6);
   let days = null;
   try { const j = await NWAuth.call('rosterRange', { from, to }); if (j && j.ok) days = j.days || {}; } catch (e) {}
   if (!days) { try { const j = await NWAuth.call('rosterGet', { date }); days = {}; if (j && j.ok && (j.rows || []).length) days[date] = j.rows; } catch (e) { days = {}; } }
@@ -346,12 +346,13 @@ async function loadRoster() {
     const set = {}; days[k].forEach(r => [r[1], r[2]].forEach(x => { if (x) set[String(x).trim()] = String(r[0]); }));
     SETS[k] = set; if (k === date) { ROSTER = set; ROSTER_N = days[k].length; }
   });
-  WEEK_N = Object.keys(SETS).length;
+  WEEK_N = Object.keys(SETS).filter(k => k >= addD(date, -6)).length;
   if (!ROSTER_N) return;
   D.forEach(r => {
     const iq = r[C.IQ]; if (ROSTER[iq]) return;
-    let n = 1;
-    for (let k = 1; k <= 6; k++) { const s = SETS[addD(date, -k)]; if (!s || s[iq]) break; n++; }
+    let n = 1, first = date;
+    for (let k = 1; k <= 30; k++) { const dk = addD(date, -k), s = SETS[dk]; if (!s || s[iq]) break; n++; first = dk; }
+    SINCE[iq] = first;
     for (let k = 1; k <= 6; k++) { const s = SETS[addD(date, k)]; if (!s || s[iq]) break; n++; }
     ABSENT[iq] = n;
   });
@@ -449,8 +450,8 @@ $('impFile').onchange = async () => {
 };
 $('bExport').onclick = async () => {
   await loadXlsx();
-  const head = ['No.', 'Employee ID', 'ID Number', 'Driver Name', 'Status', 'Nationality', 'Depot', 'Standby', 'Rest day', 'On trip', 'Mobile', 'From', 'Expected return', 'Operating card expiry', 'Note', 'Last update by', 'Last update'];
-  const rows = applyF(filtered($('fDepot').value)).map((r, i) => [i + 1, r[C.EMP], r[C.IQ], r[C.NAME], r[C.ST], r[C.NAT], r[C.DEP], isStandby(r) ? 'Yes' : '', isRest(r) ? 'Yes' : '', ROSTER[r[C.IQ]] || '', r[C.MOB], r[C.FROM], r[C.TO], r[C.CARD] || '', r[C.NOTE], r[C.BY], r[C.AT]]);
+  const head = ['No.', 'Employee ID', 'ID Number', 'Driver Name', 'Status', 'Nationality', 'Depot', 'Standby', 'Standby since', 'Rest day', 'On trip', 'Mobile', 'From', 'Expected return', 'Operating card expiry', 'Note', 'Last update by', 'Last update'];
+  const rows = applyF(filtered($('fDepot').value)).map((r, i) => [i + 1, r[C.EMP], r[C.IQ], r[C.NAME], r[C.ST], r[C.NAT], r[C.DEP], isStandby(r) ? 'Yes' : '', isStandby(r) && r[C.SB] !== 'نعم' ? (SINCE[r[C.IQ]] || '') : '', isRest(r) ? 'Yes' : '', ROSTER[r[C.IQ]] || '', r[C.MOB], r[C.FROM], r[C.TO], r[C.CARD] || '', r[C.NOTE], r[C.BY], r[C.AT]]);
   const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([head, ...rows]), 'Drivers_Data');
   XLSX.writeFile(wb, `Northwest_Bus_Drivers_${today()}.xlsx`);
 };
