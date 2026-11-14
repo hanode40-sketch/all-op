@@ -14,7 +14,7 @@
   var HOME_URL  = 'https://hanode40-sketch.github.io/all-op/';
   var KEY = 'nw_auth_v1';
   var IDLE_KEY = 'nw_last_active';
-  var AUTH_VERSION = '2026-11-13.6';   // غيّره عند كل تعديل على هذا الملف (يجبر الأجهزة على التحديث)
+  var AUTH_VERSION = '2026-11-15.1';   // غيّره عند كل تعديل على هذا الملف (يجبر الأجهزة على التحديث)
   var IDLE_MS = 2 * 60 * 60 * 1000;   // يقفل بعد ساعتين بدون أي نشاط (غيّر الرقم 2 لتغيير المدة)
 
   var script = document.currentScript;
@@ -255,11 +255,15 @@
     { g: 2, t: 'violation',   ic: '📝', ar: 'محضر مخالفة',         en: 'Violation Report',  url: 'https://hanode40-sketch.github.io/violation/' },
     { g: 2, t: 'accident',    ic: '🚨', ar: 'تقرير حادث',          en: 'Accident Report',   url: 'https://hanode40-sketch.github.io/accident_report/' },
     { g: 2, t: 'evaluation',  ic: '⭐', ar: 'تقييم السائقين',      en: 'Driver Evaluation', url: 'https://hanode40-sketch.github.io/OP/' },
+    // السجلات: نفس صلاحية البرنامج، وتفتح تبويب السجل مباشرة (#log)
+    { g: 4, t: 'violation',   log: 1, ic: '🗂️', ar: 'سجل المحاضر',    en: 'Violation Log',     url: 'https://hanode40-sketch.github.io/violation/#log' },
+    { g: 4, t: 'accident',    log: 1, ic: '📂', ar: 'سجل تقارير الحوادث', en: 'Accident Log',   url: 'https://hanode40-sketch.github.io/accident_report/#log' },
+    { g: 4, t: 'evaluation',  log: 1, ic: '📋', ar: 'سجل التقييمات',  en: 'Evaluation Log',    url: 'https://hanode40-sketch.github.io/OP/#log' },
     { g: 3, t: 'performance', ic: '📊', ar: 'أداء الموظفين',       en: 'Staff Performance', url: HOME_URL + 'performance.html' },
     { g: 3, t: 'stats',       ic: '📈', ar: 'إحصائيات العمل',      en: 'Work Statistics',   url: HOME_URL + 'stats.html' },
     { g: 3, t: 'kpi',         ic: '🎯', ar: 'المؤشرات التشغيلية',  en: 'Operational KPIs',  url: HOME_URL + 'kpi.html' }
   ];
-  var SIDE_GROUPS = [null, ['التشغيل اليومي', 'Daily operations'], ['التقارير والسلامة', 'Reports & safety'], ['الإدارة', 'Management']];
+  var SIDE_GROUPS = [null, ['التشغيل اليومي', 'Daily operations'], ['التقارير والسلامة', 'Reports & safety'], ['الإدارة', 'Management'], ['السجلات', 'Records']];
   var ROLE_EN = { 'مدير': 'Manager', 'مشرف': 'Supervisor', 'مرحّل': 'Dispatcher', 'مرحل': 'Dispatcher', 'موظف': 'Employee' };
   var sideCss =
     '.nws{display:none}' +
@@ -307,7 +311,7 @@
     document.body.appendChild(nav);
     var here = location.href.split('#')[0].split('?')[0];
     function isOn(it) {
-      if (TOOL) return it.t === TOOL;
+      if (TOOL) return it.t === TOOL && !!it.log === (location.hash === '#log');
       if (!it.t) return /\/all-op\/(index\.html)?$/.test(here);
       return false;
     }
@@ -361,6 +365,9 @@
     render();
     window.addEventListener('storage', function (ev) { if (ev.key === 'hubLang') setTimeout(render, 50); });
     new MutationObserver(function () { render(); }).observe(root, { attributes: true, attributeFilter: ['dir', 'lang'] });
+    // فتح/إغلاق السجل داخل البرنامج يحدّث العنصر النشط في القائمة
+    window.addEventListener('hashchange', render);
+    window.addEventListener('nw-route', render);
   }
 
   function init() {
@@ -482,7 +489,7 @@
   function buildHead() {
     if (!TOOL || OWN_HEAD[TOOL] || (script && script.getAttribute('data-head') === 'off')) return;
     var it = null;
-    SIDE_ITEMS.forEach(function (x) { if (x.t === TOOL) it = x; });
+    SIDE_ITEMS.forEach(function (x) { if (x.t === TOOL && !x.log) it = x; });
     if (!it) return;
     var st = el('style'); st.textContent = headCss + (HIDE_OLD[TOOL] ? HIDE_OLD[TOOL] + '{display:none!important}' : '');
     document.head.appendChild(st);
