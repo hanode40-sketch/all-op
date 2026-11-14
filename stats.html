@@ -288,7 +288,7 @@
   function fillFilters() {
     const g = $('fGarage').value, t = $('fTool').value;
     const gs = allGarages();
-    $('fGarage').innerHTML = `<option value="">${t_('allGarages')}</option>` + gs.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('');
+    $('fGarage').innerHTML = `<option value="">${t_('allGarages')}</option>` + gs.map(x => `<option value="${esc(x)}">${esc(NWStats.garageName(x))}</option>`).join('');
     $('fGarage').value = gs.includes(g) ? g : '';
     $('fGarage').disabled = !gs.length;
     const tools = [...new Set((CUR.rows||[]).map(r => r[3]).filter(x => x && x !== LOGIN_TOOL))].sort();
@@ -417,7 +417,7 @@
       rows.forEach(r => { const ug = userGarages(r[1]); (ug.length ? ug : [t_('unassigned')]).forEach(g => add(g, r[1])); });
       const gl = Object.entries(gStat).sort((a,b)=>b[1].n-a[1].n);
       $('byGarage').innerHTML = `<table><thead><tr><th>${t_('hGarage')}</th><th class="num">${t_('kTotal')}</th><th class="num">${t_('hUsers')}</th><th class="num">${t_('hPerUser')}</th></tr></thead><tbody>` +
-        gl.map(([g,o]) => `<tr data-nst="${D(g,'🏢','#64748b',rows.filter(r=>{const ug=userGarages(r[1]);return ug.length?ug.includes(g):g===t_('unassigned');}))}"><td><b>${esc(g)}</b></td><td class="num">${nf(o.n)}</td><td class="num">${o.users.size}</td><td class="num">${(o.n/o.users.size).toFixed(1)}</td></tr>`).join('') + '</tbody></table>';
+        gl.map(([g,o]) => `<tr data-nst="${D(NWStats.garageName(g),'🏢','#64748b',rows.filter(r=>{const ug=userGarages(r[1]);return ug.length?ug.includes(g):g===t_('unassigned');}))}"><td><b>${esc(NWStats.garageName(g))}</b></td><td class="num">${nf(o.n)}</td><td class="num">${o.users.size}</td><td class="num">${(o.n/o.users.size).toFixed(1)}</td></tr>`).join('') + '</tbody></table>';
     }
 
     /* ----- ملاحظات سريعة ----- */

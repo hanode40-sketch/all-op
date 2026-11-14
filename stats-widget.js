@@ -59,6 +59,14 @@
   function dkey(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
   function thisMonth() { return dkey(new Date()).slice(0, 7); }
   function prevMonth(m) { var a = m.split('-').map(Number), y = a[0], mm = a[1] - 1; if (!mm) { mm = 12; y--; } return y + '-' + pad(mm); }
+  /* أسماء الكراجات بالإنجليزي (البيانات تبقى بالعربي، التغيير في العرض فقط) */
+  var GARAGE_EN = { 'الشميسي': 'Al Shumaisi', 'الرياض': 'Riyadh', 'المدينة': 'Madinah', 'تبوك': 'Tabuk', 'حائل': 'Hail',
+    'خميس مشيط': 'Khamis Mushait', 'جازان': 'Jazan', 'البشائر': 'Al Bashair', 'بريدة': 'Buraydah', 'غير محدد': 'Unassigned' };
+  function garageName(g) {
+    if (lang() !== 'en') return g;
+    var k = String(g == null ? '' : g).replace(/كراج/g, '').trim();
+    return GARAGE_EN[k] || g;
+  }
   function toolName(x) { return lang() === 'en' ? ((TOOLS[x] || {}).en || x) : x; }
   function opName(x) { return lang() === 'en' ? (OP_EN[String(x).trim()] || x) : x; }
   function toolColor(x) { if (TOOLS[x]) return TOOLS[x].c; if (!extraMap[x]) extraMap[x] = EXTRA[extraI++ % EXTRA.length]; return extraMap[x]; }
@@ -306,7 +314,7 @@
         var acts = countBy(rows, function (r) { return opName(act(r)); });
         if (Object.keys(acts).length > 1) boxes += '<div class="nst-box"><h4>' + esc(t('byAct')) + '</h4>' + hbars(acts, function () { return spec.c; }) + '</div>';
       }
-      if (allGarages().length) boxes += '<div class="nst-box"><h4>' + esc(t('byGarage')) + '</h4>' + hbars(countBy(rows, function (r) { var g = userGarages(r[1]); return g.length ? g : t('unassigned'); }), function () { return '#64748b'; }) + '</div>';
+      if (allGarages().length) boxes += '<div class="nst-box"><h4>' + esc(t('byGarage')) + '</h4>' + hbars(countBy(rows, function (r) { var g = userGarages(r[1]); return g.length ? g.map(garageName) : t('unassigned'); }), function () { return '#64748b'; }) + '</div>';
     }
     ov.innerHTML =
       '<div class="nst-md" style="--acc:' + spec.c + '">' +
@@ -433,7 +441,7 @@
   window.NWStats = {
     AUTH_URL: AUTH_URL, TOOLS: TOOLS, fetchMonth: fetchMonth, setUsers: setUsers, userGarages: userGarages, allGarages: allGarages,
     opsRows: opsRows, isRemoved: isRemoved, dedupe: dedupe, kpis: kpis, tileHtml: tileHtml, reg: reg, details: details, exportCsv: exportCsv,
-    toolName: toolName, opName: opName, toolColor: toolColor, t: t, thisMonth: thisMonth, prevMonth: prevMonth, mountHub: mountHub
+    toolName: toolName, opName: opName, garageName: garageName, toolColor: toolColor, t: t, thisMonth: thisMonth, prevMonth: prevMonth, mountHub: mountHub
   };
 
   /* تركيب تلقائي: <section id="nw-stats"> في الصفحة الرئيسية */

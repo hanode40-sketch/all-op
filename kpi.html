@@ -331,7 +331,7 @@ function render() {
   $('score').innerHTML = `<svg width="110" height="110" viewBox="0 0 110 110" style="color:var(--ink)"><circle cx="55" cy="55" r="${R}" fill="none" stroke="currentColor" stroke-opacity=".1" stroke-width="11"/>
       <circle cx="55" cy="55" r="${R}" fill="none" stroke="${rc}" stroke-width="11" stroke-linecap="round" stroke-dasharray="${C*pct/100} ${C}" transform="rotate(-90 55 55)"/>
       <text x="55" y="62" text-anchor="middle" font-size="22" font-weight="800" fill="currentColor">${pct}%</text></svg>
-    <div><div class="big">${t_('scoreLbl')} · ${esc(monthLabel(month))}${garage ? ' · ' + esc(garage) : ''}<b>${cnt.g} ${t_('of')} ${measured}</b></div>
+    <div><div class="big">${t_('scoreLbl')} · ${esc(monthLabel(month))}${garage ? ' · ' + esc(NWStats.garageName(garage)) : ''}<b>${cnt.g} ${t_('of')} ${measured}</b></div>
       <div class="chips"><span class="chip g">● ${t_('sG')}: ${cnt.g}</span><span class="chip y">● ${t_('sY')}: ${cnt.y}</span><span class="chip r">● ${t_('sR')}: ${cnt.r}</span>${cnt.n ? `<span class="chip n">● ${t_('sN')}: ${cnt.n}</span>` : ''}</div></div>`;
 
   /* البطاقات */
@@ -364,7 +364,7 @@ function render() {
     let h = `<table><thead><tr><th>${t_('garage')}</th>${KPIS.map(k => `<th title="${esc(kName(k))}">${k.ic} ${esc(k.short[LANG==='en'?1:0])}</th>`).join('')}<th>${t_('overall')}</th></tr></thead><tbody>`;
     list.forEach(g => {
       const x = compute(month, g); let ok = 0, ms = 0;
-      h += `<tr><td>${esc(g)}</td>` + KPIS.map(k => { const s = status(k, x[k.id]); if (s !== 'n') { ms++; if (s === 'g') ok++; }
+      h += `<tr><td>${esc(NWStats.garageName(g))}</td>` + KPIS.map(k => { const s = status(k, x[k.id]); if (s !== 'n') { ms++; if (s === 'g') ok++; }
         return `<td class="c ${s}" data-k="${k.id}" data-g="${esc(g)}"><span>${fmtV(k, x[k.id] && x[k.id].v)}${x[k.id] && x[k.id].v != null ? unitOf(k, x[k.id].v) : ''}</span></td>`; }).join('') +
         `<td class="sc">${ms ? ok + '/' + ms : '—'}</td></tr>`;
     });
@@ -376,7 +376,7 @@ function render() {
 function openKpi(id, g) {
   const k = KPIS.find(x => x.id === id), month = $('fMonth').value, garage = g ?? $('fGarage').value;
   const x = compute(month, garage)[id]; if (!x) return;
-  const spec = { lb: kName(k) + (garage ? ' · ' + garage : ''), ic: k.ic, c: k.c, rows: x.rows || [], sub: monthLabel(month) + (x.v != null ? ' · ' + fmtV(k, x.v) + unitOf(k, x.v) : '') };
+  const spec = { lb: kName(k) + (garage ? ' · ' + NWStats.garageName(garage) : ''), ic: k.ic, c: k.c, rows: x.rows || [], sub: monthLabel(month) + (x.v != null ? ' · ' + fmtV(k, x.v) + unitOf(k, x.v) : '') };
   if (x.pending) { spec.pending = x.pending; spec.pendLbl = x.pendLbl; }
   if (x.missing && x.missing.length) spec.box = { warn:true, title: `${t_('missDays')} (${x.missing.length})`, html: x.missing.map(d => esc(d.slice(5))).join(' · ') };
   if (x.pairs && x.pairs.length) {
@@ -426,7 +426,7 @@ async function load(force) {
   $('fMonth').innerHTML = [...months].sort().reverse().map(m => `<option value="${m}">${monthLabel(m)}</option>`).join('');
   $('fMonth').value = months.has(cur) ? cur : thisMonth();
   const gs = NWStats.allGarages(), g = $('fGarage').value;
-  $('fGarage').innerHTML = `<option value="">${t_('allGarages')}</option>` + gs.map(x => `<option value="${esc(x)}">${esc(x)}</option>`).join('');
+  $('fGarage').innerHTML = `<option value="">${t_('allGarages')}</option>` + gs.map(x => `<option value="${esc(x)}">${esc(NWStats.garageName(x))}</option>`).join('');
   $('fGarage').value = gs.includes(g) ? g : '';
   render();
 }
