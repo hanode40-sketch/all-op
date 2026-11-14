@@ -79,7 +79,21 @@
   /* السجلات المحذوفة أو الملغاة: تنشال من كل الإحصائيات (التسليم + استلامه، المهمة الملغاة، التقييم المحذوف) */
   var DEL = {};
   var DEL_RE = /حذف|إلغاء|delete|cancel/i;
-  function regDel(j) { ((j && j.rows) || []).forEach(function (r) { if (r[5] && DEL_RE.test(act(r))) DEL[r[3] + '|' + String(r[5]).trim()] = 1; }); }
+  var CHK_RE = /بند/;   // بنود القائمة اليومية: مرجعها رقم الوردية، فما نعتبر إلغاءها حذف لكل الوردية
+
+  /** بند القائمة اليومية لو انسجّل أكثر من مرة لنفس اليوم والوردية والكراج: نحسبه مرة وحدة (أول تسجيل) */
+  function dedupe(rows) {
+    var seen = {}, out = [];
+    rows.slice().sort(function (a, b) { return String(a[0]).localeCompare(String(b[0])); }).forEach(function (r) {
+      if (act(r) === 'بند القائمة اليومية') {
+        var k = dkey(new Date(r[0])) + '|' + String(r[5] || '').trim() + '|' + String(r[6] || '').trim() + '|' + userGarages(r[1]).join(',');
+        if (seen[k]) return; seen[k] = 1;
+      }
+      out.push(r);
+    });
+    return out;
+  }
+  function regDel(j) { ((j && j.rows) || []).forEach(function (r) { if (r[5] && DEL_RE.test(act(r)) && !CHK_RE.test(act(r))) DEL[r[3] + '|' + String(r[5]).trim()] = 1; }); }
   /* استبعاد عملية معلّقة (تسليم مكرر أو مهمة غلط) — للمدير والمشرف: يسجّل حذف بنفس المرجع */
   var EXCLUDE = { 'تسليم الوردية': ['shift', 'حذف تسليم'], 'المهام': ['tasks', 'إلغاء مهمة'] };
   function canExclude() { return !!(window.NWAuth && (NWAuth.role === 'مدير' || NWAuth.role === 'مشرف')); }
@@ -108,7 +122,7 @@
   function allGarages() { var s = {}; USERS.forEach(function (x) { userGarages(x.u).forEach(function (g) { s[g] = 1; }); }); return Object.keys(s).sort(); }
   function opsRows(data, f) {
     f = f || {};
-    return ((data && data.rows) || []).filter(function (r) {
+    return dedupe((data && data.rows) || []).filter(function (r) {
       return r[3] && r[3] !== LOGIN_TOOL && !isRemoved(r) && (!f.tool || r[3] === f.tool) && (!f.garage || userGarages(r[1]).indexOf(f.garage) > -1);
     });
   }
@@ -418,7 +432,7 @@
 
   window.NWStats = {
     AUTH_URL: AUTH_URL, TOOLS: TOOLS, fetchMonth: fetchMonth, setUsers: setUsers, userGarages: userGarages, allGarages: allGarages,
-    opsRows: opsRows, isRemoved: isRemoved, kpis: kpis, tileHtml: tileHtml, reg: reg, details: details, exportCsv: exportCsv,
+    opsRows: opsRows, isRemoved: isRemoved, dedupe: dedupe, kpis: kpis, tileHtml: tileHtml, reg: reg, details: details, exportCsv: exportCsv,
     toolName: toolName, opName: opName, toolColor: toolColor, t: t, thisMonth: thisMonth, prevMonth: prevMonth, mountHub: mountHub
   };
 

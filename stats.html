@@ -299,7 +299,7 @@
   function ops(data) {
     if (!data) return [];
     const g = $('fGarage').value, t = $('fTool').value;
-    return (data.rows || []).filter(r => r[3] && r[3] !== LOGIN_TOOL && !NWStats.isRemoved(r) && (!t || r[3] === t) && (!g || userGarages(r[1]).includes(g)));
+    return NWStats.dedupe(data.rows || []).filter(r => r[3] && r[3] !== LOGIN_TOOL && !NWStats.isRemoved(r) && (!t || r[3] === t) && (!g || userGarages(r[1]).includes(g)));
   }
   const cnt = (rows, act) => rows.filter(r => String(r[4]).trim() === act).length;
   const cntTool = (rows, tool, ex) => rows.filter(r => r[3] === tool && !/حذف|delete/i.test(r[4]) && (!ex || !ex.includes(String(r[4]).trim()))).length;
