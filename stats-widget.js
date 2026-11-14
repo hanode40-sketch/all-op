@@ -76,12 +76,14 @@
 
   /* ---------- البيانات ---------- */
   var cache = {};
-  function fetchMonth(month, force) {
-    if (!force && cache[month] && Date.now() - cache[month].at < 60000) return cache[month].p;
-    var p = fetch(AUTH_URL, { method:'POST', body: JSON.stringify({ action:'activity', token: window.NWAuth ? NWAuth.token() : '', month: month }) })
+  /** force = يتجاوز التخزين المؤقت (هنا وفي السيرفر) · since = من شهر وطالع (مثل 2026-06) */
+  function fetchMonth(month, force, since) {
+    var ck = month + '|' + (since || '');
+    if (!force && cache[ck] && Date.now() - cache[ck].at < 60000) return cache[ck].p;
+    var p = fetch(AUTH_URL, { method:'POST', body: JSON.stringify({ action:'activity', token: window.NWAuth ? NWAuth.token() : '', month: month, since: since || '', fresh: !!force }) })
       .then(function (r) { return r.json(); }).then(function (j) { regDel(j); return j; });
-    cache[month] = { at: Date.now(), p: p };
-    p.catch(function () { delete cache[month]; });
+    cache[ck] = { at: Date.now(), p: p };
+    p.catch(function () { delete cache[ck]; });
     return p;
   }
   /* السجلات المحذوفة أو الملغاة: تنشال من كل الإحصائيات (التسليم + استلامه، المهمة الملغاة، التقييم المحذوف) */

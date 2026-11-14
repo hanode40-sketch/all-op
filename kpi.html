@@ -416,7 +416,8 @@ function fail(m) { $('score').innerHTML = `<div class="msg err">${esc(m)}</div>`
 async function load(force) {
   $('score').innerHTML = `<div class="msg">${t_('loading')}</div>`;
   let a;
-  try { a = await NWStats.fetchMonth('all', force); } catch (e) { return fail(t_('eNet')); }
+  // آخر ٦ أشهر بس (هذا الشهر + ٥ قبله) — أخف بكثير من كل الفترات
+  try { a = await NWStats.fetchMonth('all', force, shiftMonth(thisMonth(), -5)); } catch (e) { return fail(t_('eNet')); }
   if (a.error === 'AUTH') { NWAuth.relogin(); return fail(t_('eAuth')); }
   if (a.error === 'FORBIDDEN') return fail(t_('eForbidden'));
   if (!a.ok) return fail(t_('eErr') + (a.message || a.error));

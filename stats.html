@@ -128,7 +128,7 @@
     <div><label data-i="lMonth">الفترة</label><select id="fMonth"></select></div>
     <div><label data-i="lGarage">الكراج</label><select id="fGarage"><option value="" data-i="allGarages">كل الكراجات</option></select></div>
     <div><label data-i="lTool">البرنامج</label><select id="fTool"><option value="" data-i="allTools">كل البرامج</option></select></div>
-    <div class="btns"><button class="btn light" onclick="load()" data-i="refresh">↻ تحديث</button><button class="btn light" onclick="exportCsv()" data-i="export">Excel</button><button class="btn" onclick="window.print()" data-i="print">طباعة / PDF</button></div>
+    <div class="btns"><button class="btn light" onclick="load(true)" data-i="refresh">↻ تحديث</button><button class="btn light" onclick="exportCsv()" data-i="export">Excel</button><button class="btn" onclick="window.print()" data-i="print">طباعة / PDF</button></div>
   </div>
 
   <div class="sec" data-i="secSummary">الملخص</div>
@@ -254,12 +254,12 @@
     return r.json();
   }
 
-  async function load() {
+  async function load(force) {
     const month = $('fMonth').value || thisMonth();
     ['daily','byTool','heat','topActs','byGarage'].forEach(id => $(id).innerHTML = `<div class="msg">${t_('loading')}</div>`);
     let a, b = null;
     try {
-      [a, b] = await Promise.all([NWStats.fetchMonth(month, true), month==='all' ? Promise.resolve(null) : NWStats.fetchMonth(prevMonth(month), true).catch(()=>null)]);
+      [a, b] = await Promise.all([NWStats.fetchMonth(month, !!force), month==='all' ? Promise.resolve(null) : NWStats.fetchMonth(prevMonth(month), !!force).catch(()=>null)]);
     } catch (e) { return fail(t_('eNet')); }
     if (a.error === 'AUTH') { NWAuth.relogin(); return fail(t_('eAuth')); }
     if (a.error === 'FORBIDDEN') return fail(t_('eForbidden'));

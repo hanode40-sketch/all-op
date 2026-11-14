@@ -68,8 +68,8 @@
   var root, D = null;
   function violHtml() {
     if (!VC) return '';
-    var a = VC['معلّق'] || 0, b = VC['محوّل للتحقيق'] || 0;
-    if (!a && !b) return '';
+    var a = VC['معلّق'] || 0, b = 0;   // محوّل للتحقيق = انتهى الإجراء
+    if (!a) return '';
     return '<a class="nta" href="' + VIOL_PAGE + '"><div class="nta-h"><span class="nta-bell">📝</span><span>' + esc(t().viol(a, b)) +
       '</span><span class="nta-go">' + esc(t().openV) + '</span></div></a>';
   }
