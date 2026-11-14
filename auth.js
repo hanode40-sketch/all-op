@@ -14,7 +14,7 @@
   var HOME_URL  = 'https://hanode40-sketch.github.io/all-op/';
   var KEY = 'nw_auth_v1';
   var IDLE_KEY = 'nw_last_active';
-  var AUTH_VERSION = '2026-11-15.1';   // غيّره عند كل تعديل على هذا الملف (يجبر الأجهزة على التحديث)
+  var AUTH_VERSION = '2026-11-15.2';   // غيّره عند كل تعديل على هذا الملف (يجبر الأجهزة على التحديث)
   var IDLE_MS = 2 * 60 * 60 * 1000;   // يقفل بعد ساعتين بدون أي نشاط (غيّر الرقم 2 لتغيير المدة)
 
   var script = document.currentScript;
@@ -82,7 +82,7 @@
     return p;
   }
   // صفحات الإدارة (الأداء والإحصائيات والمؤشرات): مفتوحة للمدير والمشرف تلقائياً
-  var MGMT_TOOLS = { performance: 1, stats: 1, kpi: 1 };
+  var MGMT_TOOLS = { performance: 1, stats: 1, kpi: 1, drivers: 1 };
   function can(user, tool) {
     if (!tool) return true;
     if (MGMT_TOOLS[String(tool).toLowerCase()] && user && (user.r === 'مدير' || user.r === 'مشرف')) return true;
@@ -261,7 +261,8 @@
     { g: 4, t: 'evaluation',  log: 1, ic: '📋', ar: 'سجل التقييمات',  en: 'Evaluation Log',    url: 'https://hanode40-sketch.github.io/OP/#log' },
     { g: 3, t: 'performance', ic: '📊', ar: 'أداء الموظفين',       en: 'Staff Performance', url: HOME_URL + 'performance.html' },
     { g: 3, t: 'stats',       ic: '📈', ar: 'إحصائيات العمل',      en: 'Work Statistics',   url: HOME_URL + 'stats.html' },
-    { g: 3, t: 'kpi',         ic: '🎯', ar: 'المؤشرات التشغيلية',  en: 'Operational KPIs',  url: HOME_URL + 'kpi.html' }
+    { g: 3, t: 'kpi',         ic: '🎯', ar: 'المؤشرات التشغيلية',  en: 'Operational KPIs',  url: HOME_URL + 'kpi.html' },
+    { g: 3, t: 'drivers',     ic: '👨‍✈️', ar: 'إدارة السائقين',     en: 'Drivers Management', url: HOME_URL + 'drivers.html' }
   ];
   var SIDE_GROUPS = [null, ['التشغيل اليومي', 'Daily operations'], ['التقارير والسلامة', 'Reports & safety'], ['الإدارة', 'Management'], ['السجلات', 'Records']];
   var ROLE_EN = { 'مدير': 'Manager', 'مشرف': 'Supervisor', 'مرحّل': 'Dispatcher', 'مرحل': 'Dispatcher', 'موظف': 'Employee' };
@@ -460,7 +461,7 @@
   }
 
   /* ---------- شريط عنوان ثابت موحّد لكل البرامج (نفس شكل صفحة المؤشرات) ---------- */
-  var OWN_HEAD = { stats: 1, kpi: 1, performance: 1 };        // صفحات لها شريطها الخاص
+  var OWN_HEAD = { stats: 1, kpi: 1, performance: 1, drivers: 1 };        // صفحات لها شريطها الخاص
   // عنوان البرنامج القديم (الشعار + الاسم) يتخفى لأن الشريط الجديد يعرضه
   var HIDE_OLD = {
     accident:   '.e-logo,.e-title,.e-sub',
