@@ -34,12 +34,12 @@
   .btn.light{background:#eef2f7;color:var(--navy)} .btn.green{background:#15803d} .btn:disabled{opacity:.6;cursor:wait}
   .sec{margin:22px 4px 10px;color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;gap:10px;text-shadow:0 2px 6px rgba(0,0,0,.4)}
   .sec::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.25)}
-  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
   .tile{all:unset;box-sizing:border-box;cursor:pointer;background:#fff;border-radius:16px;padding:14px 16px;position:relative;overflow:hidden;color:var(--ink);font-family:inherit;
     border:1px solid rgba(15,23,42,.06);box-shadow:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(10,25,55,.16);transition:transform .15s}
   .tile:hover{transform:translateY(-3px)} .tile::before{content:"";position:absolute;inset-inline:0;top:0;height:4px;background:var(--acc)}
   .tile .lb{font-size:13px;color:var(--muted);font-weight:600} .tile b{display:block;font-size:30px;margin-top:6px} .tile small{font-size:12px;color:var(--muted)}
-  .tiles.s{grid-template-columns:repeat(8,1fr)} .tiles.s .tile b{font-size:24px}
+  .tiles.s{grid-template-columns:repeat(9,1fr)} .tiles.s .tile b{font-size:24px}
   .grid2{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}
   .card{padding:16px;min-width:0} .card h2{margin:0 0 12px;font-size:16px;color:var(--navy)}
   table{width:100%;border-collapse:collapse;font-size:13.5px}
@@ -78,7 +78,7 @@
   html[data-theme="dark"] .alert{background:#2a1a0e;border-color:#9a3412;color:#fed7aa}
   html[data-theme="dark"] .alert.red{background:#3a1e22;border-color:#b91c1c;color:#fecaca}
   @media (min-width:1500px){ .grid2{grid-template-columns:1.5fr 1fr} }
-  @media (max-width:1000px){ .tiles.s{grid-template-columns:repeat(4,1fr)} }
+  @media (max-width:1000px){ .tiles{grid-template-columns:repeat(3,1fr)} .tiles.s{grid-template-columns:repeat(3,1fr)} }
   @media (max-width:700px){ .tiles,.tiles.s{grid-template-columns:1fr 1fr} .list .row{grid-template-columns:1fr auto} .list .row .hm{display:none} .fg{grid-template-columns:1fr} .top h1{font-size:18px} }
   @media print{ body{background:#fff!important;padding:0} body::before,.bar,.back,.nws,.nwh,.btn{display:none!important} .top{position:static;background:none;color:#000;box-shadow:none} .sec{color:#000;text-shadow:none} }
 </style>
@@ -121,7 +121,7 @@
     </div>
     <div class="list" id="list"><div class="msg" data-i="loading">جاري التحميل...</div></div>
   </div>
-  <div class="note" data-i="note">«على الرحلات» = السائقين المسجّلين في روستر التاريخ المختار. «الاستعداد» = باقي سائقي التشغيل، أو اللي انحط عليهم «استعداد» يدوياً.</div>
+  <div class="note" data-i="note">..</div>
 </div>
 
 <!-- نافذة التعديل -->
@@ -174,9 +174,9 @@ const I18N = {
   ar:{ title:'إدارة السائقين', subtitle:'Drivers Management', back:'← أدوات التشغيل', lDate:'تاريخ الروستر (على الرحلات / الاستعداد)', lDepot:'الكراج',
     refresh:'↻ تحديث', export:'⬇️ Excel', add:'➕ سائق جديد', import:'📤 استيراد من Excel', secSum:'الملخص', secList:'قائمة السائقين', loading:'جاري التحميل...',
     natTitle:'السائقون حسب الجنسية والحالة', depTitle:'سائقو التشغيل والاستعداد في الكراجات', search:'بحث بالاسم أو الإقامة أو الرقم الوظيفي...',
-    note:'«على الرحلات» = السائقين المسجّلين في روستر التاريخ المختار. «الاستعداد» = باقي سائقي التشغيل، أو اللي انحط عليهم «استعداد» يدوياً.',
+    note:'«على الرحلات» = سائقو التشغيل المسجّلون في روستر التاريخ المختار. السائق اللي مو في روستر اليوم: إذا غاب عن روستر أسبوعه (الأحد ← السبت) يومين أو أقل = «راحة»، وإذا أكثر من يومين = «استعداد». و«الاستعداد» اليدوي يبقى استعداد دائماً. ارفع روستر الأسبوع كامل عشان يطلع الحساب دقيق.',
     allDep:'كل الكراجات', allSt:'كل الحالات', allNat:'كل الجنسيات', req:'إجمالي احتياج التشغيل', active:'على رأس العمل', out:'خارج الخدمة / مطلوب تعويضهم',
-    avail:'المتاحين للتشغيل', onLeave:'في إجازات', onTrips:'على الرحلات', standby:'الاستعداد', total:'إجمالي السائقين', noRoster:'لا يوجد روستر لهذا التاريخ',
+    avail:'المتاحين للتشغيل', onLeave:'في إجازات', onTrips:'على الرحلات', standby:'الاستعداد', rest:'راحة', wk:n=>`روستر الأسبوع: ${n}/7 أيام`, total:'إجمالي السائقين', noRoster:'لا يوجد روستر لهذا التاريخ',
     nat:'الجنسية', depot:'الكراج', count:'العدد', gt:'الإجمالي', opDrivers:'التشغيل', sbDrivers:'الاستعداد', edit:'تعديل', trip:'رحلة',
     fIq:'رقم الإقامة', fEmp:'الرقم الوظيفي', fName:'اسم السائق', fNat:'الجنسية', fStatus:'الحالة', fDepot:'الكراج', fSb:'🟣 السائق على الاستعداد (Standby)',
     fFrom:'من تاريخ', fTo:'تاريخ العودة المتوقع', fMob:'الجوال', fNote:'ملاحظة', cancel:'إلغاء', save:'حفظ', saving:'جاري الحفظ...',
@@ -189,9 +189,9 @@ const I18N = {
   en:{ title:'Drivers Management', subtitle:'إدارة السائقين', back:'← Operations Tools', lDate:'Roster date (on trips / standby)', lDepot:'Depot',
     refresh:'↻ Refresh', export:'⬇️ Excel', add:'➕ New driver', import:'📤 Import from Excel', secSum:'Summary', secList:'Drivers list', loading:'Loading...',
     natTitle:'Drivers by nationality & status', depTitle:'Operational & standby drivers by depot', search:'Search by name, Iqama or employee ID...',
-    note:'"On trips" = drivers in the roster of the selected date. "Standby" = the rest of the operational drivers, or anyone manually marked as standby.',
+    note:'"On trips" = operational drivers in the roster of the selected date. A driver missing from today\'s roster is a "Rest day" if missing 2 days or fewer in that week (Sun → Sat), otherwise "Standby". Manual standby always counts as standby. Upload the full week\'s roster for accurate figures.',
     allDep:'All depots', allSt:'All statuses', allNat:'All nationalities', req:'Total operational requirement', active:'Active drivers', out:'Out of service / replacement required',
-    avail:'Available for operation', onLeave:'On leave', onTrips:'On trips', standby:'Standby', total:'Total drivers', noRoster:'No roster for this date',
+    avail:'Available for operation', onLeave:'On leave', onTrips:'On trips', standby:'Standby', rest:'Rest day', wk:n=>`Week roster: ${n}/7 days`, total:'Total drivers', noRoster:'No roster for this date',
     nat:'Nationality', depot:'Depot', count:'Count', gt:'Grand total', opDrivers:'Operation', sbDrivers:'Standby', edit:'Edit', trip:'Trip',
     fIq:'Iqama number', fEmp:'Employee ID', fName:'Driver name', fNat:'Nationality', fStatus:'Status', fDepot:'Depot', fSb:'🟣 Driver is on standby',
     fFrom:'From', fTo:'Expected return', fMob:'Mobile', fNote:'Note', cancel:'Cancel', save:'Save', saving:'Saving...',
@@ -210,13 +210,15 @@ const depName = d => d ? (LANG==='en' ? d : (DEP[d] || d)) : (LANG==='en' ? 'Una
 const pad = n => String(n).padStart(2,'0');
 const today = () => { const d = new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); };
 
-let D = [], ROSTER = {}, ROSTER_N = 0, canEdit = false, canImport = false, LISTS = {};
+let D = [], ROSTER = {}, ROSTER_N = 0, ABSENT = {}, WEEK_N = 0, canEdit = false, canImport = false, LISTS = {};
 
 /* ---------- الحسابات ---------- */
 const dep = r => r[C.DEP] || 'Unassigned';
 function filtered(depot) { return D.filter(r => !depot || dep(r) === depot); }
 function isOnTrip(r) { return r[C.ST] === 'operation' && r[C.SB] !== 'نعم' && !!ROSTER[r[C.IQ]]; }
-function isStandby(r) { return r[C.ST] === 'operation' && (r[C.SB] === 'نعم' || (ROSTER_N > 0 && !ROSTER[r[C.IQ]])); }
+const offToday = r => r[C.ST] === 'operation' && r[C.SB] !== 'نعم' && ROSTER_N > 0 && !ROSTER[r[C.IQ]];
+function isRest(r) { return offToday(r) && (ABSENT[r[C.IQ]] || 0) <= 2; }
+function isStandby(r) { return r[C.ST] === 'operation' && (r[C.SB] === 'نعم' || (offToday(r) && (ABSENT[r[C.IQ]] || 0) > 2)); }
 const in30 = () => { const d = new Date(); d.setDate(d.getDate() + 30); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); };
 const cardOk = r => r[C.ST] !== 'Termination of services' && r[C.ST] !== 'Absconding';
 function cardExpired(r) { return cardOk(r) && r[C.CARD] && r[C.CARD] < today(); }
@@ -228,15 +230,17 @@ function render() {
   const cnt = s => rows.filter(r => r[C.ST] === s).length;
   const active = cnt('operation'), leave = cnt('Annual Leave') + cnt('Emergency Leave');
   const out = cnt('Not Returned') + cnt('Suspended') + cnt('Absconding') + cnt('Termination of services');
-  const onTrips = rows.filter(isOnTrip).length, sb = rows.filter(isStandby).length;
+  const onTrips = rows.filter(isOnTrip).length, sb = rows.filter(isStandby).length, rest = rows.filter(isRest).length;
   const tile = (acc, lb, v, key, sub) => `<button class="tile" style="--acc:${acc}" data-f="${key}"><div class="lb">${lb}</div><b>${v}</b>${sub?`<small>${sub}</small>`:''}</button>`;
   $('tMain').innerHTML =
-    tile('#1f3f7a', t_('req'), active + leave, 'req') +
-    tile('#15803d', t_('active'), active, 'st:operation', `${t_('onTrips')}: ${ROSTER_N ? onTrips : '—'} · ${t_('standby')}: ${sb}`) +
+    tile('#1f3f7a', t_('req'), rows.length, 'all') +
+    tile('#0369a1', t_('active'), active + leave, 'req') +
+    tile('#15803d', t_('avail'), active, 'st:operation', `${t_('onTrips')}: ${ROSTER_N ? onTrips : '—'} · ${t_('rest')}: ${ROSTER_N ? rest : '—'} · ${t_('standby')}: ${sb}`) +
     tile('#2563eb', t_('onLeave'), leave, 'leave') +
     tile('#dc2626', t_('out'), out, 'out');
   $('tStatus').innerHTML =
-    tile('#0d9488', t_('onTrips'), ROSTER_N ? onTrips : '—', 'trip', ROSTER_N ? '' : t_('noRoster')) +
+    tile('#0d9488', t_('onTrips'), ROSTER_N ? onTrips : '—', 'trip', ROSTER_N ? t_('wk')(WEEK_N) : t_('noRoster')) +
+    tile('#64748b', t_('rest'), ROSTER_N ? rest : '—', 'rest') +
     tile('#7c3aed', t_('standby'), sb, 'sb') +
     STATUSES.filter(s => s !== 'operation').map(s => tile(ST[s].grp === 'leave' ? '#2563eb' : '#dc2626', stName(s), cnt(s), 'st:' + s)).join('');
 
@@ -252,14 +256,14 @@ function render() {
 
   // الكراجات: التشغيل والاستعداد
   const deps = DEPOTS.filter(d => !depot || d === depot);
-  let g = `<table><thead><tr><th>${t_('depot')}</th><th>${t_('opDrivers')}</th><th>${t_('onTrips')}</th><th>${t_('standby')}</th></tr></thead><tbody>`;
-  let s1 = 0, s2 = 0, s3 = 0;
+  let g = `<table><thead><tr><th>${t_('depot')}</th><th>${t_('opDrivers')}</th><th>${t_('onTrips')}</th><th>${t_('rest')}</th><th>${t_('standby')}</th></tr></thead><tbody>`;
+  let s1 = 0, s2 = 0, s3 = 0, s4 = 0;
   deps.forEach(d => {
-    const rr = D.filter(r => dep(r) === d), op = rr.filter(r => r[C.ST] === 'operation').length, tr = rr.filter(isOnTrip).length, st = rr.filter(isStandby).length;
-    if (!rr.length) return; s1 += op; s2 += tr; s3 += st;
-    g += `<tr><td><b>${esc(depName(d))}</b></td><td class="c" data-f="ds:${d}|operation">${op}</td><td class="c" data-f="dt:${d}">${ROSTER_N ? tr : '—'}</td><td class="c" data-f="db:${d}">${st}</td></tr>`;
+    const rr = D.filter(r => dep(r) === d), op = rr.filter(r => r[C.ST] === 'operation').length, tr = rr.filter(isOnTrip).length, st = rr.filter(isStandby).length, rs = rr.filter(isRest).length;
+    if (!rr.length) return; s1 += op; s2 += tr; s3 += st; s4 += rs;
+    g += `<tr><td><b>${esc(depName(d))}</b></td><td class="c" data-f="ds:${d}|operation">${op}</td><td class="c" data-f="dt:${d}">${ROSTER_N ? tr : '—'}</td><td class="c" data-f="dr:${d}">${ROSTER_N ? rs : '—'}</td><td class="c" data-f="db:${d}">${st}</td></tr>`;
   });
-  g += `<tr class="tot"><td>${t_('gt')}</td><td>${s1}</td><td>${ROSTER_N ? s2 : '—'}</td><td>${s3}</td></tr></tbody></table>`;
+  g += `<tr class="tot"><td>${t_('gt')}</td><td>${s1}</td><td>${ROSTER_N ? s2 : '—'}</td><td>${ROSTER_N ? s4 : '—'}</td><td>${s3}</td></tr></tbody></table>`;
   $('depTable').innerHTML = g;
 
   // تنبيه المتأخرين عن العودة
@@ -274,11 +278,13 @@ function render() {
 let LISTF = '';
 function applyF(rows) {
   const f = LISTF; if (!f) return rows;
+  if (f === 'all') return rows;
   if (f === 'req') return rows.filter(r => ['operation','Annual Leave','Emergency Leave'].includes(r[C.ST]));
   if (f === 'leave') return rows.filter(r => ST[r[C.ST]] && ST[r[C.ST]].grp === 'leave');
   if (f === 'out') return rows.filter(r => ST[r[C.ST]] && ST[r[C.ST]].grp === 'out');
   if (f === 'trip') return rows.filter(isOnTrip);
   if (f === 'sb') return rows.filter(isStandby);
+  if (f === 'rest') return rows.filter(isRest);
   if (f === 'late') return rows.filter(isLate);
   if (f === 'cexp') return rows.filter(cardExpired);
   if (f === 'csoon') return rows.filter(cardSoon);
@@ -289,6 +295,7 @@ function applyF(rows) {
   if (k === 'ds') { const [d, s] = v.split('|'); return rows.filter(r => dep(r) === d && r[C.ST] === s); }
   if (k === 'dt') return rows.filter(r => dep(r) === v && isOnTrip(r));
   if (k === 'db') return rows.filter(r => dep(r) === v && isStandby(r));
+  if (k === 'dr') return rows.filter(r => dep(r) === v && isRest(r));
   return rows;
 }
 function renderList() {
@@ -301,7 +308,7 @@ function renderList() {
   $('list').innerHTML = head + rows.slice(0, 300).map(r => {
     const tr = ROSTER[r[C.IQ]];
     const badges = `<span class="chip ${ST[r[C.ST]] ? ST[r[C.ST]].cls : ''}">${esc(stName(r[C.ST]))}</span>` +
-      (isStandby(r) ? ` <span class="chip s-sb">${t_('standby')}</span>` : '') + (isOnTrip(r) ? ` <span class="chip s-trip">🚌 ${esc(tr)}</span>` : '') +
+      (isStandby(r) ? ` <span class="chip s-sb">${t_('standby')}</span>` : '') + (isRest(r) ? ` <span class="chip" style="background:var(--nbg);color:var(--n)">😴 ${t_('rest')}</span>` : '') + (isOnTrip(r) ? ` <span class="chip s-trip">🚌 ${esc(tr)}</span>` : '') +
       (isLate(r) ? ` <span class="chip s-late">⏰ ${esc(r[C.TO])}</span>` : (r[C.TO] && ST[r[C.ST]] && ST[r[C.ST]].grp === 'leave' ? ` <small style="color:var(--muted)">↩ ${esc(r[C.TO])}</small>` : '')) +
       (cardExpired(r) ? ` <span class="chip s-late">🪪 ${t_('cExp')} ${esc(r[C.CARD])}</span>` : cardSoon(r) ? ` <span class="chip s-emergency">🪪 ${t_('cSoon')} ${esc(r[C.CARD])}</span>` : '');
     return `<div class="row"><div class="nm"><b>${esc(r[C.NAME])}</b><small>${esc(r[C.IQ])}${r[C.EMP] ? ' · ' + esc(r[C.EMP]) : ''}${r[C.MOB] ? ' · 📞 ' + esc(r[C.MOB]) : ''}</small></div>
@@ -314,20 +321,31 @@ function renderList() {
 async function load() {
   $('list').innerHTML = `<div class="msg">${t_('loading')}</div>`;
   try {
-    const [a, r] = await Promise.all([NWAuth.call('driversList', {}), loadRoster()]);
+    const a = await NWAuth.call('driversList', {});
     if (a.error === 'AUTH') { NWAuth.relogin(); throw new Error(t_('eAuth')); }
     if (!a.ok) throw new Error(t_('eErr') + (a.error || ''));
     D = a.drivers || []; canEdit = !!a.canEdit; canImport = !!a.canImport;
+    await loadRoster();
     $('bAdd').style.display = canEdit ? '' : 'none'; $('bImport').style.display = canImport ? '' : 'none';
     fillFilters(); render();
   } catch (e) { $('list').innerHTML = `<div class="msg err">${esc(e.message || t_('eNet'))}</div>`; }
 }
+/* أسبوع التاريخ المختار (الأحد ← السبت): من غاب عن الروستر يومين أو أقل = راحة، أكثر من يومين = استعداد */
+const ymd = d => d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+function weekOf(ds) { const d = new Date(ds + 'T12:00:00'), s = new Date(d); s.setDate(d.getDate() - d.getDay()); const e = new Date(s); e.setDate(s.getDate() + 6); return [ymd(s), ymd(e)]; }
 async function loadRoster() {
-  ROSTER = {}; ROSTER_N = 0;
-  try {
-    const j = await NWAuth.call('rosterGet', { date: $('fDate').value });
-    if (j && j.ok) (j.rows || []).forEach(r => { [r[1], r[2]].forEach(x => { if (x) ROSTER[String(x).trim()] = String(r[0]); }); ROSTER_N++; });
-  } catch (e) {}
+  ROSTER = {}; ROSTER_N = 0; ABSENT = {}; WEEK_N = 0;
+  const date = $('fDate').value, [from, to] = weekOf(date);
+  let days = null;
+  try { const j = await NWAuth.call('rosterRange', { from, to }); if (j && j.ok) days = j.days || {}; } catch (e) {}
+  if (!days) { try { const j = await NWAuth.call('rosterGet', { date }); days = {}; if (j && j.ok && (j.rows || []).length) days[date] = j.rows; } catch (e) { days = {}; } }
+  const sets = Object.keys(days).filter(k => (days[k] || []).length).map(k => {
+    const set = {}; days[k].forEach(r => [r[1], r[2]].forEach(x => { if (x) set[String(x).trim()] = String(r[0]); }));
+    if (k === date) { ROSTER = set; ROSTER_N = days[k].length; }
+    return set;
+  });
+  WEEK_N = sets.length;
+  D.forEach(r => { ABSENT[r[C.IQ]] = sets.filter(st => !st[r[C.IQ]]).length; });
 }
 function fillFilters() {
   const keep = (id, html) => { const v = $(id).value; $(id).innerHTML = html; if ([...$(id).options].some(o => o.value === v)) $(id).value = v; };
@@ -422,8 +440,8 @@ $('impFile').onchange = async () => {
 };
 $('bExport').onclick = async () => {
   await loadXlsx();
-  const head = ['No.', 'Employee ID', 'ID Number', 'Driver Name', 'Status', 'Nationality', 'Depot', 'Standby', 'On trip', 'Mobile', 'From', 'Expected return', 'Operating card expiry', 'Note', 'Last update by', 'Last update'];
-  const rows = applyF(filtered($('fDepot').value)).map((r, i) => [i + 1, r[C.EMP], r[C.IQ], r[C.NAME], r[C.ST], r[C.NAT], r[C.DEP], isStandby(r) ? 'Yes' : '', ROSTER[r[C.IQ]] || '', r[C.MOB], r[C.FROM], r[C.TO], r[C.CARD] || '', r[C.NOTE], r[C.BY], r[C.AT]]);
+  const head = ['No.', 'Employee ID', 'ID Number', 'Driver Name', 'Status', 'Nationality', 'Depot', 'Standby', 'Rest day', 'On trip', 'Mobile', 'From', 'Expected return', 'Operating card expiry', 'Note', 'Last update by', 'Last update'];
+  const rows = applyF(filtered($('fDepot').value)).map((r, i) => [i + 1, r[C.EMP], r[C.IQ], r[C.NAME], r[C.ST], r[C.NAT], r[C.DEP], isStandby(r) ? 'Yes' : '', isRest(r) ? 'Yes' : '', ROSTER[r[C.IQ]] || '', r[C.MOB], r[C.FROM], r[C.TO], r[C.CARD] || '', r[C.NOTE], r[C.BY], r[C.AT]]);
   const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([head, ...rows]), 'Drivers_Data');
   XLSX.writeFile(wb, `Northwest_Bus_Drivers_${today()}.xlsx`);
 };
