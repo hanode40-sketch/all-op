@@ -10,17 +10,22 @@
   var TASKS_URL = 'https://script.google.com/macros/s/AKfycbzd8yDSxYL_Qt4JLaaTpqRG4IOAkhuGTx9mY98NevDqseiTyOmSWfZpIr9YOTxy51iVvQ/exec';
   var TASKS_PAGE = 'https://hanode40-sketch.github.io/tasks/';
   var REFRESH_MS = 5 * 60 * 1000;
+  var VIOL_URL = 'https://script.google.com/macros/s/AKfycbynHzaInTH3aul1LCv2_w6FkEZ0_r-24P9Tw5P8WuhNqgHI-8H5yuU8tOl1Uko3OVl4Ag/exec';
+  var VIOL_PAGE = 'https://hanode40-sketch.github.io/violation/';
+  var VC = null;   // عدد المحاضر حسب الحالة
 
   var T = {
     ar: { mine: function (n) { return 'لديك مهام لم تقم بتأكيد إنجازها (' + n + ')'; },
           over: function (n) { return n + ' متأخرة'; }, high: function (n) { return n + ' عاجلة'; },
           list: function (a, b) { return 'قائمة الوردية اليومية: ' + a + ' من ' + b; },
           follow: function (n) { return 'لديك مهام كلّفت بها غيرك ولم يتم تأكيد إنجازها (' + n + ' متأخرة)'; },
+          viol: function (a, b) { return 'محاضر مخالفات بانتظار إجراء: ' + a + ' معلّقة' + (b ? ' · ' + b + ' محوّلة للتحقيق' : ''); }, openV: 'فتح المحاضر ←',
           due: 'الموعد', open: 'فتح المهام ←', lateTag: 'متأخرة', newTag: 'جديدة', doingTag: 'قيد التنفيذ' },
     en: { mine: function (n) { return 'You have tasks you have not confirmed as done (' + n + ')'; },
           over: function (n) { return n + ' overdue'; }, high: function (n) { return n + ' urgent'; },
           list: function (a, b) { return 'Daily shift checklist: ' + a + ' of ' + b; },
           follow: function (n) { return 'Tasks you assigned have not been confirmed as done (' + n + ' overdue)'; },
+          viol: function (a, b) { return 'Violation reports awaiting action: ' + a + ' pending' + (b ? ' · ' + b + ' under investigation' : ''); }, openV: 'Open reports →',
           due: 'Due', open: 'Open tasks →', lateTag: 'Overdue', newTag: 'New', doingTag: 'In progress' }
   };
   function lang() { try { return localStorage.getItem('hubLang') === 'en' ? 'en' : 'ar'; } catch (e) { return 'ar'; } }
@@ -35,7 +40,7 @@
   }
 
   var css =
-    '.nta{display:block;text-decoration:none!important;margin:0 0 22px;border-radius:16px;padding:14px 16px;color:#7c2d12;' +
+    '.nta{display:block;text-decoration:none!important;margin:0 0 14px;border-radius:16px;padding:14px 16px;color:#7c2d12;' +
       'background:linear-gradient(135deg,#fff7ed,#ffedd5);border:1px solid #fdba74;box-shadow:0 8px 24px rgba(10,25,55,.16);cursor:pointer;transition:transform .15s}' +
     '.nta:hover{transform:translateY(-2px)}' +
     '.nta.bad{color:#7f1d1d;background:linear-gradient(135deg,#fef2f2,#fee2e2);border-color:#fca5a5}' +
@@ -61,10 +66,17 @@
     '@media (max-width:600px){.nta-go{margin-inline-start:0}}';
 
   var root, D = null;
+  function violHtml() {
+    if (!VC) return '';
+    var a = VC['معلّق'] || 0, b = VC['محوّل للتحقيق'] || 0;
+    if (!a && !b) return '';
+    return '<a class="nta" href="' + VIOL_PAGE + '"><div class="nta-h"><span class="nta-bell">📝</span><span>' + esc(t().viol(a, b)) +
+      '</span><span class="nta-go">' + esc(t().openV) + '</span></div></a>';
+  }
   function render() {
     if (!root) return;
     var badge = document.querySelector('a.card[data-tool="tasks"] .nta-badge');
-    if (!D || !D.me) { root.innerHTML = ''; if (badge) badge.remove(); return; }
+    if (!D || !D.me) { root.innerHTML = violHtml(); if (badge) badge.remove(); return; }
     var me = D.me.u, L = t();
     var tasks = D.tasks || [];
     var mine = tasks.filter(function (x) { return x.to === me && isOpen(x); });
@@ -80,7 +92,7 @@
       else if (badge) badge.remove();
     }
 
-    if (!mine.length && !follow.length && !clOpen) { root.innerHTML = ''; return; }
+    if (!mine.length && !follow.length && !clOpen) { root.innerHTML = violHtml(); return; }
     var bad = mineOver.length || follow.length;
     var chips = '';
     if (mineOver.length) chips += '<span class="nta-chip r">🔴 ' + esc(L.over(mineOver.length)) + '</span>';
@@ -97,11 +109,21 @@
     if (!mine.length && follow.length && clOpen) extra += '<div class="nta-x">📋 ' + esc(L.list(clDone, cl.length)) + '</div>';
     root.innerHTML = '<a class="nta' + (bad ? ' bad' : '') + '" href="' + TASKS_PAGE + '">' +
       '<div class="nta-h"><span class="nta-bell">🔔</span><span>' + esc(head) + '</span><span class="nta-chips">' + chips + '</span><span class="nta-go">' + esc(L.open) + '</span></div>' +
-      (list ? '<ul class="nta-l">' + list + '</ul>' : '') + extra + '</a>';
+      (list ? '<ul class="nta-l">' + list + '</ul>' : '') + extra + '</a>' + violHtml();
   }
 
+  function loadViol() {
+    if (!window.NWAuth || !(NWAuth.role === 'مدير' || NWAuth.role === 'مشرف')) return;
+    if (NWAuth.can && !NWAuth.can('violation')) return;
+    fetch(VIOL_URL + '?action=summary&authToken=' + encodeURIComponent(NWAuth.token()))
+      .then(function (r) { return r.json(); })
+      .then(function (j) { if (j && j.ok && j.counts) { VC = j.counts; render(); } })
+      .catch(function () {});
+  }
   function load() {
+    loadViol();
     if (!window.NWAuth) return;
+    if (NWAuth.can && !NWAuth.can('tasks')) return;
     fetch(TASKS_URL + '?action=boot&month=&authToken=' + encodeURIComponent(NWAuth.token()))
       .then(function (r) { return r.json(); })
       .then(function (j) { if (j && j.ok !== false && j.me) { D = j; render(); } })
@@ -111,7 +133,6 @@
   function mount() {
     root = document.getElementById('nw-task-alert');
     if (!root || !window.NWAuth) return;
-    if (NWAuth.can && !NWAuth.can('tasks')) { root.style.display = 'none'; return; }
     var s = document.createElement('style'); s.textContent = css; document.head.appendChild(s);
     load();
     setInterval(load, REFRESH_MS);
