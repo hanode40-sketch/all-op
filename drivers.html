@@ -136,8 +136,8 @@
 <div class="ov" id="swOv"><div class="md" style="max-width:560px">
   <h3 data-i="swTitle">🔄 تبديل سائق</h3><div class="sub" id="swSub"></div>
   <div class="fg">
-    <div class="full" id="swOrigW"><label data-i="swOrig">السائق المعتذر ورحلته</label><select id="swOrig"></select></div>
-    <div class="full" id="swRepW"><label data-i="swRep">السائق البديل</label><select id="swRep"></select></div>
+    <div class="full" id="swOrigW"><label data-i="swOrig">السائق المعتذر ورحلته</label><div style="position:relative;margin-bottom:8px"><input id="swOrigQ" type="search" autocomplete="off" data-ph="swQph"><div id="swOrigS" class="sug"></div></div><select id="swOrig"></select></div>
+    <div class="full" id="swRepW"><label data-i="swRep">السائق البديل</label><div style="position:relative;margin-bottom:8px"><input id="swRepQ" type="search" autocomplete="off" data-ph="swQph"><div id="swRepS" class="sug"></div></div><select id="swRep"></select></div>
     <div><label><span data-i="swReason">السبب</span> <b style="color:#dc2626">*</b></label><select id="swReason"><option value="">— اختر السبب —</option><option>رفض الرحلة</option><option>مريض</option><option>غياب</option><option>ظرف طارئ</option><option>تأخر</option><option>أخرى</option></select></div>
     <div><label><span data-i="swNote">ملاحظة</span> <b style="color:#dc2626">*</b></label><input id="swNote" maxlength="300" data-ph="swNotePh" placeholder="اكتب تفاصيل السبب..."></div>
   </div>
@@ -195,7 +195,7 @@ const I18N = {
     natTitle:'السائقون حسب الجنسية والحالة', depTitle:'سائقو التشغيل والاستعداد في الكراجات', search:'ابحث برقم الإقامة أو الاسم أو الرحلة...',
     note:'«على الرحلات» = سائقو التشغيل المسجّلون في روستر التاريخ المختار. السائق اللي مو في روستر اليوم: إذا كان غير مجدول يومين متتاليين أو أقل = «راحة»، وإذا أكثر من يومين متتاليين = «استعداد». و«الاستعداد» اليدوي يبقى استعداد. ارفعوا الروستر يوم بيوم عشان يطلع الحساب دقيق.',
     allDep:'كل الكراجات', myDeps:'كل كراجاتي', allSt:'كل الحالات', allNat:'كل الجنسيات', req:'إجمالي احتياج التشغيل', active:'على رأس العمل', out:'خارج الخدمة / مطلوب تعويضهم',
-    avail:'المتاحين للتشغيل', onLeave:'في إجازات', onTrips:'على الرحلات', standby:'الاستعداد', rest:'راحة', outT:'معتذر/مستبدل', swapA:n=>`🔄 ${n} تبديل سائق في هذا التاريخ`, swapT:'تبديل السائق ببديل من الاستعداد', unswap:'إلغاء التبديل', subFor:'بديل عن', swTitle:'🔄 تبديل سائق', swOrig:'السائق المعتذر ورحلته', swNeedR:'اختر سبب التبديل', swNeedN:'اكتب ملاحظة توضح السبب', swNotePh:'اكتب تفاصيل السبب...', swPickO:'اختر السائق المعتذر / الرحلة', swFromB:'تكليف', swFromT:'تكليف هذا السائق بديل عن سائق معتذر', swRep:'السائق البديل', swReason:'السبب', swNote:'ملاحظة', swDo:'تأكيد التبديل', swG1:'الاستعداد', swG2:'الراحة', swSame:'نفس الموقع', swBusy:'البديل عنده رحلة في نفس اليوم', swNotIn:'السائق الأصلي مو موجود في روستر هذا اليوم', swPick:'اختر السائق البديل', swDone:'✅ تم التبديل — يظهر البديل في مسار الرحلة', unswAsk:'إلغاء التبديل ورجوع السائق الأصلي للرحلة؟', sbAt:'استعداد في', restAt:'راحة في', lastT:'آخر رحلة', manual:'يدوي', offN:n=>`${n} أيام`, since:d=>`من ${d}`, wk:n=>`أيام الروستر المرفوعة حول التاريخ: ${n}`, total:'إجمالي السائقين', noRoster:'لا يوجد روستر لهذا التاريخ',
+    avail:'المتاحين للتشغيل', onLeave:'في إجازات', onTrips:'على الرحلات', standby:'الاستعداد', rest:'راحة', outT:'معتذر/مستبدل', swapA:n=>`🔄 ${n} تبديل سائق في هذا التاريخ`, swapT:'تبديل السائق ببديل من الاستعداد', unswap:'إلغاء التبديل', subFor:'بديل عن', swTitle:'🔄 تبديل سائق', swOrig:'السائق المعتذر ورحلته', swQph:'🔍 ابحث بالاسم أو الإقامة أو رقم الرحلة...', noMatch:'لا توجد نتائج', swNeedR:'اختر سبب التبديل', swNeedN:'اكتب ملاحظة توضح السبب', swNotePh:'اكتب تفاصيل السبب...', swPickO:'اختر السائق المعتذر / الرحلة', swFromB:'تكليف', swFromT:'تكليف هذا السائق بديل عن سائق معتذر', swRep:'السائق البديل', swReason:'السبب', swNote:'ملاحظة', swDo:'تأكيد التبديل', swG1:'الاستعداد', swG2:'الراحة', swSame:'نفس الموقع', swBusy:'البديل عنده رحلة في نفس اليوم', swNotIn:'السائق الأصلي مو موجود في روستر هذا اليوم', swPick:'اختر السائق البديل', swDone:'✅ تم التبديل — يظهر البديل في مسار الرحلة', unswAsk:'إلغاء التبديل ورجوع السائق الأصلي للرحلة؟', sbAt:'استعداد في', restAt:'راحة في', lastT:'آخر رحلة', manual:'يدوي', offN:n=>`${n} أيام`, since:d=>`من ${d}`, wk:n=>`أيام الروستر المرفوعة حول التاريخ: ${n}`, total:'إجمالي السائقين', noRoster:'لا يوجد روستر لهذا التاريخ',
     nat:'الجنسية', depot:'الكراج', count:'العدد', gt:'الإجمالي', opDrivers:'التشغيل', sbDrivers:'الاستعداد', edit:'تعديل', trip:'رحلة',
     fIq:'رقم الإقامة', fEmp:'الرقم الوظيفي', fName:'اسم السائق', fNat:'الجنسية', fStatus:'الحالة', fDepot:'الكراج', fSb:'🟣 السائق على الاستعداد (Standby)',
     fFrom:'من تاريخ', fTo:'تاريخ العودة المتوقع', fMob:'الجوال', fNote:'ملاحظة', cancel:'إلغاء', save:'حفظ', saving:'جاري الحفظ...',
@@ -211,7 +211,7 @@ const I18N = {
     natTitle:'Drivers by nationality & status', depTitle:'Operational & standby drivers by depot', search:'Search by Iqama, name or trip...',
     note:'"On trips" = operational drivers in the roster of the selected date. A driver missing from today\'s roster is on a "Rest day" if unscheduled for 2 consecutive days or fewer, otherwise "Standby". Manual standby always counts as standby.',
     allDep:'All depots', myDeps:'All my depots', allSt:'All statuses', allNat:'All nationalities', req:'Total operational requirement', active:'Active drivers', out:'Out of service / replacement required',
-    avail:'Available for operation', onLeave:'On leave', onTrips:'On trips', standby:'Standby', rest:'Rest day', outT:'Replaced', swapA:n=>`🔄 ${n} driver replacements on this date`, swapT:'Replace with a standby driver', unswap:'Cancel replacement', subFor:'Replacing', swTitle:'🔄 Replace driver', swOrig:'Absent driver & trip', swNeedR:'Choose the reason', swNeedN:'Write a note explaining the reason', swNotePh:'Describe the reason...', swPickO:'Choose the absent driver / trip', swFromB:'Assign', swFromT:'Assign this driver to replace an absent driver', swRep:'Replacement driver', swReason:'Reason', swNote:'Note', swDo:'Confirm replacement', swG1:'Standby', swG2:'Rest day', swSame:'same location', swBusy:'The replacement already has a trip that day', swNotIn:'The original driver is not in this day\'s roster', swPick:'Choose the replacement driver', swDone:'✅ Replaced — the replacement shows in Trip Route', unswAsk:'Cancel the replacement and return the original driver to the trip?', sbAt:'standby at', restAt:'resting at', lastT:'Last trip', manual:'manual', offN:n=>`${n} days`, since:d=>`since ${d}`, wk:n=>`Roster days uploaded around date: ${n}`, total:'Total drivers', noRoster:'No roster for this date',
+    avail:'Available for operation', onLeave:'On leave', onTrips:'On trips', standby:'Standby', rest:'Rest day', outT:'Replaced', swapA:n=>`🔄 ${n} driver replacements on this date`, swapT:'Replace with a standby driver', unswap:'Cancel replacement', subFor:'Replacing', swTitle:'🔄 Replace driver', swOrig:'Absent driver & trip', swQph:'🔍 Search by name, Iqama or trip...', noMatch:'No matches', swNeedR:'Choose the reason', swNeedN:'Write a note explaining the reason', swNotePh:'Describe the reason...', swPickO:'Choose the absent driver / trip', swFromB:'Assign', swFromT:'Assign this driver to replace an absent driver', swRep:'Replacement driver', swReason:'Reason', swNote:'Note', swDo:'Confirm replacement', swG1:'Standby', swG2:'Rest day', swSame:'same location', swBusy:'The replacement already has a trip that day', swNotIn:'The original driver is not in this day\'s roster', swPick:'Choose the replacement driver', swDone:'✅ Replaced — the replacement shows in Trip Route', unswAsk:'Cancel the replacement and return the original driver to the trip?', sbAt:'standby at', restAt:'resting at', lastT:'Last trip', manual:'manual', offN:n=>`${n} days`, since:d=>`since ${d}`, wk:n=>`Roster days uploaded around date: ${n}`, total:'Total drivers', noRoster:'No roster for this date',
     nat:'Nationality', depot:'Depot', count:'Count', gt:'Grand total', opDrivers:'Operation', sbDrivers:'Standby', edit:'Edit', trip:'Trip',
     fIq:'Iqama number', fEmp:'Employee ID', fName:'Driver name', fNat:'Nationality', fStatus:'Status', fDepot:'Depot', fSb:'🟣 Driver is on standby',
     fFrom:'From', fTo:'Expected return', fMob:'Mobile', fNote:'Note', cancel:'Cancel', save:'Save', saving:'Saving...',
@@ -547,6 +547,27 @@ document.addEventListener('click', e => {
 });
 $('bAdd').onclick = () => openEdit('');
 /* ---------- تبديل سائق ---------- */
+/* بحث داخل قائمة الاختيار: يكتب جزء من الاسم أو الإقامة أو الرحلة وتطلع الاقتراحات */
+function picker(qId, sId, selId) {
+  const q = $(qId), box = $(sId), sel = $(selId); let hits = [], act = -1;
+  const hide = () => { box.classList.remove('on'); box.innerHTML = ''; hits = []; act = -1; };
+  const show = () => {
+    const v = q.value.trim().toLowerCase(); if (!v) { hide(); return; }
+    hits = [...sel.options].filter(o => o.value && (o.text.toLowerCase().includes(v) || o.value.includes(v))).slice(0, 20);
+    if (!hits.length) { box.innerHTML = `<div style="cursor:default;color:var(--muted)">${t_('noMatch')}</div>`; box.classList.add('on'); return; }
+    box.innerHTML = hits.map((o, i) => `<div data-pk="${i}">${esc(o.text)}<br><small>${esc(o.value)}</small></div>`).join(''); box.classList.add('on'); act = -1;
+  };
+  const pick = i => { const o = hits[i]; if (!o) return; sel.value = o.value; q.value = ''; hide(); sel.style.outline = '3px solid #16a34a'; setTimeout(() => sel.style.outline = '', 900); };
+  q.addEventListener('input', show); q.addEventListener('focus', show); q.addEventListener('blur', () => setTimeout(hide, 150));
+  q.addEventListener('keydown', e => {
+    if (!hits.length) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); act = (act + (e.key === 'ArrowDown' ? 1 : -1) + hits.length) % hits.length; [...box.children].forEach((x, i) => x.classList.toggle('act', i === act)); }
+    else if (e.key === 'Enter') { e.preventDefault(); pick(act < 0 ? 0 : act); }
+    else if (e.key === 'Escape') hide();
+  });
+  box.addEventListener('mousedown', e => { const x = e.target.closest('[data-pk]'); if (x) { e.preventDefault(); pick(+x.dataset.pk); } });
+}
+picker('swOrigQ', 'swOrigS', 'swOrig'); picker('swRepQ', 'swRepS', 'swRep');
 let SW = null;
 function openSwapFrom(iq) {           // من سائق الاستعداد/الراحة: يختار الرحلة اللي بيغطيها
   const r = D.find(x => x[C.IQ] === iq); if (!r) return;
@@ -557,7 +578,7 @@ function openSwapFrom(iq) {           // من سائق الاستعداد/الر
     .sort((x, y) => (dep(y) === here) - (dep(x) === here) || String(ROSTER[x[C.IQ]]).localeCompare(String(ROSTER[y[C.IQ]])));
   $('swOrig').innerHTML = `<option value="">— ${t_('swPickO')} —</option>` + on.map(x => `<option value="${esc(x[C.IQ])}">🚌 ${esc(ROSTER[x[C.IQ]])} · ${esc(x[C.NAME])} · ${esc(depName(dep(x)))}${dep(x) === here ? ' ✓' : ''}</option>`).join('');
   $('swOrigW').style.display = ''; $('swRepW').style.display = 'none';
-  $('swNote').value = ''; $('swReason').value = ''; $('swOv').classList.add('on');
+  $('swNote').value = ''; $('swReason').value = ''; $('swOrigQ').value = ''; $('swOv').classList.add('on'); setTimeout(() => $('swOrigQ').focus(), 50);
 }
 function openSwap(iq) {
   const r = D.find(x => x[C.IQ] === iq); if (!r) return;
@@ -569,7 +590,7 @@ function openSwap(iq) {
   const sort = a => a.sort((x, y) => (sbDep(y) === here) - (sbDep(x) === here) || String(x[C.NAME]).localeCompare(String(y[C.NAME])));
   const sb = sort(D.filter(isStandby)), rs = sort(D.filter(isRest));
   $('swRep').innerHTML = `<option value="">— ${t_('swPick')} —</option>` + (sb.length ? `<optgroup label="${t_('swG1')} (${sb.length})">${sb.map(opt).join('')}</optgroup>` : '') + (rs.length ? `<optgroup label="${t_('swG2')} (${rs.length})">${rs.map(opt).join('')}</optgroup>` : '');
-  $('swNote').value = ''; $('swReason').value = ''; $('swOv').classList.add('on');
+  $('swNote').value = ''; $('swReason').value = ''; $('swRepQ').value = ''; $('swOv').classList.add('on'); setTimeout(() => $('swRepQ').focus(), 50);
 }
 $('swCancel').onclick = () => { $('swOv').classList.remove('on'); SW = null; };
 $('swOv').addEventListener('click', e => { if (e.target.id === 'swOv') $('swOv').classList.remove('on'); });
