@@ -560,6 +560,24 @@ $('bDash').onclick = () => {
   const deps = DEPOTS.filter(d => inDep(d, depot));
   const opRows = deps.map(d => [d, rows.filter(r => dep(r) === d && r[C.ST] === 'operation').length]).filter(x => x[1] || !depot);
   const sbRows = deps.map(d => [d, D.filter(r => isStandby(r) && sbDep(r) === d).length, D.filter(r => isRest(r) && sbDep(r) === d).length]);
+  // ---- التصميم الداكن ----
+  const parts = [['على الرحلات', ROSTER_N ? trips : 0, '#2dd4bf'], ['راحة', ROSTER_N ? rest : 0, '#94a3b8'], ['استعداد', sb, '#a78bfa'], ['معتذرين', outN, '#f87171']];
+  const pTot = parts.reduce((a, x) => a + x[1], 0) || 1, R = 113, CIRC = 2 * Math.PI * R; let off = 0;
+  const donut = `<svg width="260" height="260" viewBox="0 0 260 260"><circle cx="130" cy="130" r="${R}" fill="none" stroke="#1b2a57" stroke-width="34"/>` +
+    parts.map(x => { const L = CIRC * x[1] / pTot, c = `<circle cx="130" cy="130" r="${R}" fill="none" stroke="${x[2]}" stroke-width="34" stroke-dasharray="${L} ${CIRC - L}" stroke-dashoffset="${-off}" transform="rotate(-90 130 130)"/>`; off += L; return c; }).join('') + '</svg>';
+  const dRows = deps.map(d => { const opN = rows.filter(r => dep(r) === d && r[C.ST] === 'operation').length;
+    return [d, opN, rows.filter(r => dep(r) === d && isOnTrip(r)).length, D.filter(r => isRest(r) && sbDep(r) === d).length, D.filter(r => isStandby(r) && sbDep(r) === d).length]; }).filter(x => x[1] || x[3] || x[4]);
+  const dMax = Math.max(1, ...dRows.map(x => Math.max(x[1], x[2] + x[3] + x[4])));
+  const pct = rows.length ? Math.round(op / rows.length * 100) : 0;
+  const dark = `<div id="dash2" dir="rtl"><div class="hd2"><div><h1>لوحة السائقين · Drivers Overview</h1><small>${dTxt} · ${esc(scope)}</small></div><img src="${location.origin}${location.pathname.replace(/[^/]*$/, '')}icon-192.png" alt="" onerror="this.style.display='none'"></div>
+<div class="k5">${[['إجمالي الاحتياج', rows.length, '', ''], ['على رأس العمل', op + an + em + sk, '', ''], ['المتاحين للتشغيل', op, '', pct + '% من الإجمالي'], ['في إجازات', an + em + sk, '#60a5fa', ''], ['خارج الخدمة', nr + su + ab + te, '#f87171', '']].map(x => `<div class="c2"><span>${x[0]}</span><b style="color:${x[2] || '#fff'}">${x[1]}</b>${x[3] ? `<i>${x[3]}</i>` : ''}</div>`).join('')}</div>
+<div class="g2"><div class="c2 dn"><h3>توزيع المتاحين اليوم</h3><div class="dw">${donut}<div class="ctr"><b>${op}</b><span>متاح</span></div></div>
+<div class="lg">${parts.map(x => `<div><span><em style="background:${x[2]}"></em>${x[0]}</span><b>${x[0] === 'استعداد' || x[0] === 'معتذرين' || ROSTER_N ? x[1] : '—'}</b></div>`).join('')}</div></div>
+<div class="c2"><h3>الكراجات: <em style="background:#2dd4bf"></em>رحلات · <em style="background:#94a3b8"></em>راحة · <em style="background:#a78bfa"></em>استعداد</h3>
+${dRows.map(x => `<div class="br"><span>${esc(depName(x[0]))}</span><div class="tr"><i style="width:${x[2] / dMax * 100}%;background:#2dd4bf"></i><i style="width:${x[3] / dMax * 100}%;background:#94a3b8"></i><i style="width:${x[4] / dMax * 100}%;background:#a78bfa"></i></div><b>${x[1]}</b><small>${x[2]} · ${x[3]} · ${x[4]}</small></div>`).join('')}</div></div>
+<div class="k7">${[['إجازة سنوية', an, '#60a5fa'], ['اضطرارية', em, '#60a5fa'], ['مرضية', sk, '#f9a8d4'], ['لم يعد', nr, '#f87171'], ['موقوف', su, '#f87171'], ['هروب', ab, '#f87171'], ['إنهاء خدمات', te, '#f87171']].map(x => `<div class="c2"><span>${x[0]}</span><b style="color:${x[2]}">${x[1]}</b></div>`).join('')}</div>
+<div class="nat2">${nats.map(n => { const v = rows.filter(r => (r[C.NAT] || '—') === n).length; return `<div><span>${esc(n)}</span><b>${v}</b></div>`; }).join('')}</div>
+<div class="ft2">NORTHWEST BUS · OPERATIONS MANAGEMENT · ${esc(new Date().toLocaleString('en-GB'))}</div></div>`;
   const box = (cls, en, ar, v, ic) => `<div class="k ${cls}"><div class="ic">${ic}</div><div class="t"><b>${en}</b><span>${ar}</span></div><div class="v">${v}</div></div>`;
   const small = (cls, en, ar, v, ic) => `<div class="s ${cls}"><div class="ic">${ic}</div><b>${en}</b><span>${ar}</span><div class="v">${v}</div></div>`;
   const html = `<!DOCTYPE html><html lang="ar" dir="ltr"><head><meta charset="utf-8"><title>Drivers Dashboard ${date}</title>
@@ -583,9 +601,20 @@ td{padding:7px 6px;text-align:center;border-bottom:1px solid #e3e8f0}td.l{text-a
 .tw{margin:0 24px;border:1px solid #c9d3e2;border-top:0}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 24px 8px}.two .sec{margin:0}.two .tw{margin:0}.sec.o{background:#f97316}
 .ft{text-align:center;color:#f97316;font-weight:800;font-size:13px;background:#0f2447;padding:10px;margin-top:12px;letter-spacing:.5px}
-@media print{.bar{display:none}body{background:#fff}#dash{margin:0;box-shadow:none;border:0;zoom:.72}@page{size:A4 landscape;margin:8mm}}
+#dash2{width:1400px;margin:16px auto;background:#0b1530;color:#e7edf8;padding:28px 32px}
+#dash2 .hd2{display:flex;justify-content:space-between;align-items:center}#dash2 h1{margin:0;font-size:30px}#dash2 .hd2 small{color:#8fa3c7;font-size:15px}#dash2 .hd2 img{height:64px;background:#fff;border-radius:12px;padding:4px}
+#dash2 .k5{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:22px 0}#dash2 .c2{background:#13214a;border:1px solid #22356b;border-radius:16px;padding:18px}#dash2 .c2 span{color:#8fa3c7;font-size:14px}#dash2 .c2>b{display:block;font-size:42px;margin-top:6px}#dash2 .c2 i{font-style:normal;font-size:13px;color:#8fa3c7}
+#dash2 .g2{display:grid;grid-template-columns:420px 1fr;gap:14px}#dash2 .dn{display:flex;flex-direction:column;align-items:center}#dash2 .dw{position:relative;width:260px;height:260px}#dash2 .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}#dash2 .ctr b{font-size:46px}
+#dash2 .lg{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px;margin-top:18px;font-size:16px;width:100%}#dash2 .lg div{display:flex;justify-content:space-between;align-items:center}#dash2 .lg b{font-size:26px}#dash2 em{display:inline-block;width:12px;height:12px;border-radius:3px;margin:0 6px}
+#dash2 h3{margin:0 0 14px;font-size:17px;color:#c5d3ee;font-weight:700}#dash2 .br{display:grid;grid-template-columns:110px 1fr 50px 110px;gap:12px;align-items:center;margin:10px 0;font-size:15px}#dash2 .tr{display:flex;height:20px;background:#1b2a57;border-radius:6px;overflow:hidden}#dash2 .tr i{display:block}#dash2 .br b{font-size:18px}#dash2 .br small{color:#8fa3c7;font-size:13px}
+#dash2 .k7{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-top:14px}#dash2 .k7 .c2>b{font-size:30px}
+#dash2 .nat2{display:flex;gap:10px;margin-top:14px}#dash2 .nat2 div{flex:1;display:flex;justify-content:space-between;background:#13214a;border:1px solid #22356b;border-radius:12px;padding:10px 16px;color:#c5d3ee}#dash2 .nat2 b{color:#fff}
+#dash2 .ft2{text-align:center;color:#f59e0b;font-weight:800;font-size:13px;margin-top:16px;letter-spacing:.5px}
+body.v-dark{background:#050b1c}body.v-dark #dash{display:none}body:not(.v-dark) #dash2{display:none}
+.bar button.t{background:#24345f;color:#cbd6ef}.bar button.t.on{background:#fff;color:#0f2447}
+@media print{.bar{display:none}body{background:#fff}#dash,#dash2{margin:0;box-shadow:none;border:0;zoom:.72}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{size:A4 landscape;margin:8mm}}
 </style></head><body>
-<div class="bar"><button onclick="print()">🖨️ طباعة / حفظ PDF</button><button class="b" id="png">🖼️ حفظ صورة PNG</button></div>
+<div class="bar"><button class="t" data-v="dark">🌙 داكن</button><button class="t" data-v="classic">📋 كلاسيكي</button><span style="width:16px"></span><button onclick="print()">🖨️ طباعة / حفظ PDF</button><button class="b" id="png">🖼️ حفظ صورة PNG</button></div>
 <div id="dash">
 <div class="hd"><img src="${location.origin}${location.pathname.replace(/[^/]*$/, '')}icon-192.png" alt="" onerror="this.style.display='none'"><h1>DRIVERS DASHBOARD | لوحة بيانات السائقين</h1><div class="dt">${dTxt}<small>${esc(scope)}</small></div></div>
 <div class="top">
@@ -613,9 +642,13 @@ td{padding:7px 6px;text-align:center;border-bottom:1px solid #e3e8f0}td.l{text-a
 </div>
 <div class="ft">NORTHWEST BUS | OPERATIONS MANAGEMENT · ${esc(new Date().toLocaleString('en-GB'))}</div>
 </div>
+${dark}
 <script>
+function setV(v){document.body.classList.toggle('v-dark',v==='dark');document.querySelectorAll('.bar .t').forEach(function(b){b.classList.toggle('on',b.dataset.v===v)});try{localStorage.setItem('nwDashV',v)}catch(e){}}
+document.querySelectorAll('.bar .t').forEach(function(b){b.onclick=function(){setV(b.dataset.v)}});
+var v0='dark';try{v0=localStorage.getItem('nwDashV')||'dark'}catch(e){}setV(v0);
 document.getElementById('png').onclick=function(){var b=this;b.disabled=true;b.textContent='...';
- function go(){html2canvas(document.getElementById('dash'),{scale:2,useCORS:true,backgroundColor:'#ffffff'}).then(function(c){var a=document.createElement('a');a.download='Drivers_Dashboard_${date}.png';a.href=c.toDataURL('image/png');a.click();b.disabled=false;b.textContent='🖼️ حفظ صورة PNG';});}
+ function go(){(function(){var dk=document.body.classList.contains('v-dark');return html2canvas(document.getElementById(dk?'dash2':'dash'),{scale:2,useCORS:true,backgroundColor:dk?'#0b1530':'#ffffff'})})().then(function(c){var a=document.createElement('a');a.download='Drivers_Dashboard_${date}.png';a.href=c.toDataURL('image/png');a.click();b.disabled=false;b.textContent='🖼️ حفظ صورة PNG';});}
  if(window.html2canvas)return go();var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=go;s.onerror=function(){alert('تعذّر تحميل أداة الصور — استخدم الطباعة / PDF');b.disabled=false;};document.head.appendChild(s);};
 <\/script></body></html>`;
   const w = window.open('', '_blank');
