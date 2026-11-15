@@ -106,7 +106,7 @@
   function regDel(j) { ((j && j.rows) || []).forEach(function (r) { if (r[5] && DEL_RE.test(act(r)) && !CHK_RE.test(act(r))) DEL[r[3] + '|' + String(r[5]).trim()] = 1; }); }
   /* استبعاد عملية معلّقة (تسليم مكرر أو مهمة غلط) — للمدير والمشرف: يسجّل حذف بنفس المرجع */
   var EXCLUDE = { 'تسليم الوردية': ['shift', 'حذف تسليم'], 'المهام': ['tasks', 'إلغاء مهمة'] };
-  function canExclude() { return !!(window.NWAuth && (NWAuth.role === 'مدير' || NWAuth.role === 'مشرف')); }
+  function canExclude() { return !!(window.NWAuth && (NWAuth.role === 'مدير' || NWAuth.role === 'مدير تنفيذي' || NWAuth.role === 'مشرف')); }
   function exclude(r) {
     var x = EXCLUDE[r[3]]; if (!x || !r[5] || !window.NWAuth) return Promise.reject();
     var ref = String(r[5]).trim(), key = r[3] + '|' + ref;

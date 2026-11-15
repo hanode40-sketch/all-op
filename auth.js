@@ -14,7 +14,7 @@
   var HOME_URL  = 'https://hanode40-sketch.github.io/all-op/';
   var KEY = 'nw_auth_v1';
   var IDLE_KEY = 'nw_last_active';
-  var AUTH_VERSION = '2026-11-15.3';   // غيّره عند كل تعديل على هذا الملف (يجبر الأجهزة على التحديث)
+  var AUTH_VERSION = '2026-11-15.4';   // غيّره عند كل تعديل على هذا الملف (يجبر الأجهزة على التحديث)
   var IDLE_MS = 2 * 60 * 60 * 1000;   // يقفل بعد ساعتين بدون أي نشاط (غيّر الرقم 2 لتغيير المدة)
 
   var script = document.currentScript;
@@ -85,7 +85,7 @@
   var MGMT_TOOLS = { performance: 1, stats: 1, kpi: 1, drivers: 1 };
   function can(user, tool) {
     if (!tool) return true;
-    if (MGMT_TOOLS[String(tool).toLowerCase()] && user && (user.r === 'مدير' || user.r === 'مشرف')) return true;
+    if (MGMT_TOOLS[String(tool).toLowerCase()] && user && (user.r === 'مدير' || user.r === 'مدير تنفيذي' || user.r === 'مشرف')) return true;
     var t = (user && user.t) || [];
     return t.indexOf('all') > -1 || t.indexOf(String(tool).toLowerCase()) > -1;
   }
@@ -265,7 +265,7 @@
     { g: 3, t: 'kpi',         ic: '🎯', ar: 'المؤشرات التشغيلية',  en: 'Operational KPIs',  url: HOME_URL + 'kpi.html' }
   ];
   var SIDE_GROUPS = [null, ['التشغيل اليومي', 'Daily operations'], ['التقارير والسلامة', 'Reports & safety'], ['الإدارة', 'Management'], ['السجلات', 'Records']];
-  var ROLE_EN = { 'مدير': 'Manager', 'مشرف': 'Supervisor', 'مرحّل': 'Dispatcher', 'مرحل': 'Dispatcher', 'موظف': 'Employee' };
+  var ROLE_EN = { 'مدير': 'Manager', 'مدير تنفيذي': 'Executive Manager', 'مشرف': 'Supervisor', 'مرحّل': 'Dispatcher', 'مرحل': 'Dispatcher', 'موظف': 'Employee' };
   var sideCss =
     '.nws{display:none}' +
     '@media screen and (min-width:1100px){' +

@@ -113,7 +113,7 @@
   }
 
   function loadViol() {
-    if (!window.NWAuth || !(NWAuth.role === 'مدير' || NWAuth.role === 'مشرف')) return;
+    if (!window.NWAuth || !(NWAuth.role === 'مدير' || NWAuth.role === 'مدير تنفيذي' || NWAuth.role === 'مشرف')) return;
     if (NWAuth.can && !NWAuth.can('violation')) return;
     fetch(VIOL_URL + '?action=summary&authToken=' + encodeURIComponent(NWAuth.token()))
       .then(function (r) { return r.json(); })

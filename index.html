@@ -419,7 +419,7 @@
 (function(){
   var $=function(i){return document.getElementById(i)};
   $('yr').textContent=new Date().getFullYear();
-  var ROLE_EN={'مدير':'Manager','مشرف':'Supervisor','مرحّل':'Dispatcher','مرحل':'Dispatcher','موظف':'Employee'};
+  var ROLE_EN={'مدير':'Manager','مدير تنفيذي':'Executive Manager','مشرف':'Supervisor','مرحّل':'Dispatcher','مرحل':'Dispatcher','موظف':'Employee'};
   var G_EN={'الشميسي':'Al-Shumaisi','الرياض':'Riyadh','المدينة':'Madinah','تبوك':'Tabuk','حائل':'Hail','خميس مشيط':'Khamis Mushait','جازان':'Jazan','البشائر':'Al-Bashayer','بريدة':'Buraydah'};
   function esc(x){return String(x==null?'':x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
   function upd(){

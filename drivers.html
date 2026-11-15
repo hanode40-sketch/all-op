@@ -271,7 +271,7 @@ const sbDep = r => { const l = lastTrip(r), d = l && endDepot(tripEnd(l.code)); 
 let MINE = null;   // null = كل الكراجات
 function initMine() {
   const A = window.NWAuth || {}, role = A.role || (A.user && A.user.r) || '', g = A.garages || (A.user && A.user.g) || [];
-  if (role === 'مدير' || !g.length || g.includes('all')) { MINE = null; return; }
+  if (role === 'مدير' || role === 'مدير تنفيذي' || !g.length || g.includes('all')) { MINE = null; return; }
   const rev = {}; DEPOTS.forEach(d => { rev[d.toLowerCase()] = d; rev[DEP[d]] = d; });
   const m = g.map(x => rev[String(x).replace(/كراج/g, '').trim()] || rev[String(x).trim().toLowerCase()]).filter(Boolean);
   MINE = m.length ? [...new Set(m)] : null;
