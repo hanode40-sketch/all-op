@@ -106,6 +106,7 @@
       <button class="btn light" id="bExport" data-i="export">⬇️ Excel</button>
       <button class="btn light" id="bDash" data-i="dash">📊 الداش بورد</button>
       <button class="btn" id="bAdd" style="display:none" data-i="add">➕ سائق جديد</button>
+      <button class="btn light" id="bCards" style="display:none" data-i="cards">🪪 تحديث الكروت</button>
       <button class="btn light" id="bImport" style="display:none" data-i="import">📤 استيراد من Excel</button>
     </div>
   </div>
@@ -169,6 +170,7 @@
   <div class="mbtns"><button class="btn light" id="mCancel" data-i="cancel">إلغاء</button><button class="btn green" id="mSave" data-i="save">حفظ</button></div>
 </div></div>
 <datalist id="natList"><option>Pakistan</option><option>UGANDA</option><option>India</option><option>Indonesia</option></datalist>
+<input type="file" id="cardFile" accept=".xlsx,.xls,.csv" style="display:none">
 <input type="file" id="impFile" accept=".xlsx,.xls,.csv" style="display:none">
 
 <script>
@@ -193,7 +195,7 @@ const C = { IQ:0, EMP:1, NAME:2, NAT:3, ST:4, DEP:5, SB:6, MOB:7, FROM:8, TO:9, 
 let LANG = (() => { try { return localStorage.getItem('hubLang') === 'en' ? 'en' : 'ar'; } catch (e) { return 'ar'; } })();
 const I18N = {
   ar:{ title:'إدارة السائقين', subtitle:'Drivers Management', back:'← أدوات التشغيل', lDate:'تاريخ الروستر (على الرحلات / الاستعداد)', lDepot:'الكراج',
-    refresh:'↻ تحديث', export:'⬇️ Excel', dash:'📊 الداش بورد', add:'➕ سائق جديد', import:'📤 استيراد من Excel', secSum:'الملخص', secList:'قائمة السائقين', loading:'جاري التحميل...',
+    refresh:'↻ تحديث', cards:'🪪 تحديث الكروت', cardsHow:'اختر ملف Excel فيه عمود «رقم الإقامة» (أو ID Number) وعمود «تاريخ انتهاء كرت التشغيل» (أو oc). يتحدث تاريخ الكرت فقط وما يتغير أي شي ثاني.\n\nتقدر تصدّر القائمة من زر Excel وتعدّل عمود Operating card expiry وترفعها.', cardsBad:'ما لقيت عمود رقم الإقامة وعمود تاريخ انتهاء الكرت في الملف', cardsAsk:(n,f,c,x)=>`في الملف ${n} سائق:\n• موجودين في البرنامج: ${f}\n• تاريخ كرتهم بيتغير: ${c}\n• غير موجودين: ${x}\n\nتحديث؟`, cardsDone:(c,x)=>`✅ تم تحديث ${c} كرت${x ? `\n⚠️ ${x} رقم إقامة غير موجود:` : ''}`, export:'⬇️ Excel', dash:'📊 الداش بورد', add:'➕ سائق جديد', import:'📤 استيراد من Excel', secSum:'الملخص', secList:'قائمة السائقين', loading:'جاري التحميل...',
     natTitle:'السائقون حسب الجنسية والحالة', depTitle:'سائقو التشغيل والاستعداد في الكراجات', search:'ابحث برقم الإقامة أو الاسم أو الرحلة...',
     note:'«على الرحلات» = سائقو التشغيل المسجّلون في روستر التاريخ المختار. السائق اللي مو في روستر اليوم: إذا كان غير مجدول يومين متتاليين أو أقل = «راحة»، وإذا أكثر من يومين متتاليين = «استعداد». و«الاستعداد» اليدوي يبقى استعداد. ارفعوا الروستر يوم بيوم عشان يطلع الحساب دقيق.',
     allDep:'كل الكراجات', myDeps:'كل كراجاتي', allSt:'كل الحالات', allNat:'كل الجنسيات', req:'إجمالي احتياج التشغيل', active:'على رأس العمل', out:'خارج الخدمة / مطلوب تعويضهم',
@@ -209,7 +211,7 @@ const I18N = {
     impAsk:n=>`استيراد ${n} سائق من الملف؟ هذا يستبدل القائمة الحالية (الجوال والملاحظات الموجودة تبقى).`, impDone:n=>`✅ تم استيراد ${n} سائق`, impBad:'ما لقيت أعمدة Employee ID / ID Number / Driver Name / Status في الملف',
     saved:'✅ تم الحفظ', fCard:'🪪 انتهاء كرت التشغيل', cardExp:n=>`🪪 ${n} سائق كرت التشغيل حقه منتهي`, cardSoon:n=>`🪪 ${n} سائق كرت التشغيل ينتهي خلال 30 يوم`, cExp:'كرت منتهي', cSoon:'كرت ينتهي', results:n=>`${n} سائق`, more:n=>`يظهر أول 300 من ${n} — استخدم البحث أو الفلتر` },
   en:{ title:'Drivers Management', subtitle:'إدارة السائقين', back:'← Operations Tools', lDate:'Roster date (on trips / standby)', lDepot:'Depot',
-    refresh:'↻ Refresh', export:'⬇️ Excel', dash:'📊 Dashboard', add:'➕ New driver', import:'📤 Import from Excel', secSum:'Summary', secList:'Drivers list', loading:'Loading...',
+    refresh:'↻ Refresh', cards:'🪪 Update cards', cardsHow:'Choose an Excel file with an Iqama (ID Number) column and an operating card expiry (oc) column. Only the card date is updated.\n\nTip: export with the Excel button, edit the Operating card expiry column and upload it back.', cardsBad:'Could not find Iqama and card expiry columns', cardsAsk:(n,f,c,x)=>`${n} drivers in file:\n• found: ${f}\n• card date will change: ${c}\n• not found: ${x}\n\nUpdate?`, cardsDone:(c,x)=>`✅ ${c} cards updated${x ? `\n⚠️ ${x} Iqama numbers not found:` : ''}`, export:'⬇️ Excel', dash:'📊 Dashboard', add:'➕ New driver', import:'📤 Import from Excel', secSum:'Summary', secList:'Drivers list', loading:'Loading...',
     natTitle:'Drivers by nationality & status', depTitle:'Operational & standby drivers by depot', search:'Search by Iqama, name or trip...',
     note:'"On trips" = operational drivers in the roster of the selected date. A driver missing from today\'s roster is on a "Rest day" if unscheduled for 2 consecutive days or fewer, otherwise "Standby". Manual standby always counts as standby.',
     allDep:'All depots', myDeps:'All my depots', allSt:'All statuses', allNat:'All nationalities', req:'Total operational requirement', active:'Active drivers', out:'Out of service / replacement required',
@@ -407,7 +409,7 @@ async function load() {
     D = a.drivers || []; canEdit = !!a.canEdit; canImport = !!a.canImport;
     initMine();
     await Promise.all([loadRoster(), loadTrips()]);
-    $('bAdd').style.display = canEdit ? '' : 'none'; $('bImport').style.display = canImport ? '' : 'none';
+    $('bAdd').style.display = canEdit ? '' : 'none'; $('bImport').style.display = canImport ? '' : 'none'; $('bCards').style.display = canEdit ? '' : 'none';
     fillFilters(); render();
   } catch (e) { $('list').innerHTML = `<div class="msg err">${esc(e.message || t_('eNet'))}</div>`; }
 }
@@ -516,6 +518,37 @@ const xlDate = v => {
 };
 const normDep = d => { d = String(d || '').trim().toLowerCase(); return DEPOTS.find(x => x.toLowerCase() === d) || 'Unassigned'; };
 $('bImport').onclick = () => $('impFile').click();
+/* تحديث كروت التشغيل من ملف: عمود رقم الإقامة + عمود تاريخ انتهاء الكرت (أي ترتيب) — ما يغيّر شي ثاني */
+$('bCards').onclick = () => { alert(t_('cardsHow')); $('cardFile').click(); };
+$('cardFile').onchange = async () => {
+  const f = $('cardFile').files[0]; if (!f) return;
+  try {
+    await loadXlsx();
+    const wb = XLSX.read(await f.arrayBuffer(), { type: 'array' });
+    const ws = wb.Sheets['Drivers_Data'] || wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: '' });
+    // نلقى صف العناوين (أول 10 صفوف)
+    let hi = -1, iI = -1, iD = -1;
+    for (let k = 0; k < Math.min(10, rows.length) && hi < 0; k++) {
+      const h = rows[k].map(x => String(x).trim().toLowerCase());
+      const a = h.findIndex(x => /id number|iqama|إقامة|اقامة|هوية|الإقامة/.test(x));
+      const b = h.findIndex(x => x === 'oc' || /card|كرت|بطاقة|انتهاء|expir/.test(x));
+      if (a > -1 && b > -1) { hi = k; iI = a; iD = b; }
+    }
+    if (hi < 0) return alert(t_('cardsBad'));
+    const list = rows.slice(hi + 1).map(r => [String(r[iI] ?? '').replace(/\D/g, ''), xlDate(r[iD])]).filter(x => x[0].length >= 5 && x[1]);
+    if (!list.length) return alert(t_('cardsBad'));
+    const byIq = {}; D.forEach(r => byIq[r[C.IQ]] = r);
+    const found = list.filter(x => byIq[x[0]]), chg = found.filter(x => (byIq[x[0]][C.CARD] || '') !== x[1]);
+    if (!confirm(t_('cardsAsk')(list.length, found.length, chg.length, list.length - found.length))) return;
+    const j = await NWAuth.call('driversCards', { rows: list });
+    if (j.error === 'AUTH') { NWAuth.relogin(); throw new Error(t_('eAuth')); }
+    if (!j.ok) throw new Error(j.error === 'FORBIDDEN' ? t_('eForb') : t_('eErr') + j.error);
+    alert(t_('cardsDone')(j.changed, (j.notFound || []).length) + ((j.notFound || []).length ? '\n\n' + j.notFound.slice(0, 20).join('\n') : ''));
+    load();
+  } catch (e) { alert(e.message || t_('eErr')); }
+  finally { $('cardFile').value = ''; }
+};
 $('impFile').onchange = async () => {
   const f = $('impFile').files[0]; if (!f) return;
   try {
