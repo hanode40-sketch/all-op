@@ -558,7 +558,7 @@ $('bDash').onclick = () => {
     ['Not Returned', 'Not Returned', 'لم يعد من الإجازة'], ['Suspended', 'Suspended', 'موقوف عن العمل'], ['Absconding', 'Absconding', 'هروب'], ['Termination of services', 'Termination', 'إنهاء خدمات']];
   const natRows = nats.map(n => { const rr = rows.filter(r => (r[C.NAT] || '—') === n); return `<tr><td class="l"><b>${esc(n)}</b></td>${COLS.map(c => `<td>${rr.filter(r => r[C.ST] === c[0]).length}</td>`).join('')}<td class="gt">${rr.length}</td></tr>`; }).join('');
   const deps = DEPOTS.filter(d => inDep(d, depot));
-  const opRows = deps.map(d => [d, rows.filter(r => dep(r) === d && r[C.ST] === 'operation').length]).filter(x => x[1] || !depot);
+  const opRows = deps.map(d => [d, rows.filter(r => dep(r) === d && r[C.ST] === 'operation').length]);
   const sbRows = deps.map(d => [d, D.filter(r => isStandby(r) && sbDep(r) === d).length, D.filter(r => isRest(r) && sbDep(r) === d).length]);
   // ---- التصميم الداكن ----
   const parts = [['على الرحلات', ROSTER_N ? trips : 0, '#2dd4bf'], ['راحة', ROSTER_N ? rest : 0, '#94a3b8'], ['استعداد', sb, '#a78bfa'], ['معتذرين', outN, '#f87171']];
@@ -573,7 +573,7 @@ $('bDash').onclick = () => {
 <div class="k5">${[['إجمالي الاحتياج', rows.length, '', ''], ['على رأس العمل', op + an + em + sk, '', ''], ['المتاحين للتشغيل', op, '', pct + '% من الإجمالي'], ['في إجازات', an + em + sk, '#60a5fa', ''], ['خارج الخدمة', nr + su + ab + te, '#f87171', '']].map(x => `<div class="c2"><span>${x[0]}</span><b style="color:${x[2] || '#fff'}">${x[1]}</b>${x[3] ? `<i>${x[3]}</i>` : ''}</div>`).join('')}</div>
 <div class="g2"><div class="c2 dn"><h3>توزيع المتاحين اليوم</h3><div class="dw">${donut}<div class="ctr"><b>${op}</b><span>متاح</span></div></div>
 <div class="lg">${parts.map(x => `<div><span><em style="background:${x[2]}"></em>${x[0]}</span><b>${x[0] === 'استعداد' || x[0] === 'معتذرين' || ROSTER_N ? x[1] : '—'}</b></div>`).join('')}</div></div>
-<div class="c2"><h3>الكراجات: <em style="background:#2dd4bf"></em>رحلات · <em style="background:#94a3b8"></em>راحة · <em style="background:#a78bfa"></em>استعداد</h3>
+<div class="c2 bars"><h3>الكراجات: <em style="background:#2dd4bf"></em>رحلات · <em style="background:#94a3b8"></em>راحة · <em style="background:#a78bfa"></em>استعداد</h3>
 ${dRows.map(x => `<div class="br"><span>${esc(depName(x[0]))}</span><div class="tr"><i style="width:${x[2] / dMax * 100}%;background:#2dd4bf"></i><i style="width:${x[3] / dMax * 100}%;background:#94a3b8"></i><i style="width:${x[4] / dMax * 100}%;background:#a78bfa"></i></div><b>${x[1]}</b><small>${x[2]} · ${x[3]} · ${x[4]}</small></div>`).join('')}</div></div>
 <div class="k7">${[['إجازة سنوية', an, '#60a5fa'], ['اضطرارية', em, '#60a5fa'], ['مرضية', sk, '#f9a8d4'], ['لم يعد', nr, '#f87171'], ['موقوف', su, '#f87171'], ['هروب', ab, '#f87171'], ['إنهاء خدمات', te, '#f87171']].map(x => `<div class="c2"><span>${x[0]}</span><b style="color:${x[2]}">${x[1]}</b></div>`).join('')}</div>
 <div class="nat2">${nats.map(n => { const v = rows.filter(r => (r[C.NAT] || '—') === n).length; return `<div><span>${esc(n)}</span><b>${v}</b></div>`; }).join('')}</div>
@@ -590,7 +590,7 @@ ${dRows.map(x => `<div class="br"><span>${esc(depName(x[0]))}</span><div class="
 .top{display:grid;grid-template-columns:270px 1fr 1fr;gap:12px;padding:16px 24px}
 .req{background:#0f2447;color:#fff;border-radius:12px;padding:18px;display:flex;flex-direction:column;justify-content:space-between}
 .req b{font-size:17px}.req span{font-size:15px;opacity:.85}.req .v{font-size:76px;font-weight:900;text-align:center;background:rgba(255,255,255,.12);border-radius:12px;margin:12px 0}
-.col{display:flex;flex-direction:column;gap:10px}
+.col{display:flex;flex-direction:column;gap:10px;justify-content:flex-start}.col>*{flex:none}.col>.fill{flex:1;align-items:stretch}.col>.fill .s{align-self:stretch;justify-content:center}.row{align-items:start}.s{align-self:start}.top{align-items:stretch}
 .k{display:flex;align-items:center;gap:12px;border-radius:12px;padding:12px 16px}.k .ic{font-size:30px}.k .t{flex:1;display:flex;flex-direction:column}.k .t b{font-size:16px}.k .t span{font-size:14px;color:#3b4b66}.k .v{font-size:34px;font-weight:900;background:rgba(255,255,255,.75);border-radius:10px;padding:2px 18px;min-width:96px;text-align:center}
 .g{background:#dcfce7}.bl{background:#dbeafe}.gr{background:#e8f5e9}.rd{background:#fee2e2}.or{background:#ffedd5}.pu{background:#ede9fe}.gy{background:#eef1f5}
 .row{display:grid;gap:10px}.r3{grid-template-columns:repeat(3,1fr)}.r4{grid-template-columns:repeat(4,1fr)}
@@ -599,12 +599,12 @@ ${dRows.map(x => `<div class="br"><span>${esc(depName(x[0]))}</span><div class="
 table{width:100%;border-collapse:collapse;font-size:15px}th{background:#e8eef7;color:#0f2447;padding:8px 6px;font-size:13px;border-bottom:2px solid #0f2447}th span{display:block;font-weight:600;color:#5b6b85}
 td{padding:7px 6px;text-align:center;border-bottom:1px solid #e3e8f0}td.l{text-align:left}.gt{background:#eef3fb;font-weight:800}tr.tot td{background:#0f2447;color:#fff;font-weight:800}
 .tw{margin:0 24px;border:1px solid #c9d3e2;border-top:0}
-.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 24px 8px}.two .sec{margin:0}.two .tw{margin:0}.sec.o{background:#f97316}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 24px 8px}.two .sec{margin:0;font-size:16px;white-space:nowrap;gap:12px}.two>div{display:flex;flex-direction:column}.two .tw{flex:1;background:#fff}.two .tw{margin:0}.sec.o{background:#f97316}
 .ft{text-align:center;color:#f97316;font-weight:800;font-size:13px;background:#0f2447;padding:10px;margin-top:12px;letter-spacing:.5px}
 #dash2{width:1400px;margin:16px auto;background:#0b1530;color:#e7edf8;padding:28px 32px}
 #dash2 .hd2{display:flex;justify-content:space-between;align-items:center}#dash2 h1{margin:0;font-size:30px}#dash2 .hd2 small{color:#8fa3c7;font-size:15px}#dash2 .hd2 img{width:280px;height:128px;object-fit:cover;background:#fff;border-radius:16px}
 #dash2 .k5{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:22px 0}#dash2 .c2{background:#13214a;border:1px solid #22356b;border-radius:16px;padding:18px}#dash2 .c2 span{color:#8fa3c7;font-size:14px}#dash2 .c2>b{display:block;font-size:42px;margin-top:6px}#dash2 .c2 i{font-style:normal;font-size:13px;color:#8fa3c7}
-#dash2 .g2{display:grid;grid-template-columns:420px 1fr;gap:14px}#dash2 .dn{display:flex;flex-direction:column;align-items:center}#dash2 .dw{position:relative;width:260px;height:260px}#dash2 .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}#dash2 .ctr b{font-size:46px}
+#dash2 .g2{display:grid;grid-template-columns:420px 1fr;gap:14px;align-items:stretch}#dash2 .bars{display:flex;flex-direction:column}#dash2 .bars .br{flex:1;margin:4px 0}#dash2 .dn{justify-content:space-between}#dash2 .dn{display:flex;flex-direction:column;align-items:center}#dash2 .dw{position:relative;width:260px;height:260px}#dash2 .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}#dash2 .ctr b{font-size:46px}
 #dash2 .lg{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px;margin-top:18px;font-size:16px;width:100%}#dash2 .lg div{display:flex;justify-content:space-between;align-items:center}#dash2 .lg b{font-size:26px}#dash2 em{display:inline-block;width:12px;height:12px;border-radius:3px;margin:0 6px}
 #dash2 h3{margin:0 0 14px;font-size:17px;color:#c5d3ee;font-weight:700}#dash2 .br{display:grid;grid-template-columns:110px 1fr 50px 110px;gap:12px;align-items:center;margin:10px 0;font-size:15px}#dash2 .tr{display:flex;height:20px;background:#1b2a57;border-radius:6px;overflow:hidden}#dash2 .tr i{display:block}#dash2 .br b{font-size:18px}#dash2 .br small{color:#8fa3c7;font-size:13px}
 #dash2 .k7{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-top:14px}#dash2 .k7 .c2>b{font-size:30px}
@@ -622,7 +622,7 @@ body.v-dark{background:#050b1c}body.v-dark #dash{display:none}body:not(.v-dark) 
  <div class="col">
   ${box('g', 'Active Drivers (On Duty)', 'السائقون على رأس العمل', op + an + em + sk, '👥')}
   ${box('bl', 'Available for Operation', 'المتاحون للتشغيل', op, '🚌')}
-  <div class="row r4">${small('bl', 'OnTrips', 'على الرحلات', ROSTER_N ? trips : '—', '🚌')}${small('gy', 'Rest Day', 'راحة', ROSTER_N ? rest : '—', '😴')}${small('or', 'Standby', 'الاستعداد', sb, '⏱️')}${small('rd', 'Absent', 'معتذرين', outN, '❌')}</div>
+  <div class="row r4 fill">${small('bl', 'OnTrips', 'على الرحلات', ROSTER_N ? trips : '—', '🚌')}${small('gy', 'Rest Day', 'راحة', ROSTER_N ? rest : '—', '😴')}${small('or', 'Standby', 'الاستعداد', sb, '⏱️')}${small('rd', 'Absent', 'معتذرين', outN, '❌')}</div>
  </div>
  <div class="col">
   ${box('gr', 'Drivers on Leave', 'السائقون في إجازات', an + em + sk, '🌴')}
@@ -637,7 +637,7 @@ body.v-dark{background:#050b1c}body.v-dark #dash{display:none}body:not(.v-dark) 
 <div class="two">
  <div><div class="sec"><span>🚌 Operational Drivers by Garage</span><span>السائقون العاملون في الكراجات</span></div><div class="tw"><table><thead><tr><th style="text-align:left">Depot | الكراج</th><th>Count | العدد</th></tr></thead><tbody>
  ${opRows.map(x => `<tr><td class="l"><b>${x[0]}</b></td><td>${x[1]}</td></tr>`).join('')}<tr class="tot"><td class="l">Grand Total | الإجمالي</td><td>${opRows.reduce((a, x) => a + x[1], 0)}</td></tr></tbody></table></div></div>
- <div><div class="sec o"><span>⏱️ Standby &amp; Rest Drivers by Garage</span><span>توزيع الاستعداد والراحة على الكراجات</span></div><div class="tw"><table><thead><tr><th style="text-align:left">Depot | الكراج</th><th>Standby | الاستعداد</th><th>Rest | راحة</th></tr></thead><tbody>
+ <div><div class="sec o"><span>⏱️ Standby &amp; Rest by Garage</span><span>الاستعداد والراحة في الكراجات</span></div><div class="tw"><table><thead><tr><th style="text-align:left">Depot | الكراج</th><th>Standby | الاستعداد</th><th>Rest | راحة</th></tr></thead><tbody>
  ${sbRows.map(x => `<tr><td class="l"><b>${x[0]}</b></td><td>${x[1]}</td><td>${ROSTER_N ? x[2] : '—'}</td></tr>`).join('')}<tr class="tot" style="--x:1"><td class="l">Grand Total | الإجمالي</td><td>${sbRows.reduce((a, x) => a + x[1], 0)}</td><td>${ROSTER_N ? sbRows.reduce((a, x) => a + x[2], 0) : '—'}</td></tr></tbody></table></div></div>
 </div>
 <div class="ft">NORTHWEST BUS | OPERATIONS MANAGEMENT · ${esc(new Date().toLocaleString('en-GB'))}</div>
