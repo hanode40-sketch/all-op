@@ -40,29 +40,28 @@
   }
 
   var css =
-    '.nta{display:block;text-decoration:none!important;margin:0 0 14px;border-radius:16px;padding:14px 16px;color:#7c2d12;' +
-      'background:linear-gradient(135deg,#fff7ed,#ffedd5);border:1px solid #fdba74;box-shadow:0 8px 24px rgba(10,25,55,.16);cursor:pointer;transition:transform .15s}' +
-    '.nta:hover{transform:translateY(-2px)}' +
-    '.nta.bad{color:#7f1d1d;background:linear-gradient(135deg,#fef2f2,#fee2e2);border-color:#fca5a5}' +
-    '.nta-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-weight:800;font-size:16px}' +
-    '.nta-bell{font-size:22px;animation:ntaR 2.4s ease-in-out infinite;transform-origin:50% 0}' +
-    '@keyframes ntaR{0%,80%,100%{transform:rotate(0)}85%{transform:rotate(14deg)}90%{transform:rotate(-12deg)}95%{transform:rotate(8deg)}}' +
+    '.nta{display:block;text-decoration:none!important;margin:0 0 12px;border-radius:14px;padding:14px 18px;color:var(--nw-ink,#0f172a);' +
+      'background:var(--nw-card,#fff);border:1px solid var(--nw-line,#e2e8f0);border-inline-start:4px solid #d97706;box-shadow:var(--nw-shadow,0 1px 3px rgba(0,0,0,.06));cursor:pointer;transition:transform .15s,box-shadow .15s}' +
+    '.nta:hover{transform:translateY(-1px)}' +
+    '.nta.bad{border-inline-start-color:#dc2626}' +
+    '.nta-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-weight:700;font-size:15px}' +
+    '.nta-bell{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;font-size:17px;background:#fef3c7;color:#b45309;flex-shrink:0}' +
+    '.nta.bad .nta-bell{background:#fee2e2;color:#b91c1c}' +
     '.nta-chips{display:flex;gap:6px;flex-wrap:wrap}' +
-    '.nta-chip{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:rgba(255,255,255,.75)}' +
-    '.nta-chip.r{background:#dc2626;color:#fff}.nta-chip.o{background:#ea580c;color:#fff}' +
-    '.nta-go{margin-inline-start:auto;font-size:13px;font-weight:700;background:#ea580c;color:#fff;padding:6px 12px;border-radius:999px;white-space:nowrap}' +
-    '.nta.bad .nta-go{background:#dc2626}' +
+    '.nta-chip{font-size:12px;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--nw-soft,#f1f5f9);color:var(--nw-muted,#64748b);border:1px solid var(--nw-line,#e2e8f0)}' +
+    '.nta-chip.r{background:#fee2e2;color:#b91c1c;border-color:#fecaca}.nta-chip.o{background:#ffedd5;color:#c2410c;border-color:#fed7aa}' +
+    '.nta-go{margin-inline-start:auto;font-size:13px;font-weight:700;background:transparent;color:var(--nw-ink,#0f172a);border:1px solid var(--nw-line,#e2e8f0);padding:6px 14px;border-radius:10px;white-space:nowrap}' +
+    '.nta:hover .nta-go{background:var(--nw-navy,#13274f);border-color:var(--nw-navy,#13274f);color:#fff}' +
     '.nta-l{margin:10px 0 0;padding:0;list-style:none;font-size:13.5px}' +
-    '.nta-l li{display:flex;gap:8px;align-items:center;padding:6px 0;border-top:1px dashed rgba(124,45,18,.2)}' +
-    '.nta-l li b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
-    '.nta-l li small{opacity:.8;white-space:nowrap}' +
-    '.nta-x{font-size:13px;margin-top:8px;font-weight:600}' +
+    '.nta-l li{display:flex;gap:8px;align-items:center;padding:7px 0;border-top:1px solid var(--nw-line,#eef2f7)}' +
+    '.nta-l li b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}' +
+    '.nta-l li small{color:var(--nw-muted,#64748b);white-space:nowrap}' +
+    '.nta-x{font-size:13px;margin-top:8px;font-weight:500;color:var(--nw-muted,#64748b)}' +
     'a.card[data-tool="tasks"]{position:relative}' +
-    '.nta-badge{position:absolute;top:10px;inset-inline-end:10px;min-width:24px;height:24px;padding:0 7px;border-radius:999px;background:#dc2626;color:#fff;' +
-      'font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(220,38,38,.45)}' +
-    'html[data-theme="dark"] .nta{color:#fed7aa;background:linear-gradient(135deg,#2a1a0e,#3a2210);border-color:#9a3412}' +
-    'html[data-theme="dark"] .nta.bad{color:#fecaca;background:linear-gradient(135deg,#2a1215,#3a1519);border-color:#991b1b}' +
-    'html[data-theme="dark"] .nta-chip{background:rgba(255,255,255,.1)}html[data-theme="dark"] .nta-l li{border-color:rgba(255,255,255,.12)}' +
+    '.nta-badge{position:absolute;top:10px;inset-inline-end:10px;min-width:22px;height:22px;padding:0 7px;border-radius:999px;background:#dc2626;color:#fff;' +
+      'font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}' +
+    'html[data-theme="dark"] .nta-bell{background:#3a2a12;color:#fbbf24}html[data-theme="dark"] .nta.bad .nta-bell{background:#3a1e22;color:#fca5a5}' +
+    'html[data-theme="dark"] .nta-chip.r{background:#3a1e22;color:#fca5a5;border-color:#5b2329}html[data-theme="dark"] .nta-chip.o{background:#3a2412;color:#fdba74;border-color:#5b3a1c}' +
     '@media (max-width:600px){.nta-go{margin-inline-start:0}}';
 
   var root, D = null;
@@ -70,7 +69,7 @@
     if (!VC) return '';
     var a = VC['معلّق'] || 0, b = 0;   // محوّل للتحقيق = انتهى الإجراء
     if (!a) return '';
-    return '<a class="nta" href="' + VIOL_PAGE + '"><div class="nta-h"><span class="nta-bell">📝</span><span>' + esc(t().viol(a, b)) +
+    return '<a class="nta" href="' + VIOL_PAGE + '"><div class="nta-h"><span class="nta-bell">' + (window.NWIcon ? NWIcon('violation', 18) : '📝') + '</span><span>' + esc(t().viol(a, b)) +
       '</span><span class="nta-go">' + esc(t().openV) + '</span></div></a>';
   }
   function render() {
@@ -108,7 +107,7 @@
     if (mine.length && follow.length) extra += '<div class="nta-x">👀 ' + esc(L.follow(follow.length)) + '</div>';
     if (!mine.length && follow.length && clOpen) extra += '<div class="nta-x">📋 ' + esc(L.list(clDone, cl.length)) + '</div>';
     root.innerHTML = '<a class="nta' + (bad ? ' bad' : '') + '" href="' + TASKS_PAGE + '">' +
-      '<div class="nta-h"><span class="nta-bell">🔔</span><span>' + esc(head) + '</span><span class="nta-chips">' + chips + '</span><span class="nta-go">' + esc(L.open) + '</span></div>' +
+      '<div class="nta-h"><span class="nta-bell">' + (window.NWIcon ? NWIcon('bell', 18) : '🔔') + '</span><span>' + esc(head) + '</span><span class="nta-chips">' + chips + '</span><span class="nta-go">' + esc(L.open) + '</span></div>' +
       (list ? '<ul class="nta-l">' + list + '</ul>' : '') + extra + '</a>' + violHtml();
   }
 

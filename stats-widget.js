@@ -201,17 +201,20 @@
     } else {
       body = '<b class="nst-v' + (k.small ? ' sm' : '') + '">' + esc(k.v) + '</b><div class="nst-sub">' + (k.sub ? esc(k.sub) : '') + deltaHtml(k) + '</div>';
     }
-    return '<button type="button" class="nst-tile ' + (extra || '') + '" style="--acc:' + k.c + '" data-nst="' + id + '"><span class="nst-lb">' + k.ic + ' ' + esc(k.lb) +
+    var IKM = { total: 'activity', users: 'users', acc: 'accident', viol: 'violation', eval: 'evaluation', trip: 'trip', tasks: 'tasks', shift: 'shift' }, ik = window.NWIcon && IKM[k.id] ? '<span class="nst-ic">' + NWIcon(IKM[k.id], 16) + '</span>' : k.ic;
+    return '<button type="button" class="nst-tile ' + (extra || '') + '" style="--acc:' + k.c + '" data-nst="' + id + '"><span class="nst-lb">' + ik + ' ' + esc(k.lb) +
       '<i class="nst-go">' + (lang() === 'en' ? '›' : '‹') + '</i></span>' + body + '</button>';
   }
 
   /* ---------- نافذة التفاصيل ---------- */
   var css =
     '.nst-tile{all:unset;box-sizing:border-box;cursor:pointer;display:block;position:relative;overflow:hidden;background:#fff;border:1px solid rgba(15,23,42,.06);border-radius:16px;padding:14px 16px;' +
-      'box-shadow:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(10,25,55,.16);color:#0f172a;font-family:inherit;transition:transform .15s,box-shadow .15s;text-align:start}' +
+      'box-shadow:var(--nw-shadow,0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(10,25,55,.16));color:#0f172a;font-family:inherit;transition:transform .15s,box-shadow .15s;text-align:start}' +
     '.nst-tile:hover{transform:translateY(-3px);box-shadow:0 2px 4px rgba(15,23,42,.08),0 16px 32px rgba(10,25,55,.26)}' +
     '.nst-tile:focus-visible{outline:3px solid #f28c28;outline-offset:2px}' +
-    '.nst-tile::before{content:"";position:absolute;inset-inline:0;top:0;height:4px;background:var(--acc)}' +
+    '.nst-tile::before{content:"";position:absolute;inset-inline:0;top:0;height:3px;background:var(--acc);opacity:.85}' +
+    'html[data-theme="dark"] .nst-ic{filter:brightness(1.7)}' +
+    '.nst-ic{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:8px;color:var(--acc);background:var(--nw-soft,#f1f5f9)}' +
     '.nst-lb{display:flex;align-items:center;gap:6px;font-size:13px;color:#64748b;font-weight:600}' +
     '.nst-go{margin-inline-start:auto;font-style:normal;font-size:18px;color:#cbd5e1;line-height:1}' +
     '.nst-tile:hover .nst-go{color:var(--acc)}' +
@@ -221,17 +224,17 @@
     '.nst-dl{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;background:#eef2f7;color:#64748b}' +
     '.nst-dl.up{background:#e7f5ed;color:#15803d}.nst-dl.down{background:#fdecea;color:#b91c1c}.nst-dl.up.neg{background:#fdecea;color:#b91c1c}.nst-dl.down.neg{background:#e7f5ed;color:#15803d}' +
     /* قسم الصفحة الرئيسية */
-    '.nst-hub{margin:0 0 30px}.nst-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}' +
-    '.nst-head h2{margin:0;color:#fff;font-size:18px;text-shadow:0 2px 8px rgba(0,0,0,.4);display:flex;align-items:center;gap:8px}' +
-    '.nst-seg{display:inline-flex;background:rgba(255,255,255,.16);border-radius:999px;padding:3px;margin-inline-start:auto}' +
-    '.nst-seg button{all:unset;cursor:pointer;color:#fff;font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px}' +
-    '.nst-seg button.on{background:#fff;color:#1f3f7a}' +
-    '.nst-all{color:#fff;text-decoration:none;font-size:13px;font-weight:700;background:rgba(255,255,255,.16);padding:7px 12px;border-radius:999px;white-space:nowrap}' +
+    '.nst-hub{margin:0 0 22px}.nst-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}' +
+    '.nst-head h2{margin:0;color:var(--nw-ink,#fff);font-size:17px;display:flex;align-items:center;gap:8px}' +
+    '.nst-seg{display:inline-flex;background:var(--nw-card,rgba(255,255,255,.16));border:1px solid var(--nw-line,transparent);border-radius:999px;padding:3px;margin-inline-start:auto}' +
+    '.nst-seg button{all:unset;cursor:pointer;color:var(--nw-muted,#fff);font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px}' +
+    '.nst-seg button.on{background:var(--nw-navy,#fff);color:#fff}' +
+    '.nst-all{color:var(--nw-ink,#fff);text-decoration:none;font-size:13px;font-weight:700;background:var(--nw-card,rgba(255,255,255,.16));border:1px solid var(--nw-line,transparent);padding:7px 12px;border-radius:999px;white-space:nowrap}' +
     '.nst-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.nst-grid+.nst-grid{margin-top:12px}' +
-    '.nst-hint{color:rgba(255,255,255,.8);font-size:12px;margin-top:8px;text-shadow:0 1px 4px rgba(0,0,0,.4)}' +
-    '.nst-msg{background:rgba(255,255,255,.92);border-radius:14px;padding:16px;text-align:center;color:#64748b;font-size:14px}' +
+    '.nst-hint{color:var(--nw-muted,rgba(255,255,255,.8));font-size:12px;margin-top:8px}' +
+    '.nst-msg{background:var(--nw-card,rgba(255,255,255,.92));border-radius:14px;padding:16px;text-align:center;color:#64748b;font-size:14px}' +
     '.nst-msg button{all:unset;cursor:pointer;color:#1f3f7a;font-weight:700;margin-inline-start:8px;text-decoration:underline}' +
-    '.nst-skel{height:104px;border-radius:16px;background:linear-gradient(90deg,rgba(255,255,255,.55),rgba(255,255,255,.8),rgba(255,255,255,.55));background-size:200% 100%;animation:nstsk 1.2s infinite}' +
+    '.nst-skel{height:104px;border-radius:16px;background:linear-gradient(90deg,var(--nw-card,rgba(255,255,255,.55)),var(--nw-line,rgba(255,255,255,.8)),var(--nw-card,rgba(255,255,255,.55)));background-size:200% 100%;animation:nstsk 1.2s infinite}' +
     '@keyframes nstsk{0%{background-position:200% 0}100%{background-position:-200% 0}}' +
     '@media (max-width:820px){.nst-grid{grid-template-columns:1fr 1fr}.nst-v{font-size:24px}.nst-seg{margin-inline-start:0}.nst-head h2{width:100%}}' +
     /* النافذة */
@@ -399,7 +402,7 @@
     try { period = localStorage.getItem('nwStatsPeriod') || 'today'; } catch (e) {}
     function shell(inner) {
       root.innerHTML =
-        '<div class="nst-head"><h2>📈 ' + esc(t('secTitle')) + '</h2>' +
+        '<div class="nst-head"><h2>' + (window.NWIcon ? NWIcon('stats', 20) : '📈') + ' ' + esc(t('secTitle')) + '</h2>' +
         '<div class="nst-seg">' + ['today', 'month', 'last'].map(function (p) { return '<button type="button" data-p="' + p + '" class="' + (p === period ? 'on' : '') + '">' + esc(t(p === 'today' ? 'today' : p === 'month' ? 'thisMonth' : 'lastMonth')) + '</button>'; }).join('') + '</div>' +
         '<a class="nst-all" href="' + HOME + 'stats.html">' + esc(t('allStats')) + '</a></div>' + inner;
     }
@@ -417,7 +420,7 @@
       var list = kpis(rows, prev, { days: days, totalUsers: totalUsers, vs: vs });
       var pick = ['total', 'users', 'acc', 'viol', 'eval', 'trip', 'tasks', 'shift'];
       var tiles = pick.map(function (id) { return list.find(function (k) { return k.id === id; }); });
-      shell('<div class="nst-grid">' + tiles.map(function (k) { return tileHtml(k); }).join('') + '</div><div class="nst-hint">👆 ' + esc(t('tapHint')) + '</div>');
+      shell('<div class="nst-grid">' + tiles.map(function (k) { return tileHtml(k); }).join('') + '</div><div class="nst-hint">' + esc(t('tapHint')) + '</div>');
     }
     function load(force) {
       skeleton();

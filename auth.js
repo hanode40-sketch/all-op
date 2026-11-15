@@ -14,8 +14,52 @@
   var HOME_URL  = 'https://hanode40-sketch.github.io/all-op/';
   var KEY = 'nw_auth_v1';
   var IDLE_KEY = 'nw_last_active';
-  var AUTH_VERSION = '2026-11-15.4';   // غيّره عند كل تعديل على هذا الملف (يجبر الأجهزة على التحديث)
+  var AUTH_VERSION = '2026-11-15.7';   // غيّره عند كل تعديل على هذا الملف (يجبر الأجهزة على التحديث)
   var IDLE_MS = 2 * 60 * 60 * 1000;   // يقفل بعد ساعتين بدون أي نشاط (غيّر الرقم 2 لتغيير المدة)
+
+  /* ===== ألوان موحدة لكل البرامج (نهاري / ليلي) — أي برنامج يستخدم var(--nw-...) ياخذ نفس الشكل ===== */
+  try {
+    var tk = document.createElement('style'); tk.id = 'nw-tokens';
+    tk.textContent =
+      ':root{--nw-bg:#eef2f8;--nw-card:#ffffff;--nw-ink:#0f1e3d;--nw-muted:#64748b;--nw-line:#e2e8f0;--nw-soft:#f6f8fc;' +
+        '--nw-brand:#1f3f7a;--nw-navy:#13274f;--nw-acc:#f97316;--nw-ok:#16a34a;--nw-warn:#d97706;--nw-bad:#dc2626;' +
+        '--nw-radius:16px;--nw-shadow:0 1px 2px rgba(15,30,61,.06),0 4px 16px rgba(15,30,61,.06);' +
+        '--nw-hero:linear-gradient(135deg,#13274f 0%,#1f4a8a 100%);--nw-font:"IBM Plex Sans Arabic",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Tahoma,Arial,sans-serif}' +
+      'html[data-theme="dark"]{--nw-bg:#0b1220;--nw-card:#141c2e;--nw-ink:#e6ecf7;--nw-muted:#8b9ab5;--nw-line:#24304a;--nw-soft:#0f1626;' +
+        '--nw-brand:#93b4f0;--nw-shadow:0 0 0 1px #1f2a40;--nw-hero:linear-gradient(135deg,#132447 0%,#1b3566 100%)}';
+    (document.head || document.documentElement).appendChild(tk);
+    if (!document.getElementById('nw-font')) {   // خط موحد احترافي (عربي + إنجليزي)
+      var fl = document.createElement('link'); fl.id = 'nw-font'; fl.rel = 'stylesheet';
+      fl.href = 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap';
+      (document.head || document.documentElement).appendChild(fl);
+    }
+  } catch (e) {}
+
+  var NW_IC = {
+    home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/>',
+    shift: '<path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/>',
+    tasks: '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="m8 12 3 3 5-6"/>',
+    trip: '<rect x="4" y="3" width="16" height="15" rx="3"/><path d="M4 11h16"/><path d="M8 3v8M16 3v8"/><circle cx="8" cy="15" r="1"/><circle cx="16" cy="15" r="1"/><path d="M6 18v3M18 18v3"/>',
+    drivers: '<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="11" r="2.5"/><path d="M5.5 17c.6-2 2-3 3.5-3s2.9 1 3.5 3"/><path d="M15 10h3M15 14h3"/>',
+    violation: '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M12 11v4"/><path d="M12 18h.01"/>',
+    accident: '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+    evaluation: '<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.2l1.1-6.2L3 9.6l6.2-.9z"/>',
+    logV: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M8 13h8"/>',
+    logA: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 10v3"/><path d="M12 16h.01"/>',
+    logE: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="m12 10 1 2 2 .3-1.5 1.4.4 2.1-1.9-1-1.9 1 .4-2.1L9 12.3l2-.3z"/>',
+    performance: '<path d="M3 21h18"/><rect x="5" y="11" width="3" height="7" rx="1"/><rect x="10.5" y="6" width="3" height="12" rx="1"/><rect x="16" y="13" width="3" height="5" rx="1"/>',
+    stats: '<path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 6-7"/>',
+    kpi: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
+    users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.7-3.4 3.4-5.5 6.5-5.5s5.8 2.1 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/><path d="M18 14.8c1.9.7 3.2 2.5 3.5 5.2"/>',
+    activity: '<path d="M3 12h4l3-8 4 16 3-8h4"/>',
+    calendar: '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+    bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    card: '<rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/><path d="M6 15h4"/>',
+    arrow: '<path d="M15 6l-6 6 6 6"/>'
+  };
+  function icon(k, size) { var p = NW_IC[k]; if (!p) return ''; return '<svg class="nwi" width="' + (size || 20) + '" height="' + (size || 20) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; }
+  window.NWIcon = icon;   // أيقونات موحدة لكل البرامج
 
   var script = document.currentScript;
   var TOOL = (script && script.getAttribute('data-tool')) || '';
@@ -248,24 +292,24 @@
   /* ================= القائمة الجانبية (الكمبيوتر فقط ≥ 1100px) ================= */
   var SIDE_KEY = 'nwSideMini';
   var SIDE_ITEMS = [
-    { g: 0, t: '',            ic: '🏠', ar: 'الرئيسية',            en: 'Home',              url: HOME_URL },
-    { g: 1, t: 'shift',       ic: '🔄', ar: 'تسليم الوردية',       en: 'Shift Handover',    url: 'https://hanode40-sketch.github.io/shift_handover/' },
-    { g: 1, t: 'tasks',       ic: '✅', ar: 'المهام',              en: 'Tasks',             url: 'https://hanode40-sketch.github.io/tasks/' },
-    { g: 1, t: 'trip',        ic: '🚌', ar: 'مسار الرحلة',         en: 'Trip Route',        url: 'https://hanode40-sketch.github.io/trip/' },
-    { g: 1, t: 'drivers',     ic: '👨‍✈️', ar: 'إدارة السائقين',     en: 'Drivers Management', url: HOME_URL + 'drivers.html' },
-    { g: 2, t: 'violation',   ic: '📝', ar: 'محضر مخالفة',         en: 'Violation Report',  url: 'https://hanode40-sketch.github.io/violation/' },
-    { g: 2, t: 'accident',    ic: '🚨', ar: 'تقرير حادث',          en: 'Accident Report',   url: 'https://hanode40-sketch.github.io/accident_report/' },
-    { g: 2, t: 'evaluation',  ic: '⭐', ar: 'تقييم السائقين',      en: 'Driver Evaluation', url: 'https://hanode40-sketch.github.io/OP/' },
+    { ik: 'home', g: 0, t: '',            ic: '🏠', ar: 'الرئيسية',            en: 'Home',              url: HOME_URL },
+    { ik: 'shift', g: 1, t: 'shift',       ic: '🔄', ar: 'تسليم الوردية',       en: 'Shift Handover',    url: 'https://hanode40-sketch.github.io/shift_handover/' },
+    { ik: 'tasks', g: 1, t: 'tasks',       ic: '✅', ar: 'المهام',              en: 'Tasks',             url: 'https://hanode40-sketch.github.io/tasks/' },
+    { ik: 'trip', g: 1, t: 'trip',        ic: '🚌', ar: 'مسار الرحلة',         en: 'Trip Route',        url: 'https://hanode40-sketch.github.io/trip/' },
+    { ik: 'drivers', g: 1, t: 'drivers',     ic: '👨‍✈️', ar: 'إدارة السائقين',     en: 'Drivers Management', url: HOME_URL + 'drivers.html' },
+    { ik: 'violation', g: 2, t: 'violation',   ic: '📝', ar: 'محضر مخالفة',         en: 'Violation Report',  url: 'https://hanode40-sketch.github.io/violation/' },
+    { ik: 'accident', g: 2, t: 'accident',    ic: '🚨', ar: 'تقرير حادث',          en: 'Accident Report',   url: 'https://hanode40-sketch.github.io/accident_report/' },
+    { ik: 'evaluation', g: 2, t: 'evaluation',  ic: '⭐', ar: 'تقييم السائقين',      en: 'Driver Evaluation', url: 'https://hanode40-sketch.github.io/OP/' },
     // السجلات: نفس صلاحية البرنامج، وتفتح تبويب السجل مباشرة (#log)
-    { g: 4, t: 'violation',   log: 1, ic: '🗂️', ar: 'سجل المحاضر',    en: 'Violation Log',     url: 'https://hanode40-sketch.github.io/violation/#log' },
-    { g: 4, t: 'accident',    log: 1, ic: '📂', ar: 'سجل تقارير الحوادث', en: 'Accident Log',   url: 'https://hanode40-sketch.github.io/accident_report/#log' },
-    { g: 4, t: 'evaluation',  log: 1, ic: '📋', ar: 'سجل التقييمات',  en: 'Evaluation Log',    url: 'https://hanode40-sketch.github.io/OP/#log' },
-    { g: 3, t: 'performance', ic: '📊', ar: 'أداء الموظفين',       en: 'Staff Performance', url: HOME_URL + 'performance.html' },
-    { g: 3, t: 'stats',       ic: '📈', ar: 'إحصائيات العمل',      en: 'Work Statistics',   url: HOME_URL + 'stats.html' },
-    { g: 3, t: 'kpi',         ic: '🎯', ar: 'المؤشرات التشغيلية',  en: 'Operational KPIs',  url: HOME_URL + 'kpi.html' }
+    { ik: 'logV', g: 4, t: 'violation',   log: 1, ic: '🗂️', ar: 'سجل المحاضر',    en: 'Violation Log',     url: 'https://hanode40-sketch.github.io/violation/#log' },
+    { ik: 'logA', g: 4, t: 'accident',    log: 1, ic: '📂', ar: 'سجل تقارير الحوادث', en: 'Accident Log',   url: 'https://hanode40-sketch.github.io/accident_report/#log' },
+    { ik: 'logE', g: 4, t: 'evaluation',  log: 1, ic: '📋', ar: 'سجل التقييمات',  en: 'Evaluation Log',    url: 'https://hanode40-sketch.github.io/OP/#log' },
+    { ik: 'performance', g: 3, t: 'performance', ic: '📊', ar: 'أداء الموظفين',       en: 'Staff Performance', url: HOME_URL + 'performance.html' },
+    { ik: 'stats', g: 3, t: 'stats',       ic: '📈', ar: 'إحصائيات العمل',      en: 'Work Statistics',   url: HOME_URL + 'stats.html' },
+    { ik: 'kpi', g: 3, t: 'kpi',         ic: '🎯', ar: 'المؤشرات التشغيلية',  en: 'Operational KPIs',  url: HOME_URL + 'kpi.html' }
   ];
   var SIDE_GROUPS = [null, ['التشغيل اليومي', 'Daily operations'], ['التقارير والسلامة', 'Reports & safety'], ['الإدارة', 'Management'], ['السجلات', 'Records']];
-  var ROLE_EN = { 'مدير': 'Manager', 'مدير تنفيذي': 'Executive Manager', 'مشرف': 'Supervisor', 'مرحّل': 'Dispatcher', 'مرحل': 'Dispatcher', 'موظف': 'Employee' };
+  var ROLE_EN = { 'مدير': 'Manager', 'مدير تنفيذي': 'Executive Manager', 'جودة': 'Quality', 'علاقات حكومية': 'Government Relations', 'مشرف': 'Supervisor', 'مرحّل': 'Dispatcher', 'مرحل': 'Dispatcher', 'موظف': 'Employee' };
   var sideCss =
     '.nws{display:none}' +
     '@media screen and (min-width:1100px){' +
@@ -275,7 +319,7 @@
       'html.nws-on.nws-mini.nws-r body{margin-right:76px!important}html.nws-on.nws-mini.nws-l body{margin-left:76px!important}' +
     '}' +
     '.nws{position:fixed;top:0;bottom:0;width:248px;z-index:99990;flex-direction:column;background:linear-gradient(180deg,#0f1d38 0%,#0b1529 100%);' +
-      'color:#cbd5e1;font:14px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;box-shadow:0 0 0 1px rgba(255,255,255,.04),0 10px 30px rgba(0,0,0,.25);transition:width .2s}' +
+      'color:#cbd5e1;font:14px/1.35 var(--nw-font,-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif);box-shadow:0 0 0 1px rgba(255,255,255,.04),0 10px 30px rgba(0,0,0,.25);transition:width .2s}' +
     'html.nws-r .nws{right:0}html.nws-l .nws{left:0}html.nws-mini .nws{width:76px}' +
     '.nws *{box-sizing:border-box}' +
     '.nws-top{display:flex;gap:8px;padding:14px 16px 0}' +
@@ -293,7 +337,7 @@
     '.nws-i{display:flex;align-items:center;gap:12px;padding:10px 12px;margin:2px 0;border-radius:10px;color:#cbd5e1;text-decoration:none;font-weight:600;position:relative;transition:background .15s,color .15s}' +
     '.nws-i:hover{background:rgba(255,255,255,.06);color:#fff}' +
     '.nws-i .ic{width:30px;height:30px;flex-shrink:0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;background:rgba(255,255,255,.05)}' +
-    '.nws-i.on{background:rgba(242,140,40,.14);color:#fff}.nws-i.on .ic{background:#f28c28}' +
+    '.nws-i.on{background:rgba(255,255,255,.08);color:#fff}.nws-i.on .ic{background:#f97316;color:#fff}.nws-i .ic{color:#9fb3d1}.nws-i:hover .ic{color:#fff}' +
     '.nws-i.on::before{content:"";position:absolute;top:8px;bottom:8px;width:3px;border-radius:3px;background:#f28c28}' +
     'html.nws-r .nws-i.on::before{right:-10px}html.nws-l .nws-i.on::before{left:-10px}' +
     '.nws-foot{display:flex;align-items:center;gap:10px;padding:14px 14px 16px;border-top:1px solid rgba(255,255,255,.07)}' +
@@ -333,7 +377,7 @@
         if (it.g !== lastG && SIDE_GROUPS[it.g]) h += '<div class="nws-g">' + SIDE_GROUPS[it.g][en ? 1 : 0] + '</div>';
         lastG = it.g;
         var name = en ? it.en : it.ar;
-        h += '<a class="nws-i' + (isOn(it) ? ' on' : '') + '" href="' + it.url + '" title="' + esc(name) + '"><span class="ic">' + it.ic + '</span><span class="tx">' + esc(name) + '</span></a>';
+        h += '<a class="nws-i' + (isOn(it) ? ' on' : '') + '" href="' + it.url + '" title="' + esc(name) + '"><span class="ic">' + (icon(it.ik, 18) || it.ic) + '</span><span class="tx">' + esc(name) + '</span></a>';
       });
       var nm = String(user.n || ''), role = user.r || '';
       h += '</div><div class="nws-foot"><div class="nws-av">' + esc(nm.trim().charAt(0).toUpperCase() || '؟') + '</div><div class="nws-u"><b dir="auto" title="' + esc(nm) + '">' + esc(nm) +
@@ -498,7 +542,7 @@
     function render() {
       var en = false; try { en = localStorage.getItem('hubLang') === 'en'; } catch (e) {}
       h.setAttribute('dir', en ? 'ltr' : 'rtl');
-      h.innerHTML = '<div class="nwh-t"><span class="nwh-ic">' + it.ic + '</span><div style="min-width:0"><h1>' + esc(en ? it.en : it.ar) +
+      h.innerHTML = '<div class="nwh-t"><span class="nwh-ic">' + (icon(it.ik, 22) || it.ic) + '</span><div style="min-width:0"><h1>' + esc(en ? it.en : it.ar) +
         '</h1><small>' + esc(en ? it.ar : it.en) + '</small></div></div>' +
         '<a class="nwh-back" href="' + HOME_URL + '">' + (en ? '← Operations Tools' : '← أدوات التشغيل') + '</a>';
     }
