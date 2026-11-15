@@ -571,7 +571,7 @@ $('bDash').onclick = () => {
   const dark = `<div id="dash2" dir="rtl"><div class="hd2"><div><h1>لوحة السائقين · Drivers Overview</h1><small>${dTxt} · ${esc(scope)}</small></div><img src="${new URL('icon-192.png', location.href).href}" alt="" onerror="this.style.display='none'"></div>
 <div class="k5">${[['إجمالي الاحتياج', rows.length, '', ''], ['على رأس العمل', op + an + em + sk, '', ''], ['المتاحين للتشغيل', op, '', pct + '% من الإجمالي'], ['في إجازات', an + em + sk, '#60a5fa', ''], ['خارج الخدمة', nr + su + ab + te, '#f87171', '']].map(x => `<div class="c2"><span>${x[0]}</span><b style="color:${x[2] || '#fff'}">${x[1]}</b>${x[3] ? `<i>${x[3]}</i>` : ''}</div>`).join('')}</div>
 <div class="g2"><div class="c2 dn"><h3>توزيع المتاحين اليوم</h3><div class="dw">${donut}<div class="ctr"><b>${op}</b><span>متاح</span></div></div>
-<div class="lg">${parts.map(x => `<div><span><em style="background:${x[2]}"></em>${x[0]}</span><b>${x[0] === 'استعداد' || ROSTER_N ? x[1] : '—'}</b></div>`).join('')}${outN ? `<div style="grid-column:1/-1;color:#fca5a5;font-size:14px">❌ منهم ${outN} معتذر ضمن الاستعداد</div>` : ''}</div></div>
+<div class="lg">${parts.map(x => `<div><span><em style="background:${x[2]}"></em>${x[0]}</span><b>${x[0] === 'استعداد' || ROSTER_N ? x[1] : '—'}</b></div>`).join('')}</div></div>
 <div class="c2 bars"><h3>الكراجات: <em style="background:#2dd4bf"></em>رحلات · <em style="background:#94a3b8"></em>راحة · <em style="background:#a78bfa"></em>استعداد</h3>
 ${dRows.map(x => `<div class="br"><span>${esc(depName(x[0]))}</span><div class="tr"><i style="width:${x[2] / dMax * 100}%;background:#2dd4bf"></i><i style="width:${x[3] / dMax * 100}%;background:#94a3b8"></i><i style="width:${x[4] / dMax * 100}%;background:#a78bfa"></i></div><b>${x[1]}</b><small>${x[2]} · ${x[3]} · ${x[4]}</small></div>`).join('')}</div></div>
 <div class="k7">${[['إجازة سنوية', an, '#60a5fa'], ['اضطرارية', em, '#60a5fa'], ['مرضية', sk, '#f9a8d4'], ['لم يعد', nr, '#f87171'], ['موقوف', su, '#f87171'], ['هروب', ab, '#f87171'], ['إنهاء خدمات', te, '#f87171']].map(x => `<div class="c2"><span>${x[0]}</span><b style="color:${x[2]}">${x[1]}</b></div>`).join('')}</div>
@@ -621,7 +621,7 @@ body.v-dark{background:#050b1c}body.v-dark #dash{display:none}body:not(.v-dark) 
  <div class="col">
   ${box('g', 'Active Drivers (On Duty)', 'السائقون على رأس العمل', op + an + em + sk, '👥')}
   ${box('bl', 'Available for Operation', 'المتاحون للتشغيل', op, '🚌')}
-  <div class="row r3 fill">${small('bl', 'OnTrips', 'على الرحلات', ROSTER_N ? trips : '—', '🚌')}${small('gy', 'Rest Day', 'راحة', ROSTER_N ? rest : '—', '😴')}${small('or', 'Standby', 'الاستعداد' + (outN ? ` · منهم ${outN} معتذر` : ''), sb, '⏱️')}</div>
+  <div class="row r3 fill">${small('bl', 'OnTrips', 'على الرحلات', ROSTER_N ? trips : '—', '🚌')}${small('gy', 'Rest Day', 'راحة', ROSTER_N ? rest : '—', '😴')}${small('or', 'Standby', 'الاستعداد', sb, '⏱️')}</div>
  </div>
  <div class="col">
   ${box('gr', 'Drivers on Leave', 'السائقون في إجازات', an + em + sk, '🌴')}
