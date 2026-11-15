@@ -39,7 +39,7 @@
     border:1px solid rgba(15,23,42,.06);box-shadow:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(10,25,55,.16);transition:transform .15s}
   .tile:hover{transform:translateY(-3px)} .tile::before{content:"";position:absolute;inset-inline:0;top:0;height:4px;background:var(--acc)}
   .tile .lb{font-size:13px;color:var(--muted);font-weight:600} .tile b{display:block;font-size:30px;margin-top:6px} .tile small{font-size:12px;color:var(--muted)}
-  .tiles.s{grid-template-columns:repeat(9,1fr)} .tiles.s .tile b{font-size:24px}
+  .tiles.s{grid-template-columns:repeat(10,1fr)} .tiles.s .tile b{font-size:24px}
   .grid2{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}
   .card{padding:16px;min-width:0} .card h2{margin:0 0 12px;font-size:16px;color:var(--navy)}
   table{width:100%;border-collapse:collapse;font-size:13.5px}
@@ -195,7 +195,7 @@ const I18N = {
     natTitle:'السائقون حسب الجنسية والحالة', depTitle:'سائقو التشغيل والاستعداد في الكراجات', search:'ابحث برقم الإقامة أو الاسم أو الرحلة...',
     note:'«على الرحلات» = سائقو التشغيل المسجّلون في روستر التاريخ المختار. السائق اللي مو في روستر اليوم: إذا كان غير مجدول يومين متتاليين أو أقل = «راحة»، وإذا أكثر من يومين متتاليين = «استعداد». و«الاستعداد» اليدوي يبقى استعداد. ارفعوا الروستر يوم بيوم عشان يطلع الحساب دقيق.',
     allDep:'كل الكراجات', myDeps:'كل كراجاتي', allSt:'كل الحالات', allNat:'كل الجنسيات', req:'إجمالي احتياج التشغيل', active:'على رأس العمل', out:'خارج الخدمة / مطلوب تعويضهم',
-    avail:'المتاحين للتشغيل', onLeave:'في إجازات', onTrips:'على الرحلات', standby:'الاستعداد', rest:'راحة', outT:'معتذر/مستبدل', swapA:n=>`🔄 ${n} تبديل سائق في هذا التاريخ`, swapT:'تبديل السائق ببديل من الاستعداد', unswap:'إلغاء التبديل', subFor:'بديل عن', swTitle:'🔄 تبديل سائق', swOrig:'السائق المعتذر ورحلته', swQph:'🔍 ابحث بالاسم أو الإقامة أو رقم الرحلة...', noMatch:'لا توجد نتائج', swNeedR:'اختر سبب التبديل', swNeedN:'اكتب ملاحظة توضح السبب', swNotePh:'اكتب تفاصيل السبب...', swPickO:'اختر السائق المعتذر / الرحلة', swFromB:'تكليف', swFromT:'تكليف هذا السائق بديل عن سائق معتذر', swRep:'السائق البديل', swReason:'السبب', swNote:'ملاحظة', swDo:'تأكيد التبديل', swG1:'الاستعداد', swG2:'الراحة', swSame:'نفس الموقع', swBusy:'البديل عنده رحلة في نفس اليوم', swNotIn:'السائق الأصلي مو موجود في روستر هذا اليوم', swPick:'اختر السائق البديل', swDone:'✅ تم التبديل — يظهر البديل في مسار الرحلة', unswAsk:'إلغاء التبديل ورجوع السائق الأصلي للرحلة؟', sbAt:'استعداد في', restAt:'راحة في', lastT:'آخر رحلة', manual:'يدوي', offN:n=>`${n} أيام`, since:d=>`من ${d}`, wk:n=>`أيام الروستر المرفوعة حول التاريخ: ${n}`, total:'إجمالي السائقين', noRoster:'لا يوجد روستر لهذا التاريخ',
+    avail:'المتاحين للتشغيل', onLeave:'في إجازات', onTrips:'على الرحلات', standby:'الاستعداد', rest:'راحة', outTile:'المعتذرين', outTile1:'معتذر', outLine:(t,n)=>`رحلته ${t} انتقلت إلى ${n}`, outT:'معتذر/مستبدل', swapA:n=>`🔄 ${n} تبديل سائق في هذا التاريخ`, swapT:'تبديل السائق ببديل من الاستعداد', unswap:'إلغاء التبديل', subFor:'بديل عن', swTitle:'🔄 تبديل سائق', swOrig:'السائق المعتذر ورحلته', swQph:'🔍 ابحث بالاسم أو الإقامة أو رقم الرحلة...', noMatch:'لا توجد نتائج', swNeedR:'اختر سبب التبديل', swNeedN:'اكتب ملاحظة توضح السبب', swNotePh:'اكتب تفاصيل السبب...', swPickO:'اختر السائق المعتذر / الرحلة', swFromB:'تكليف', swFromT:'تكليف هذا السائق بديل عن سائق معتذر', swRep:'السائق البديل', swReason:'السبب', swNote:'ملاحظة', swDo:'تأكيد التبديل', swG1:'الاستعداد', swG2:'الراحة', swSame:'نفس الموقع', swBusy:'البديل عنده رحلة في نفس اليوم', swNotIn:'السائق الأصلي مو موجود في روستر هذا اليوم', swPick:'اختر السائق البديل', swDone:'✅ تم التبديل — يظهر البديل في مسار الرحلة', unswAsk:'إلغاء التبديل ورجوع السائق الأصلي للرحلة؟', sbAt:'استعداد في', restAt:'راحة في', lastT:'آخر رحلة', manual:'يدوي', offN:n=>`${n} أيام`, since:d=>`من ${d}`, wk:n=>`أيام الروستر المرفوعة حول التاريخ: ${n}`, total:'إجمالي السائقين', noRoster:'لا يوجد روستر لهذا التاريخ',
     nat:'الجنسية', depot:'الكراج', count:'العدد', gt:'الإجمالي', opDrivers:'التشغيل', sbDrivers:'الاستعداد', edit:'تعديل', trip:'رحلة',
     fIq:'رقم الإقامة', fEmp:'الرقم الوظيفي', fName:'اسم السائق', fNat:'الجنسية', fStatus:'الحالة', fDepot:'الكراج', fSb:'🟣 السائق على الاستعداد (Standby)',
     fFrom:'من تاريخ', fTo:'تاريخ العودة المتوقع', fMob:'الجوال', fNote:'ملاحظة', cancel:'إلغاء', save:'حفظ', saving:'جاري الحفظ...',
@@ -211,7 +211,7 @@ const I18N = {
     natTitle:'Drivers by nationality & status', depTitle:'Operational & standby drivers by depot', search:'Search by Iqama, name or trip...',
     note:'"On trips" = operational drivers in the roster of the selected date. A driver missing from today\'s roster is on a "Rest day" if unscheduled for 2 consecutive days or fewer, otherwise "Standby". Manual standby always counts as standby.',
     allDep:'All depots', myDeps:'All my depots', allSt:'All statuses', allNat:'All nationalities', req:'Total operational requirement', active:'Active drivers', out:'Out of service / replacement required',
-    avail:'Available for operation', onLeave:'On leave', onTrips:'On trips', standby:'Standby', rest:'Rest day', outT:'Replaced', swapA:n=>`🔄 ${n} driver replacements on this date`, swapT:'Replace with a standby driver', unswap:'Cancel replacement', subFor:'Replacing', swTitle:'🔄 Replace driver', swOrig:'Absent driver & trip', swQph:'🔍 Search by name, Iqama or trip...', noMatch:'No matches', swNeedR:'Choose the reason', swNeedN:'Write a note explaining the reason', swNotePh:'Describe the reason...', swPickO:'Choose the absent driver / trip', swFromB:'Assign', swFromT:'Assign this driver to replace an absent driver', swRep:'Replacement driver', swReason:'Reason', swNote:'Note', swDo:'Confirm replacement', swG1:'Standby', swG2:'Rest day', swSame:'same location', swBusy:'The replacement already has a trip that day', swNotIn:'The original driver is not in this day\'s roster', swPick:'Choose the replacement driver', swDone:'✅ Replaced — the replacement shows in Trip Route', unswAsk:'Cancel the replacement and return the original driver to the trip?', sbAt:'standby at', restAt:'resting at', lastT:'Last trip', manual:'manual', offN:n=>`${n} days`, since:d=>`since ${d}`, wk:n=>`Roster days uploaded around date: ${n}`, total:'Total drivers', noRoster:'No roster for this date',
+    avail:'Available for operation', onLeave:'On leave', onTrips:'On trips', standby:'Standby', rest:'Rest day', outTile:'Absent', outTile1:'Absent', outLine:(t,n)=>`Trip ${t} moved to ${n}`, outT:'Replaced', swapA:n=>`🔄 ${n} driver replacements on this date`, swapT:'Replace with a standby driver', unswap:'Cancel replacement', subFor:'Replacing', swTitle:'🔄 Replace driver', swOrig:'Absent driver & trip', swQph:'🔍 Search by name, Iqama or trip...', noMatch:'No matches', swNeedR:'Choose the reason', swNeedN:'Write a note explaining the reason', swNotePh:'Describe the reason...', swPickO:'Choose the absent driver / trip', swFromB:'Assign', swFromT:'Assign this driver to replace an absent driver', swRep:'Replacement driver', swReason:'Reason', swNote:'Note', swDo:'Confirm replacement', swG1:'Standby', swG2:'Rest day', swSame:'same location', swBusy:'The replacement already has a trip that day', swNotIn:'The original driver is not in this day\'s roster', swPick:'Choose the replacement driver', swDone:'✅ Replaced — the replacement shows in Trip Route', unswAsk:'Cancel the replacement and return the original driver to the trip?', sbAt:'standby at', restAt:'resting at', lastT:'Last trip', manual:'manual', offN:n=>`${n} days`, since:d=>`since ${d}`, wk:n=>`Roster days uploaded around date: ${n}`, total:'Total drivers', noRoster:'No roster for this date',
     nat:'Nationality', depot:'Depot', count:'Count', gt:'Grand total', opDrivers:'Operation', sbDrivers:'Standby', edit:'Edit', trip:'Trip',
     fIq:'Iqama number', fEmp:'Employee ID', fName:'Driver name', fNat:'Nationality', fStatus:'Status', fDepot:'Depot', fSb:'🟣 Driver is on standby',
     fFrom:'From', fTo:'Expected return', fMob:'Mobile', fNote:'Note', cancel:'Cancel', save:'Save', saving:'Saving...',
@@ -305,6 +305,7 @@ function render() {
   $('tStatus').innerHTML =
     tile('#0d9488', t_('onTrips'), ROSTER_N ? onTrips : '—', 'trip', ROSTER_N ? t_('wk')(WEEK_N) : t_('noRoster')) +
     tile('#64748b', t_('rest'), ROSTER_N ? rest : '—', 'rest') +
+    tile('#c53030', '❌ ' + t_('outTile'), outN, 'outd', outN ? Object.entries(rows.filter(isOut).reduce((a, r) => { const k = SWOUT[r[C.IQ]].reason; a[k] = (a[k] || 0) + 1; return a; }, {})).map(([k, v]) => `${k} ${v}`).join(' · ') : '') +
     tile('#7c3aed', t_('standby'), sb, 'sb') +
     STATUSES.filter(s => s !== 'operation').map(s => tile(ST[s].grp === 'leave' ? '#2563eb' : '#dc2626', stName(s), cnt(s), 'st:' + s)).join('');
 
@@ -320,14 +321,14 @@ function render() {
 
   // الكراجات: التشغيل والاستعداد
   const deps = DEPOTS.filter(d => inDep(d, depot));
-  let g = `<table><thead><tr><th>${t_('depot')}</th><th>${t_('opDrivers')}</th><th>${t_('onTrips')}</th><th>${t_('rest')}</th><th>${t_('standby')}</th></tr></thead><tbody>`;
-  let s1 = 0, s2 = 0, s3 = 0, s4 = 0;
+  let g = `<table><thead><tr><th>${t_('depot')}</th><th>${t_('opDrivers')}</th><th>${t_('onTrips')}</th><th>${t_('rest')}</th><th>${t_('standby')}</th><th>${t_('outTile')}</th></tr></thead><tbody>`;
+  let s1 = 0, s2 = 0, s3 = 0, s4 = 0, s5 = 0;
   deps.forEach(d => {
-    const rr = D.filter(r => dep(r) === d), op = rr.filter(r => r[C.ST] === 'operation').length, tr = rr.filter(isOnTrip).length, st = D.filter(r => isStandby(r) && sbDep(r) === d).length, rs = D.filter(r => isRest(r) && sbDep(r) === d).length;
-    if (!rr.length && !st && !rs) return; s1 += op; s2 += tr; s3 += st; s4 += rs;
-    g += `<tr><td><b>${esc(depName(d))}</b></td><td class="c" data-f="ds:${d}|operation">${op}</td><td class="c" data-f="dt:${d}">${ROSTER_N ? tr : '—'}</td><td class="c" data-f="dr:${d}">${ROSTER_N ? rs : '—'}</td><td class="c" data-f="db:${d}">${st}</td></tr>`;
+    const rr = D.filter(r => dep(r) === d), op = rr.filter(r => r[C.ST] === 'operation').length, tr = rr.filter(isOnTrip).length, st = D.filter(r => isStandby(r) && sbDep(r) === d).length, rs = D.filter(r => isRest(r) && sbDep(r) === d).length, ou = rr.filter(isOut).length;
+    if (!rr.length && !st && !rs) return; s1 += op; s2 += tr; s3 += st; s4 += rs; s5 += ou;
+    g += `<tr><td><b>${esc(depName(d))}</b></td><td class="c" data-f="ds:${d}|operation">${op}</td><td class="c" data-f="dt:${d}">${ROSTER_N ? tr : '—'}</td><td class="c" data-f="dr:${d}">${ROSTER_N ? rs : '—'}</td><td class="c" data-f="db:${d}">${st}</td><td class="c" data-f="do:${d}" style="${ou ? 'color:#c53030;font-weight:800' : ''}">${ou}</td></tr>`;
   });
-  g += `<tr class="tot"><td>${t_('gt')}</td><td>${s1}</td><td>${ROSTER_N ? s2 : '—'}</td><td>${ROSTER_N ? s4 : '—'}</td><td>${s3}</td></tr></tbody></table>`;
+  g += `<tr class="tot"><td>${t_('gt')}</td><td>${s1}</td><td>${ROSTER_N ? s2 : '—'}</td><td>${ROSTER_N ? s4 : '—'}</td><td>${s3}</td><td>${s5}</td></tr></tbody></table>`;
   $('depTable').innerHTML = g;
 
   // تنبيه المتأخرين عن العودة
@@ -342,6 +343,7 @@ function render() {
 }
 
 let LISTF = '';
+const k0 = f => f.slice(0, f.indexOf(':'));
 function applyF(rows) {
   const f = LISTF; if (!f) return rows;
   if (f === 'all') return rows;
@@ -355,6 +357,8 @@ function applyF(rows) {
   if (f === 'due') return rows.filter(isDue);
   if (f === 'cexp') return rows.filter(cardExpired);
   if (f === 'csoon') return rows.filter(cardSoon);
+  if (f === 'outd') return rows.filter(isOut);
+  if (k0(f) === 'do') return rows.filter(r => dep(r) === f.slice(3) && isOut(r));
   if (f === 'swap') return rows.filter(r => isOut(r) || SWIN[r[C.IQ]]);
   const [k, v] = [f.slice(0, f.indexOf(':')), f.slice(f.indexOf(':') + 1)];
   if (k === 'st') return rows.filter(r => r[C.ST] === v);
@@ -379,7 +383,7 @@ function renderList() {
     const badges = `<span class="chip ${ST[r[C.ST]] ? ST[r[C.ST]].cls : ''}">${esc(stName(r[C.ST]))}</span>` +
       (isStandby(r) ? ` <span class="chip s-sb">${t_('standby')}${r[C.SB] === 'نعم' ? ' · ' + t_('manual') : ' · ' + t_('since')(SINCE[r[C.IQ]]) + ' · ' + t_('offN')(ABSENT[r[C.IQ]] || 0)}</span>` : '') + (isRest(r) ? ` <span class="chip" style="background:var(--nbg);color:var(--n)">😴 ${t_('rest')}</span>` : '') + (offLoc(r) && r[C.SB] !== 'نعم' || isStandby(r) ? (lastTrip(r) ? `<div style="color:var(--muted);font-size:11.5px;margin-top:3px">🏁 ${t_('lastT')} ${esc(lastTrip(r).code)} (${esc(lastTrip(r).date)}) ← ${esc(tripEnd(lastTrip(r).code) || '?')}</div>` : '') : '') + (isOnTrip(r) ? ` <span class="chip s-trip">🚌 ${esc(tr)}</span>` : '') +
       (SWIN[r[C.IQ]] ? `<div style="font-size:11.5px;margin-top:3px;color:#0f766e;font-weight:700">🔄 ${t_('subFor')} ${esc(SWIN[r[C.IQ]].origName || SWIN[r[C.IQ]].orig)} — ${esc(SWIN[r[C.IQ]].reason)}</div>` : '') +
-      (isOut(r) ? ` <span class="chip s-late">❌ ${t_('outT')} · ${esc(SWOUT[r[C.IQ]].reason)}</span><div style="font-size:11.5px;margin-top:3px;color:var(--muted)">${esc(SWOUT[r[C.IQ]].trip)} ← ${esc(SWOUT[r[C.IQ]].repName || SWOUT[r[C.IQ]].rep)}${SWOUT[r[C.IQ]].note ? ' · ' + esc(SWOUT[r[C.IQ]].note) : ''}</div>` : '') +
+      (isOut(r) ? ` <span class="chip s-late">❌ ${t_('outTile1')} · ${esc(SWOUT[r[C.IQ]].reason)}</span><div style="font-size:12px;margin-top:4px;color:var(--ink)">${t_('outLine')(esc(SWOUT[r[C.IQ]].trip), esc(SWOUT[r[C.IQ]].repName || SWOUT[r[C.IQ]].rep))}${SWOUT[r[C.IQ]].note ? '<br><span style="color:var(--muted)">📝 ' + esc(SWOUT[r[C.IQ]].note) + (SWOUT[r[C.IQ]].by ? ' — ' + esc(SWOUT[r[C.IQ]].by) : '') + '</span>' : ''}</div>` : '') +
       (isLate(r) ? ` <span class="chip s-late">⏰ ${esc(r[C.TO])}</span>` : isDue(r) ? ` <span class="chip s-annual">↩ ${r[C.TO] === today() ? t_('retToday') : esc(r[C.TO])}</span>` : (r[C.TO] && ST[r[C.ST]] && ST[r[C.ST]].grp === 'leave' ? ` <small style="color:var(--muted)">↩ ${esc(r[C.TO])}</small>` : '')) +
       (cardExpired(r) ? ` <span class="chip s-late">🪪 ${t_('cExp')} ${esc(r[C.CARD])}</span>` : cardSoon(r) ? ` <span class="chip s-emergency">🪪 ${t_('cSoon')} ${esc(r[C.CARD])}</span>` : '');
     return `<div class="row"><div class="nm"><b>${esc(r[C.NAME])}</b><small>${esc(r[C.IQ])}${r[C.EMP] ? ' · ' + esc(r[C.EMP]) : ''}${r[C.MOB] ? ' · 📞 ' + esc(r[C.MOB]) : ''}</small></div>
