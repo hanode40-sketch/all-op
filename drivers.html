@@ -39,7 +39,7 @@
     border:1px solid rgba(15,23,42,.06);box-shadow:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(10,25,55,.16);transition:transform .15s}
   .tile:hover{transform:translateY(-3px)} .tile::before{content:"";position:absolute;inset-inline:0;top:0;height:4px;background:var(--acc)}
   .tile .lb{font-size:13px;color:var(--muted);font-weight:600} .tile b{display:block;font-size:30px;margin-top:6px} .tile small{font-size:12px;color:var(--muted)}
-  .tiles.s{grid-template-columns:repeat(10,1fr)} .tiles.s .tile b{font-size:24px}
+  .tiles.s{grid-template-columns:repeat(11,1fr)} .tiles.s .tile b{font-size:24px}
   .grid2{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}
   .card{padding:16px;min-width:0} .card h2{margin:0 0 12px;font-size:16px;color:var(--navy)}
   table{width:100%;border-collapse:collapse;font-size:13.5px}
@@ -48,7 +48,7 @@
   td.c{cursor:pointer} td.c:hover{background:var(--soft);color:var(--navy);font-weight:700} tr.tot td{font-weight:800}
   .tw{overflow-x:auto}
   .chip{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap}
-  .s-operation{background:var(--gbg);color:var(--g)} .s-annual{background:var(--bbg);color:var(--b)} .s-emergency{background:var(--ybg);color:var(--y)}
+  .s-operation{background:var(--gbg);color:var(--g)} .s-annual{background:var(--bbg);color:var(--b)} .s-emergency{background:var(--ybg);color:var(--y)} .s-sick{background:#fce7f3;color:#9d174d}
   .s-out{background:var(--rbg);color:var(--r)} .s-sb{background:#ede9fe;color:#6d28d9} .s-trip{background:#ccfbf1;color:#0f766e} .s-late{background:#dc2626;color:#fff}
   .list .row{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr auto;gap:10px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--line)}
   .list .row:hover{background:var(--soft)}
@@ -81,7 +81,7 @@
   html[data-theme="dark"] .panel,html[data-theme="dark"] .tile,html[data-theme="dark"] .md{background:#151c2b;border-color:var(--line)}
   html[data-theme="dark"] .top{background:rgba(11,18,32,.88);border-bottom:1px solid #263042}
   html[data-theme="dark"] .card h2{color:#9ec1ff} html[data-theme="dark"] .btn.light{background:#1e2a44;color:#c7d7f5}
-  html[data-theme="dark"] .s-sb{background:#2e1f4f;color:#c4b5fd} html[data-theme="dark"] .s-trip{background:#123b38;color:#5eead4}
+  html[data-theme="dark"] .s-sick{background:#4a1d33;color:#f9a8d4} html[data-theme="dark"] .s-sb{background:#2e1f4f;color:#c4b5fd} html[data-theme="dark"] .s-trip{background:#123b38;color:#5eead4}
   html[data-theme="dark"] .alert{background:#2a1a0e;border-color:#9a3412;color:#fed7aa}
   html[data-theme="dark"] .alert.blue{background:#172554;border-color:#1d4ed8;color:#bfdbfe}
   html[data-theme="dark"] .alert.red{background:#3a1e22;border-color:#b91c1c;color:#fecaca}
@@ -178,6 +178,7 @@ const ST = {
   'operation':               { ar:'على رأس العمل',  en:'Operation',        cls:'s-operation', grp:'active' },
   'Annual Leave':            { ar:'إجازة سنوية',      en:'Annual Leave',     cls:'s-annual',    grp:'leave' },
   'Emergency Leave':         { ar:'إجازة اضطرارية',   en:'Emergency Leave',  cls:'s-emergency', grp:'leave' },
+  'Sick Leave':              { ar:'إجازة مرضية',      en:'Sick Leave',       cls:'s-sick', grp:'leave' },
   'Not Returned':            { ar:'لم يعد من الإجازة', en:'Not Returned',     cls:'s-out',       grp:'out' },
   'Suspended':               { ar:'موقوف عن العمل',   en:'Suspended',        cls:'s-out',       grp:'out' },
   'Absconding':              { ar:'هروب',             en:'Absconding',       cls:'s-out',       grp:'out' },
@@ -293,7 +294,7 @@ function isLate(r) { return ST[r[C.ST]] && ST[r[C.ST]].grp === 'leave' && r[C.TO
 function render() {
   const depot = $('fDepot').value, rows = filtered(depot);
   const cnt = s => rows.filter(r => r[C.ST] === s).length;
-  const active = cnt('operation'), leave = cnt('Annual Leave') + cnt('Emergency Leave');
+  const active = cnt('operation'), leave = cnt('Annual Leave') + cnt('Emergency Leave') + cnt('Sick Leave');
   const out = cnt('Not Returned') + cnt('Suspended') + cnt('Absconding') + cnt('Termination of services');
   const outN = rows.filter(isOut).length, onTrips = rows.filter(isOnTrip).length, sb = D.filter(r => isStandby(r) && inDep(sbDep(r), depot)).length, rest = D.filter(r => isRest(r) && inDep(sbDep(r), depot)).length;
   const tile = (acc, lb, v, key, sub) => `<button class="tile" style="--acc:${acc}" data-f="${key}"><div class="lb">${lb}</div><b>${v}</b>${sub?`<small>${sub}</small>`:''}</button>`;
@@ -348,7 +349,7 @@ const k0 = f => f.slice(0, f.indexOf(':'));
 function applyF(rows) {
   const f = LISTF; if (!f) return rows;
   if (f === 'all') return rows;
-  if (f === 'req') return rows.filter(r => ['operation','Annual Leave','Emergency Leave'].includes(r[C.ST]));
+  if (f === 'req') return rows.filter(r => ['operation','Annual Leave','Emergency Leave','Sick Leave'].includes(r[C.ST]));
   if (f === 'leave') return rows.filter(r => ST[r[C.ST]] && ST[r[C.ST]].grp === 'leave');
   if (f === 'out') return rows.filter(r => ST[r[C.ST]] && ST[r[C.ST]].grp === 'out');
   if (f === 'trip') return rows.filter(isOnTrip);
@@ -501,7 +502,7 @@ $('mSave').onclick = async () => {
 
 /* ---------- الاستيراد (للمدير) والتصدير ---------- */
 function loadXlsx() { return window.XLSX ? Promise.resolve() : new Promise((ok, bad) => { const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; s.onload = ok; s.onerror = bad; document.head.appendChild(s); }); }
-const normSt = s => { s = String(s || '').trim().toLowerCase(); return STATUSES.find(x => x.toLowerCase() === s) || (s.startsWith('termination') ? 'Termination of services' : 'operation'); };
+const normSt = s => { s = String(s || '').trim().toLowerCase(); return STATUSES.find(x => x.toLowerCase() === s) || (s.startsWith('termination') ? 'Termination of services' : s.startsWith('sick') || s.includes('مرض') ? 'Sick Leave' : 'operation'); };
 const xlDate = v => {
   if (v === '' || v == null) return '';
   if (typeof v === 'number' && v > 20000) { const d = new Date(Date.UTC(1899, 11, 30) + Math.round(v) * 864e5); return d.toISOString().slice(0, 10); }
