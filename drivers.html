@@ -569,7 +569,7 @@ $('bDash').onclick = () => {
     return [d, opN, rows.filter(r => dep(r) === d && isOnTrip(r)).length, D.filter(r => isRest(r) && sbDep(r) === d).length, D.filter(r => isStandby(r) && sbDep(r) === d).length]; }).filter(x => x[1] || x[3] || x[4]);
   const dMax = Math.max(1, ...dRows.map(x => Math.max(x[1], x[2] + x[3] + x[4])));
   const pct = rows.length ? Math.round(op / rows.length * 100) : 0;
-  const dark = `<div id="dash2" dir="rtl"><div class="hd2"><div><h1>لوحة السائقين · Drivers Overview</h1><small>${dTxt} · ${esc(scope)}</small></div><img src="${location.origin}${location.pathname.replace(/[^/]*$/, '')}icon-192.png" alt="" onerror="this.style.display='none'"></div>
+  const dark = `<div id="dash2" dir="rtl"><div class="hd2"><div><h1>لوحة السائقين · Drivers Overview</h1><small>${dTxt} · ${esc(scope)}</small></div><img src="${new URL('icon-192.png', location.href).href}" alt="" onerror="this.style.display='none'"></div>
 <div class="k5">${[['إجمالي الاحتياج', rows.length, '', ''], ['على رأس العمل', op + an + em + sk, '', ''], ['المتاحين للتشغيل', op, '', pct + '% من الإجمالي'], ['في إجازات', an + em + sk, '#60a5fa', ''], ['خارج الخدمة', nr + su + ab + te, '#f87171', '']].map(x => `<div class="c2"><span>${x[0]}</span><b style="color:${x[2] || '#fff'}">${x[1]}</b>${x[3] ? `<i>${x[3]}</i>` : ''}</div>`).join('')}</div>
 <div class="g2"><div class="c2 dn"><h3>توزيع المتاحين اليوم</h3><div class="dw">${donut}<div class="ctr"><b>${op}</b><span>متاح</span></div></div>
 <div class="lg">${parts.map(x => `<div><span><em style="background:${x[2]}"></em>${x[0]}</span><b>${x[0] === 'استعداد' || x[0] === 'معتذرين' || ROSTER_N ? x[1] : '—'}</b></div>`).join('')}</div></div>
@@ -586,7 +586,7 @@ ${dRows.map(x => `<div class="br"><span>${esc(depName(x[0]))}</span><div class="
 .bar{position:sticky;top:0;display:flex;gap:8px;justify-content:center;padding:10px;background:#0f2447}.bar button{font:inherit;font-weight:700;border:0;border-radius:8px;padding:9px 16px;cursor:pointer;background:#f97316;color:#fff}.bar button.b{background:#fff;color:#0f2447}
 #dash{width:1400px;margin:16px auto;background:#fff;border:1px solid #c9d3e2;box-shadow:0 10px 30px rgba(0,0,0,.15)}
 .hd{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:4px solid #f97316}
-.hd img{height:70px}.hd h1{margin:0;font-size:34px;letter-spacing:.5px}.hd .dt{background:#eef3fb;border:1px solid #c9d3e2;border-radius:10px;padding:10px 20px;text-align:center;font-weight:800;font-size:20px}.hd .dt small{display:block;font-size:12px;color:#5b6b85;font-weight:600}
+.hd img{width:250px;height:100px;object-fit:cover}.hd h1{margin:0;font-size:34px;letter-spacing:.5px}.hd .dt{background:#eef3fb;border:1px solid #c9d3e2;border-radius:10px;padding:10px 20px;text-align:center;font-weight:800;font-size:20px}.hd .dt small{display:block;font-size:12px;color:#5b6b85;font-weight:600}
 .top{display:grid;grid-template-columns:270px 1fr 1fr;gap:12px;padding:16px 24px}
 .req{background:#0f2447;color:#fff;border-radius:12px;padding:18px;display:flex;flex-direction:column;justify-content:space-between}
 .req b{font-size:17px}.req span{font-size:15px;opacity:.85}.req .v{font-size:76px;font-weight:900;text-align:center;background:rgba(255,255,255,.12);border-radius:12px;margin:12px 0}
@@ -602,7 +602,7 @@ td{padding:7px 6px;text-align:center;border-bottom:1px solid #e3e8f0}td.l{text-a
 .two{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 24px 8px}.two .sec{margin:0}.two .tw{margin:0}.sec.o{background:#f97316}
 .ft{text-align:center;color:#f97316;font-weight:800;font-size:13px;background:#0f2447;padding:10px;margin-top:12px;letter-spacing:.5px}
 #dash2{width:1400px;margin:16px auto;background:#0b1530;color:#e7edf8;padding:28px 32px}
-#dash2 .hd2{display:flex;justify-content:space-between;align-items:center}#dash2 h1{margin:0;font-size:30px}#dash2 .hd2 small{color:#8fa3c7;font-size:15px}#dash2 .hd2 img{height:64px;background:#fff;border-radius:12px;padding:4px}
+#dash2 .hd2{display:flex;justify-content:space-between;align-items:center}#dash2 h1{margin:0;font-size:30px}#dash2 .hd2 small{color:#8fa3c7;font-size:15px}#dash2 .hd2 img{width:280px;height:128px;object-fit:cover;background:#fff;border-radius:16px}
 #dash2 .k5{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:22px 0}#dash2 .c2{background:#13214a;border:1px solid #22356b;border-radius:16px;padding:18px}#dash2 .c2 span{color:#8fa3c7;font-size:14px}#dash2 .c2>b{display:block;font-size:42px;margin-top:6px}#dash2 .c2 i{font-style:normal;font-size:13px;color:#8fa3c7}
 #dash2 .g2{display:grid;grid-template-columns:420px 1fr;gap:14px}#dash2 .dn{display:flex;flex-direction:column;align-items:center}#dash2 .dw{position:relative;width:260px;height:260px}#dash2 .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}#dash2 .ctr b{font-size:46px}
 #dash2 .lg{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px;margin-top:18px;font-size:16px;width:100%}#dash2 .lg div{display:flex;justify-content:space-between;align-items:center}#dash2 .lg b{font-size:26px}#dash2 em{display:inline-block;width:12px;height:12px;border-radius:3px;margin:0 6px}
@@ -616,7 +616,7 @@ body.v-dark{background:#050b1c}body.v-dark #dash{display:none}body:not(.v-dark) 
 </style></head><body>
 <div class="bar"><button class="t" data-v="dark">🌙 داكن</button><button class="t" data-v="classic">📋 كلاسيكي</button><span style="width:16px"></span><button onclick="print()">🖨️ طباعة / حفظ PDF</button><button class="b" id="png">🖼️ حفظ صورة PNG</button></div>
 <div id="dash">
-<div class="hd"><img src="${location.origin}${location.pathname.replace(/[^/]*$/, '')}icon-192.png" alt="" onerror="this.style.display='none'"><h1>DRIVERS DASHBOARD | لوحة بيانات السائقين</h1><div class="dt">${dTxt}<small>${esc(scope)}</small></div></div>
+<div class="hd"><img src="${new URL('icon-192.png', location.href).href}" alt="" onerror="this.style.display='none'"><h1>DRIVERS DASHBOARD | لوحة بيانات السائقين</h1><div class="dt">${dTxt}<small>${esc(scope)}</small></div></div>
 <div class="top">
  <div class="req"><div><b>Total Operational Requirement</b><br><span>إجمالي احتياج التشغيل</span></div><div class="v">${rows.length}</div><div style="height:6px;border-radius:3px;background:linear-gradient(90deg,#f97316 ${rows.length ? Math.round((op / rows.length) * 100) : 0}%,rgba(255,255,255,.25) 0)"></div></div>
  <div class="col">
