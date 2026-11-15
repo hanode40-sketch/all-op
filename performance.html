@@ -196,6 +196,10 @@
     if (j.error === 'AUTH') { NWAuth.relogin(); return fail(t_('eAuth')); }
     if (j.error === 'FORBIDDEN') return fail(t_('eForbidden'));
     if (!j.ok) return fail(t_('eErr') + (j.message || j.error));
+    { const seen = {};   // الاستلام ممكن ينسجّل مرتين لنفس التسليم — نحسبه مرة وحدة
+      j.rows = (j.rows || []).slice().sort((a, b) => String(a[0]).localeCompare(String(b[0]))).filter(r => {
+        if (r[4] !== 'استلام وردية' || !String(r[5] || '').trim()) return true;
+        const k = String(r[5]).trim(); if (seen[k]) return false; seen[k] = 1; return true; }); }
     DATA = j;
     fillMonths(j.months, month);
     fillFilters();

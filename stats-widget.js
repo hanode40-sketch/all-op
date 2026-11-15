@@ -98,6 +98,10 @@
       if (act(r) === 'بند القائمة اليومية') {
         var k = dkey(new Date(r[0])) + '|' + String(r[5] || '').trim() + '|' + String(r[6] || '').trim() + '|' + userGarages(r[1]).join(',');
         if (seen[k]) return; seen[k] = 1;
+      } else if (act(r) === 'استلام وردية' && String(r[5] || '').trim()) {
+        // الاستلام ممكن ينسجّل مرتين (من البرنامج ومن الـ Apps Script) — نحسبه مرة وحدة لكل تسليم
+        var k2 = 'rcv|' + String(r[5]).trim();
+        if (seen[k2]) return; seen[k2] = 1;
       }
       out.push(r);
     });
