@@ -173,6 +173,12 @@
     <div><label data-i="fMob">الجوال</label><input id="eMob" inputmode="tel"></div>
     <div><label data-i="fNote">ملاحظة</label><input id="eNote" maxlength="300"></div>
   </div>
+  <div id="cardBox" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center">
+    <button class="btn light" id="mCardDl">🪪 <span data-i="cardDlFull">تحميل كرت التشغيل</span></button>
+    <button class="btn light" id="mCardUp">📤 <span data-i="cardUp">رفع كرت جديد</span></button>
+    <small id="mCardMsg" style="color:var(--muted)"></small>
+    <input type="file" id="cardUpFile" accept="application/pdf,image/jpeg,image/png" style="display:none">
+  </div>
   <div class="hist" id="hist"></div>
   <div class="mbtns"><button class="btn light" id="mCancel" data-i="cancel">إلغاء</button><button class="btn green" id="mSave" data-i="save">حفظ</button></div>
 </div></div>
@@ -206,7 +212,7 @@ const I18N = {
     natTitle:'السائقون حسب الجنسية والحالة', depTitle:'سائقو التشغيل والاستعداد في الكراجات', search:'ابحث برقم الإقامة أو الاسم أو الرحلة...',
     note:'«على الرحلات» = سائقو التشغيل المسجّلون في روستر التاريخ المختار. السائق اللي مو في روستر اليوم: إذا كان غير مجدول يومين متتاليين أو أقل = «راحة»، وإذا أكثر من يومين متتاليين = «استعداد». و«الاستعداد» اليدوي يبقى استعداد. ارفعوا الروستر يوم بيوم عشان يطلع الحساب دقيق.',
     allDep:'كل الكراجات', myDeps:'كل كراجاتي', allSt:'كل الحالات', allNat:'كل الجنسيات', req:'إجمالي احتياج التشغيل', active:'على رأس العمل', out:'خارج الخدمة / مطلوب تعويضهم',
-    avail:'المتاحين للتشغيل', onLeave:'في إجازات', onTrips:'على الرحلات', standby:'الاستعداد', rest:'راحة', colDay:'اليوم', colLast:'آخر رحلة', colCard:'انتهاء كرت التشغيل', colRet:'العودة من الإجازة', lateS:'متأخر عن العودة', toRestT:'تحويل السائق إلى راحة لهذا اليوم', toSbT:'إرجاع السائق إلى الاستعداد', toRestAsk:(n,d)=>`تحويل ${n} إلى راحة يوم ${d}؟`, toSbAsk:(n,d)=>`إرجاع ${n} إلى الاستعداد يوم ${d}؟`, outTile:'المعتذرين', outTile1:'معتذر', sbOut:(n,why)=>`منهم ${n} معتذر: ${why}`, outLine:(t,n)=>`رحلته ${t} انتقلت إلى ${n}`, outT:'معتذر/مستبدل', swapA:n=>`🔄 ${n} تبديل سائق في هذا التاريخ`, swapT:'تبديل السائق ببديل من الاستعداد', unswap:'إلغاء التبديل', subFor:'بديل عن', swTitle:'🔄 تبديل سائق', swOrig:'السائق المعتذر ورحلته', swQph:'🔍 ابحث بالاسم أو الإقامة أو رقم الرحلة...', noMatch:'لا توجد نتائج', swNeedR:'اختر سبب التبديل', swNeedN:'اكتب ملاحظة توضح السبب', swNotePh:'اكتب تفاصيل السبب...', swPickO:'اختر السائق المعتذر / الرحلة', swFromB:'تكليف', swFromT:'تكليف هذا السائق بديل عن سائق معتذر', swRep:'السائق البديل', swReason:'السبب', swNote:'ملاحظة', swDo:'تأكيد التبديل', swG1:'الاستعداد', swG2:'الراحة', swG3:'تبادل مع سائق عنده رحلة', swSame2:'السائقين على نفس الرحلة', xWith:(n,t)=>`تبادل مع ${n} (كانت رحلته ${t})`, xAsk:(a,ta,b,tb)=>`تبادل الرحلتين؟\n\n${a}: ${ta} ← ${tb}\n${b}: ${tb} ← ${ta}`, swSame:'نفس الموقع', swBusy:'البديل عنده رحلة في نفس اليوم', swNotIn:'السائق الأصلي مو موجود في روستر هذا اليوم', swPick:'اختر السائق البديل', swDone:'✅ تم التبديل — يظهر البديل في مسار الرحلة', unswAsk:'إلغاء التبديل ورجوع السائق الأصلي للرحلة؟', sbAt:'استعداد في', restAt:'راحة في', lastT:'آخر رحلة', manual:'يدوي', offN:n=>`${n} أيام`, since:d=>`من ${d}`, wk:n=>`أيام الروستر المرفوعة حول التاريخ: ${n}`, total:'إجمالي السائقين', noRoster:'لا يوجد روستر لهذا التاريخ',
+    avail:'المتاحين للتشغيل', onLeave:'في إجازات', onTrips:'على الرحلات', standby:'الاستعداد', rest:'راحة', cardDl:'الكرت', cardDlFull:'تحميل كرت التشغيل', cardUp:'رفع كرت جديد', noCardF:'لا يوجد ملف كرت', cardFile:'كرت_تشغيل', cardUpHow:'اختر ملف الكرت الجديد (PDF أو صورة، حد أقصى 5 ميجا). يستبدل الكرت القديم.\n\nإذا كتبت تاريخ الانتهاء في خانة «انتهاء كرت التشغيل» قبل الرفع، يتحدث معه.', cardBig:'الملف أكبر من 5 ميجا', cardType:'الملف لازم PDF أو صورة JPG/PNG', cardUpDone:'تم رفع الكرت', colDay:'اليوم', colLast:'آخر رحلة', colCard:'انتهاء كرت التشغيل', colRet:'العودة من الإجازة', lateS:'متأخر عن العودة', toRestT:'تحويل السائق إلى راحة لهذا اليوم', toSbT:'إرجاع السائق إلى الاستعداد', toRestAsk:(n,d)=>`تحويل ${n} إلى راحة يوم ${d}؟`, toSbAsk:(n,d)=>`إرجاع ${n} إلى الاستعداد يوم ${d}؟`, outTile:'المعتذرين', outTile1:'معتذر', sbOut:(n,why)=>`منهم ${n} معتذر: ${why}`, outLine:(t,n)=>`رحلته ${t} انتقلت إلى ${n}`, outT:'معتذر/مستبدل', swapA:n=>`🔄 ${n} تبديل سائق في هذا التاريخ`, swapT:'تبديل السائق ببديل من الاستعداد', unswap:'إلغاء التبديل', subFor:'بديل عن', swTitle:'🔄 تبديل سائق', swOrig:'السائق المعتذر ورحلته', swQph:'🔍 ابحث بالاسم أو الإقامة أو رقم الرحلة...', noMatch:'لا توجد نتائج', swNeedR:'اختر سبب التبديل', swNeedN:'اكتب ملاحظة توضح السبب', swNotePh:'اكتب تفاصيل السبب...', swPickO:'اختر السائق المعتذر / الرحلة', swFromB:'تكليف', swFromT:'تكليف هذا السائق بديل عن سائق معتذر', swRep:'السائق البديل', swReason:'السبب', swNote:'ملاحظة', swDo:'تأكيد التبديل', swG1:'الاستعداد', swG2:'الراحة', swG3:'تبادل مع سائق عنده رحلة', swSame2:'السائقين على نفس الرحلة', xWith:(n,t)=>`تبادل مع ${n} (كانت رحلته ${t})`, xAsk:(a,ta,b,tb)=>`تبادل الرحلتين؟\n\n${a}: ${ta} ← ${tb}\n${b}: ${tb} ← ${ta}`, swSame:'نفس الموقع', swBusy:'البديل عنده رحلة في نفس اليوم', swNotIn:'السائق الأصلي مو موجود في روستر هذا اليوم', swPick:'اختر السائق البديل', swDone:'✅ تم التبديل — يظهر البديل في مسار الرحلة', unswAsk:'إلغاء التبديل ورجوع السائق الأصلي للرحلة؟', sbAt:'استعداد في', restAt:'راحة في', lastT:'آخر رحلة', manual:'يدوي', offN:n=>`${n} أيام`, since:d=>`من ${d}`, wk:n=>`أيام الروستر المرفوعة حول التاريخ: ${n}`, total:'إجمالي السائقين', noRoster:'لا يوجد روستر لهذا التاريخ',
     nat:'الجنسية', depot:'الكراج', count:'العدد', gt:'الإجمالي', opDrivers:'التشغيل', sbDrivers:'الاستعداد', edit:'تعديل', trip:'رحلة',
     fIq:'رقم الإقامة', fEmp:'الرقم الوظيفي', fName:'اسم السائق', fNat:'الجنسية', fStatus:'الحالة', fDepot:'الكراج', fSb:'🟣 السائق على الاستعداد (Standby)',
     fFrom:'من تاريخ', fTo:'تاريخ العودة المتوقع', fMob:'الجوال', fNote:'ملاحظة', cancel:'إلغاء', save:'حفظ', saving:'جاري الحفظ...',
@@ -222,7 +228,7 @@ const I18N = {
     natTitle:'Drivers by nationality & status', depTitle:'Operational & standby drivers by depot', search:'Search by Iqama, name or trip...',
     note:'"On trips" = operational drivers in the roster of the selected date. A driver missing from today\'s roster is on a "Rest day" if unscheduled for 2 consecutive days or fewer, otherwise "Standby". Manual standby always counts as standby.',
     allDep:'All depots', myDeps:'All my depots', allSt:'All statuses', allNat:'All nationalities', req:'Total operational requirement', active:'Active drivers', out:'Out of service / replacement required',
-    avail:'Available for operation', onLeave:'On leave', onTrips:'On trips', standby:'Standby', rest:'Rest day', colDay:'Today', colLast:'Last trip', colCard:'Card expiry', colRet:'Return from leave', lateS:'Overdue', toRestT:'Mark as rest day for this date', toSbT:'Return to standby', toRestAsk:(n,d)=>`Mark ${n} as rest day on ${d}?`, toSbAsk:(n,d)=>`Return ${n} to standby on ${d}?`, outTile:'Absent', outTile1:'Absent', sbOut:(n,why)=>`incl. ${n} absent: ${why}`, outLine:(t,n)=>`Trip ${t} moved to ${n}`, outT:'Replaced', swapA:n=>`🔄 ${n} driver replacements on this date`, swapT:'Replace with a standby driver', unswap:'Cancel replacement', subFor:'Replacing', swTitle:'🔄 Replace driver', swOrig:'Absent driver & trip', swQph:'🔍 Search by name, Iqama or trip...', noMatch:'No matches', swNeedR:'Choose the reason', swNeedN:'Write a note explaining the reason', swNotePh:'Describe the reason...', swPickO:'Choose the absent driver / trip', swFromB:'Assign', swFromT:'Assign this driver to replace an absent driver', swRep:'Replacement driver', swReason:'Reason', swNote:'Note', swDo:'Confirm replacement', swG1:'Standby', swG2:'Rest day', swG3:'Exchange with a driver on a trip', swSame2:'Both drivers are on the same trip', xWith:(n,t)=>`Exchanged with ${n} (was on ${t})`, xAsk:(a,ta,b,tb)=>`Exchange the two trips?\n\n${a}: ${ta} → ${tb}\n${b}: ${tb} → ${ta}`, swSame:'same location', swBusy:'The replacement already has a trip that day', swNotIn:'The original driver is not in this day\'s roster', swPick:'Choose the replacement driver', swDone:'✅ Replaced — the replacement shows in Trip Route', unswAsk:'Cancel the replacement and return the original driver to the trip?', sbAt:'standby at', restAt:'resting at', lastT:'Last trip', manual:'manual', offN:n=>`${n} days`, since:d=>`since ${d}`, wk:n=>`Roster days uploaded around date: ${n}`, total:'Total drivers', noRoster:'No roster for this date',
+    avail:'Available for operation', onLeave:'On leave', onTrips:'On trips', standby:'Standby', rest:'Rest day', cardDl:'Card', cardDlFull:'Download operating card', cardUp:'Upload new card', noCardF:'No card file', cardFile:'Operating_card', cardUpHow:'Choose the new card file (PDF or image, max 5 MB). It replaces the old one.\n\nIf you fill the card expiry field before uploading, it is updated too.', cardBig:'File is larger than 5 MB', cardType:'File must be PDF or JPG/PNG', cardUpDone:'Card uploaded', colDay:'Today', colLast:'Last trip', colCard:'Card expiry', colRet:'Return from leave', lateS:'Overdue', toRestT:'Mark as rest day for this date', toSbT:'Return to standby', toRestAsk:(n,d)=>`Mark ${n} as rest day on ${d}?`, toSbAsk:(n,d)=>`Return ${n} to standby on ${d}?`, outTile:'Absent', outTile1:'Absent', sbOut:(n,why)=>`incl. ${n} absent: ${why}`, outLine:(t,n)=>`Trip ${t} moved to ${n}`, outT:'Replaced', swapA:n=>`🔄 ${n} driver replacements on this date`, swapT:'Replace with a standby driver', unswap:'Cancel replacement', subFor:'Replacing', swTitle:'🔄 Replace driver', swOrig:'Absent driver & trip', swQph:'🔍 Search by name, Iqama or trip...', noMatch:'No matches', swNeedR:'Choose the reason', swNeedN:'Write a note explaining the reason', swNotePh:'Describe the reason...', swPickO:'Choose the absent driver / trip', swFromB:'Assign', swFromT:'Assign this driver to replace an absent driver', swRep:'Replacement driver', swReason:'Reason', swNote:'Note', swDo:'Confirm replacement', swG1:'Standby', swG2:'Rest day', swG3:'Exchange with a driver on a trip', swSame2:'Both drivers are on the same trip', xWith:(n,t)=>`Exchanged with ${n} (was on ${t})`, xAsk:(a,ta,b,tb)=>`Exchange the two trips?\n\n${a}: ${ta} → ${tb}\n${b}: ${tb} → ${ta}`, swSame:'same location', swBusy:'The replacement already has a trip that day', swNotIn:'The original driver is not in this day\'s roster', swPick:'Choose the replacement driver', swDone:'✅ Replaced — the replacement shows in Trip Route', unswAsk:'Cancel the replacement and return the original driver to the trip?', sbAt:'standby at', restAt:'resting at', lastT:'Last trip', manual:'manual', offN:n=>`${n} days`, since:d=>`since ${d}`, wk:n=>`Roster days uploaded around date: ${n}`, total:'Total drivers', noRoster:'No roster for this date',
     nat:'Nationality', depot:'Depot', count:'Count', gt:'Grand total', opDrivers:'Operation', sbDrivers:'Standby', edit:'Edit', trip:'Trip',
     fIq:'Iqama number', fEmp:'Employee ID', fName:'Driver name', fNat:'Nationality', fStatus:'Status', fDepot:'Depot', fSb:'🟣 Driver is on standby',
     fFrom:'From', fTo:'Expected return', fMob:'Mobile', fNote:'Note', cancel:'Cancel', save:'Save', saving:'Saving...',
@@ -245,6 +251,7 @@ const today = () => { const d = new Date(); return d.getFullYear()+'-'+pad(d.get
 
 let RESTM = {};   // راحة يدوية للتاريخ المختار
 let SWOUT = {}, SWIN = {};   // تبديلات التاريخ المختار: الأصلي ← البديل
+let CARDS = {};   // أرقام الإقامة اللي لها ملف كرت في Drive
 let D = [], ROSTER = {}, ROSTER_N = 0, ABSENT = {}, SINCE = {}, WEEK_N = 0, canEdit = false, canImport = false, LISTS = {};
 
 /* ---------- الحسابات ---------- */
@@ -415,18 +422,38 @@ function renderList() {
     // كرت التشغيل
     const card = !r[C.CARD] ? '<span class="dash">—</span>' : cardExpired(r) ? `<span class="chip s-late">${esc(r[C.CARD])}</span>${sub(t_('cExp'), '#dc2626')}` :
       cardSoon(r) ? `<span class="chip s-emergency">${esc(r[C.CARD])}</span>${sub(t_('cSoon'), '#b45309')}` : `<span class="mono">${esc(r[C.CARD])}</span>`;
+    const cardF = CARDS[iq] ? `<div style="margin-top:6px"><button class="btn light" data-cd="${esc(iq)}" style="padding:5px 10px;font-size:12px">🪪 ${t_('cardDl')}</button></div>` : sub(t_('noCardF'));
     // العودة من الإجازة
     const lv = ST[r[C.ST]] && ST[r[C.ST]].grp === 'leave';
     const ret = !(lv || r[C.ST] === 'Not Returned') || !r[C.TO] ? '<span class="dash">—</span>' : isLate(r) || r[C.ST] === 'Not Returned' ? `<span class="chip s-late">⏰ ${esc(r[C.TO])}</span>${sub(t_('lateS'), '#dc2626')}` :
       isDue(r) ? `<span class="chip s-annual">↩ ${esc(r[C.TO])}</span>${r[C.TO] === today() ? sub(t_('retToday'), '#1d4ed8') : ''}` : `<span class="mono">${esc(r[C.TO])}</span>`;
     const btns = `${canEdit && r[C.ST] === 'operation' && !ROSTER[iq] && !isOut(r) && (isStandby(r) || restManual(r)) ? `<button class="btn light" data-rm="${esc(iq)}" data-v="${restManual(r) ? '' : 'rest'}" title="${restManual(r) ? t_('toSbT') : t_('toRestT')}">${restManual(r) ? '↩︎ ' + t_('standby') : '😴 ' + t_('rest')}</button>` : ''}${canEdit && ROSTER_N && (isStandby(r) || isRest(r)) ? `<button class="btn" data-swf="${esc(iq)}" title="${t_('swFromT')}" style="background:#7c3aed">🔄 ${t_('swFromB')}</button>` : ''}${canEdit && isOnTrip(r) && !SWIN[iq] ? `<button class="btn light" data-sw="${esc(iq)}" title="${t_('swapT')}">🔄</button>` : ''}${canEdit && SWIN[iq] ? `<button class="btn light" data-unsw="${esc(iq)}" title="${t_('unswap')}" style="color:#b91c1c">↩︎</button>` : ''}<button class="btn light" data-e="${esc(iq)}">${canEdit ? t_('edit') : '👁'}</button>`;
     return `<div class="row"><div class="nm"><b>${esc(r[C.NAME])}</b><small>${esc(iq)}${r[C.EMP] ? ' · ' + esc(r[C.EMP]) : ''}${r[C.MOB] ? ' · 📞 ' + esc(r[C.MOB]) : ''}</small></div>
-      <span class="hm">${esc(depName(r[C.DEP]))}</span><span class="hm">${esc(r[C.NAT])}</span><span>${stCol}</span><span>${day}</span><span class="hm">${last}</span><span class="hm">${card}</span><span class="hm">${ret}</span>
+      <span class="hm">${esc(depName(r[C.DEP]))}</span><span class="hm">${esc(r[C.NAT])}</span><span>${stCol}</span><span>${day}</span><span class="hm">${last}</span><span class="hm">${card}${cardF}</span><span class="hm">${ret}</span>
       <span class="acts">${btns}</span></div>`;
   }).join('') + (rows.length > 300 ? `<div class="msg">${esc(t_('more')(rows.length))}</div>` : '');
 }
 
 /* ---------- التحميل ---------- */
+async function loadCards() {
+  try { const j = await NWAuth.call('cardsIndex', {}); CARDS = {}; if (j && j.ok) (j.ids || []).forEach(x => CARDS[x] = 1); } catch (e) {}
+}
+/* تحميل كرت التشغيل (من Drive عن طريق نظام الدخول) */
+async function cardDownload(iq, btn) {
+  const r = D.find(x => x[C.IQ] === iq), old = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
+  try {
+    const j = await NWAuth.call('cardGet', { iqama: iq });
+    if (j.error === 'AUTH') { NWAuth.relogin(); throw new Error(t_('eAuth')); }
+    if (!j.ok) throw new Error(j.error === 'NOT_FOUND' ? t_('noCardF') : j.error === 'FORBIDDEN' ? t_('eForb') : t_('eErr') + j.error);
+    const bin = atob(j.b64), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    const url = URL.createObjectURL(new Blob([u8], { type: j.mime })), a = document.createElement('a');
+    const ext = (j.name.match(/\.\w+$/) || ['.pdf'])[0];
+    a.href = url; a.download = `${t_('cardFile')}_${(r ? r[C.NAME] : '').replace(/[^\w\u0600-\u06FF ]+/g, '').trim().replace(/\s+/g, '_')}_${iq}${ext}`;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch (e) { alert(e.message); }
+  finally { if (btn) { btn.disabled = false; btn.textContent = old; } }
+}
 async function load() {
   $('list').innerHTML = `<div class="msg">${t_('loading')}</div>`;
   try {
@@ -435,7 +462,7 @@ async function load() {
     if (!a.ok) throw new Error(t_('eErr') + (a.error || ''));
     D = a.drivers || []; canEdit = !!a.canEdit; canImport = !!a.canImport;
     initMine();
-    await Promise.all([loadRoster(), loadTrips()]);
+    await Promise.all([loadRoster(), loadTrips(), loadCards()]);
     $('bAdd').style.display = canEdit ? '' : 'none'; $('bImport').style.display = canImport ? '' : 'none'; $('bCards').style.display = canEdit ? '' : 'none';
     fillFilters(); render();
   } catch (e) { $('list').innerHTML = `<div class="msg err">${esc(e.message || t_('eNet'))}</div>`; }
@@ -491,6 +518,8 @@ let EDIT = null;
 function openEdit(iq) {
   const r = iq ? D.find(x => x[C.IQ] === iq) : null; EDIT = r ? r[C.IQ] : '';
   $('newFields').style.display = r ? 'none' : 'block';
+  $('cardBox').style.display = r ? 'flex' : 'none';
+  if (r) { $('mCardDl').style.display = CARDS[r[C.IQ]] ? '' : 'none'; $('mCardUp').style.display = canEdit ? '' : 'none'; $('mCardMsg').textContent = CARDS[r[C.IQ]] ? '' : t_('noCardF'); }
   $('mTitle').textContent = r ? r[C.NAME] : t_('newTitle');
   $('mSub').textContent = r ? `${r[C.IQ]}${r[C.EMP] ? ' · ' + r[C.EMP] : ''} · ${r[C.NAT]}${r[C.BY] ? ' — ' + t_('lastBy') + ': ' + r[C.BY] + ' (' + r[C.AT] + ')' : ''}` : '';
   ['eIq','eEmp','eName','eNat','eFrom','eTo','eMob','eNote','eCard'].forEach(id => $(id).value = '');
@@ -729,10 +758,30 @@ document.addEventListener('click', e => {
   const swf = e.target.closest('[data-swf]'); if (swf) { openSwapFrom(swf.dataset.swf); return; }
   const sw = e.target.closest('[data-sw]'); if (sw) { openSwap(sw.dataset.sw); return; }
   const us = e.target.closest('[data-unsw]'); if (us) { unswap(us.dataset.unsw); return; }
+  const cd = e.target.closest('[data-cd]'); if (cd) { cardDownload(cd.dataset.cd, cd); return; }
   const ed = e.target.closest('[data-e]'); if (ed) { openEdit(ed.dataset.e); return; }
   if (e.target.id === 'clrF') { e.preventDefault(); LISTF = ''; renderList(); }
 });
 $('bAdd').onclick = () => openEdit('');
+/* ---------- كرت التشغيل من نافذة السائق ---------- */
+$('mCardDl').onclick = () => cardDownload(EDIT, $('mCardDl'));
+$('mCardUp').onclick = () => { alert(t_('cardUpHow')); $('cardUpFile').click(); };
+$('cardUpFile').onchange = async () => {
+  const f = $('cardUpFile').files[0], iq = EDIT; if (!f || !iq) return;
+  try {
+    if (f.size > 5 * 1024 * 1024) throw new Error(t_('cardBig'));
+    const b64 = await new Promise((ok, bad) => { const fr = new FileReader(); fr.onload = () => ok(String(fr.result).split(',')[1]); fr.onerror = bad; fr.readAsDataURL(f); });
+    $('mCardMsg').textContent = '⏳ ' + t_('saving');
+    const j = await NWAuth.call('cardUpload', { iqama: iq, mime: f.type, b64, exp: $('eCard').value });
+    if (j.error === 'AUTH') { NWAuth.relogin(); throw new Error(t_('eAuth')); }
+    if (!j.ok) throw new Error(j.error === 'FORBIDDEN' ? t_('eForb') : j.error === 'BAD_TYPE' ? t_('cardType') : t_('eErr') + j.error);
+    CARDS[iq] = 1; $('mCardDl').style.display = ''; $('mCardMsg').textContent = '✅ ' + t_('cardUpDone');
+    const r = D.find(x => x[C.IQ] === iq); if (r && $('eCard').value) r[C.CARD] = $('eCard').value;
+    render();
+  } catch (e) { $('mCardMsg').textContent = ''; alert(e.message); }
+  finally { $('cardUpFile').value = ''; }
+};
+
 /* ---------- تبديل سائق ---------- */
 /* بحث داخل قائمة الاختيار: يكتب جزء من الاسم أو الإقامة أو الرحلة وتطلع الاقتراحات */
 function picker(qId, sId, selId) {
