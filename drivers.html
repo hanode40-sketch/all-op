@@ -586,7 +586,7 @@ ${dRows.map(x => `<div class="br"><span>${esc(depName(x[0]))}</span><div class="
 .bar{position:sticky;top:0;display:flex;gap:8px;justify-content:center;padding:10px;background:#0f2447}.bar button{font:inherit;font-weight:700;border:0;border-radius:8px;padding:9px 16px;cursor:pointer;background:#f97316;color:#fff}.bar button.b{background:#fff;color:#0f2447}
 #dash{width:1400px;margin:16px auto;background:#fff;border:1px solid #c9d3e2;box-shadow:0 10px 30px rgba(0,0,0,.15)}
 .hd{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:4px solid #f97316}
-.hd img{width:250px;height:100px;object-fit:cover}.hd h1{margin:0;font-size:34px;letter-spacing:.5px}.hd .dt{background:#eef3fb;border:1px solid #c9d3e2;border-radius:10px;padding:10px 20px;text-align:center;font-weight:800;font-size:20px}.hd .dt small{display:block;font-size:12px;color:#5b6b85;font-weight:600}
+.hd img{width:250px;height:100px;object-fit:cover}.hd h1{margin:0;font-size:34px}.hd .dt{background:#eef3fb;border:1px solid #c9d3e2;border-radius:10px;padding:10px 20px;text-align:center;font-weight:800;font-size:20px}.hd .dt small{display:block;font-size:12px;color:#5b6b85;font-weight:600}
 .top{display:grid;grid-template-columns:270px 1fr 1fr;gap:12px;padding:16px 24px}
 .req{background:#0f2447;color:#fff;border-radius:12px;padding:18px;display:flex;flex-direction:column;justify-content:space-between}
 .req b{font-size:17px}.req span{font-size:15px;opacity:.85}.req .v{font-size:76px;font-weight:900;text-align:center;background:rgba(255,255,255,.12);border-radius:12px;margin:12px 0}
@@ -600,7 +600,7 @@ table{width:100%;border-collapse:collapse;font-size:15px}th{background:#e8eef7;c
 td{padding:7px 6px;text-align:center;border-bottom:1px solid #e3e8f0}td.l{text-align:left}.gt{background:#eef3fb;font-weight:800}tr.tot td{background:#0f2447;color:#fff;font-weight:800}
 .tw{margin:0 24px;border:1px solid #c9d3e2;border-top:0}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 24px 8px}.two .sec{margin:0;font-size:16px;white-space:nowrap;gap:12px}.two>div{display:flex;flex-direction:column}.two .tw{flex:1;background:#fff}.two .tw{margin:0}.sec.o{background:#f97316}
-.ft{text-align:center;color:#f97316;font-weight:800;font-size:13px;background:#0f2447;padding:10px;margin-top:12px;letter-spacing:.5px}
+.ft{text-align:center;color:#f97316;font-weight:800;font-size:13px;background:#0f2447;padding:10px;margin-top:12px}
 #dash2{width:1400px;margin:16px auto;background:#0b1530;color:#e7edf8;padding:28px 32px}
 #dash2 .hd2{display:flex;justify-content:space-between;align-items:center}#dash2 h1{margin:0;font-size:30px}#dash2 .hd2 small{color:#8fa3c7;font-size:15px}#dash2 .hd2 img{width:280px;height:128px;object-fit:cover;background:#fff;border-radius:16px}
 #dash2 .k5{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:22px 0}#dash2 .c2{background:#13214a;border:1px solid #22356b;border-radius:16px;padding:18px}#dash2 .c2 span{color:#8fa3c7;font-size:14px}#dash2 .c2>b{display:block;font-size:42px;margin-top:6px}#dash2 .c2 i{font-style:normal;font-size:13px;color:#8fa3c7}
@@ -609,12 +609,12 @@ td{padding:7px 6px;text-align:center;border-bottom:1px solid #e3e8f0}td.l{text-a
 #dash2 h3{margin:0 0 14px;font-size:17px;color:#c5d3ee;font-weight:700}#dash2 .br{display:grid;grid-template-columns:110px 1fr 50px 110px;gap:12px;align-items:center;margin:10px 0;font-size:15px}#dash2 .tr{display:flex;height:20px;background:#1b2a57;border-radius:6px;overflow:hidden}#dash2 .tr i{display:block}#dash2 .br b{font-size:18px}#dash2 .br small{color:#8fa3c7;font-size:13px}
 #dash2 .k7{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-top:14px}#dash2 .k7 .c2>b{font-size:30px}
 #dash2 .nat2{display:flex;gap:10px;margin-top:14px}#dash2 .nat2 div{flex:1;display:flex;justify-content:space-between;background:#13214a;border:1px solid #22356b;border-radius:12px;padding:10px 16px;color:#c5d3ee}#dash2 .nat2 b{color:#fff}
-#dash2 .ft2{text-align:center;color:#f59e0b;font-weight:800;font-size:13px;margin-top:16px;letter-spacing:.5px}
+#dash2 .ft2{text-align:center;color:#f59e0b;font-weight:800;font-size:13px;margin-top:16px}
 body.v-dark{background:#050b1c}body.v-dark #dash{display:none}body:not(.v-dark) #dash2{display:none}
 .bar button.t{background:#24345f;color:#cbd6ef}.bar button.t.on{background:#fff;color:#0f2447}
-@media print{.bar{display:none}body{background:#fff}#dash,#dash2{margin:0;box-shadow:none;border:0;zoom:.72}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{size:A4 landscape;margin:8mm}}
+@media print{.bar{display:none}body{background:#fff}#dash,#dash2{margin:0 auto;box-shadow:none;border:0;break-inside:avoid}html,body{height:auto;overflow:hidden}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{size:A4 landscape;margin:6mm}}
 </style></head><body>
-<div class="bar"><button class="t" data-v="dark">🌙 داكن</button><button class="t" data-v="classic">📋 كلاسيكي</button><span style="width:16px"></span><button onclick="print()">🖨️ طباعة / حفظ PDF</button><button class="b" id="png">🖼️ حفظ صورة PNG</button></div>
+<div class="bar"><button class="t" data-v="dark">🌙 داكن</button><button class="t" data-v="classic">📋 كلاسيكي</button><span style="width:16px"></span><button onclick="fit();print()">🖨️ طباعة / حفظ PDF</button><button class="b" id="png">🖼️ حفظ صورة PNG</button></div>
 <div id="dash">
 <div class="hd"><img src="${new URL('icon-192.png', location.href).href}" alt="" onerror="this.style.display='none'"><h1>DRIVERS DASHBOARD | لوحة بيانات السائقين</h1><div class="dt">${dTxt}<small>${esc(scope)}</small></div></div>
 <div class="top">
@@ -644,6 +644,10 @@ body.v-dark{background:#050b1c}body.v-dark #dash{display:none}body:not(.v-dark) 
 </div>
 ${dark}
 <script>
+// صفحة وحدة: نصغّر اللوحة على مقاس A4 بالعرض قبل الطباعة
+function fit(){var el=document.getElementById(document.body.classList.contains('v-dark')?'dash2':'dash');el.style.zoom=1;var h=el.scrollHeight,w=el.scrollWidth;var z=Math.min(1060/w,700/h)*0.97;el.style.zoom=z;}
+function unfit(){['dash','dash2'].forEach(function(i){var e=document.getElementById(i);if(e)e.style.zoom=''});}
+window.addEventListener('beforeprint',fit);window.addEventListener('afterprint',unfit);
 function setV(v){document.body.classList.toggle('v-dark',v==='dark');document.querySelectorAll('.bar .t').forEach(function(b){b.classList.toggle('on',b.dataset.v===v)});try{localStorage.setItem('nwDashV',v)}catch(e){}}
 document.querySelectorAll('.bar .t').forEach(function(b){b.onclick=function(){setV(b.dataset.v)}});
 var v0='dark';try{v0=localStorage.getItem('nwDashV')||'dark'}catch(e){}setV(v0);
