@@ -219,9 +219,9 @@ let D = [], ROSTER = {}, ROSTER_N = 0, ABSENT = {}, SINCE = {}, WEEK_N = 0, canE
 
 /* ---------- الحسابات ---------- */
 const dep = r => r[C.DEP] || 'Unassigned';
-/* كراج الاستعداد حسب آخر رحلة نفّذها السائق: تنتهي في مكة أو جدة = الشميسي، والباقي حسب كراج مدينة الوصول */
+/* كراج الاستعداد حسب آخر رحلة نفّذها السائق: تنتهي في مكة أو جدة أو ينبع = الشميسي، والباقي حسب كراج مدينة الوصول */
 let TRIP_END = {}, LAST = {};
-const END_DEPOT = [[/jeddah|makkah|mecca|jarwal|جدة|مكة/i, 'Shumaysi'], [/madinah|medina|yanbu|المدينة|ينبع/i, 'Madinah'], [/tabuk|haql|تبوك|حقل/i, 'Tabuk'],
+const END_DEPOT = [[/jeddah|makkah|mecca|jarwal|yanbu|جدة|مكة|ينبع/i, 'Shumaysi'], [/madinah|medina|المدينة/i, 'Madinah'], [/tabuk|haql|تبوك|حقل/i, 'Tabuk'],
   [/riyadh|dawadmi|الرياض|الدوادمي/i, 'Riyadh'], [/jazan|jizan|جازان/i, 'Jazan'], [/khamis|خميس/i, 'Khamis Mushait'], [/bashayer|البشائر/i, 'Al Bashayer'],
   [/buraydah|qassim|بريدة|القصيم/i, 'Buraydah'], [/hail|rafha|حائل|رفحاء/i, 'Hail']];
 const endDepot = st => { for (const [re, d] of END_DEPOT) if (re.test(st || '')) return d; return ''; };
