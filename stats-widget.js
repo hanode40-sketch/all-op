@@ -194,6 +194,7 @@
   var REG = {}, regI = 0;
   function reg(spec) { var id = 'k' + (++regI); REG[id] = spec; return id; }
   function tileHtml(k, extra) {
+    ensureCss();
     var id = reg(k), body;
     if (k.ring !== undefined) {
       var col = k.ring == null ? '' : (k.ring >= (k.id === 'shift' ? 80 : 70) ? '#16a34a' : '#f59e0b');
