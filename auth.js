@@ -14,7 +14,7 @@
   var HOME_URL  = 'https://hanode40-sketch.github.io/all-op/';
   var KEY = 'nw_auth_v1';
   var IDLE_KEY = 'nw_last_active';
-  var AUTH_VERSION = '2026-11-15.7';   // غيّره عند كل تعديل على هذا الملف (يجبر الأجهزة على التحديث)
+  var AUTH_VERSION = '2026-11-16.1';   // غيّره عند كل تعديل على هذا الملف (يجبر الأجهزة على التحديث)
   var IDLE_MS = 2 * 60 * 60 * 1000;   // يقفل بعد ساعتين بدون أي نشاط (غيّر الرقم 2 لتغيير المدة)
 
   /* ===== ألوان موحدة لكل البرامج (نهاري / ليلي) — أي برنامج يستخدم var(--nw-...) ياخذ نفس الشكل ===== */
@@ -50,6 +50,7 @@
     performance: '<path d="M3 21h18"/><rect x="5" y="11" width="3" height="7" rx="1"/><rect x="10.5" y="6" width="3" height="12" rx="1"/><rect x="16" y="13" width="3" height="5" rx="1"/>',
     stats: '<path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 6-7"/>',
     kpi: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
+    review: '<circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.3-4.3M8.5 11l1.8 1.8 3.4-3.6"/>',
     users: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.7-3.4 3.4-5.5 6.5-5.5s5.8 2.1 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/><path d="M18 14.8c1.9.7 3.2 2.5 3.5 5.2"/>',
     activity: '<path d="M3 12h4l3-8 4 16 3-8h4"/>',
     calendar: '<rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/>',
@@ -126,10 +127,11 @@
     return p;
   }
   // صفحات الإدارة (الأداء والإحصائيات والمؤشرات): مفتوحة للمدير والمشرف تلقائياً
-  var MGMT_TOOLS = { performance: 1, stats: 1, kpi: 1, drivers: 1 };
+  var MGMT_TOOLS = { performance: 1, stats: 1, kpi: 1, drivers: 1, review: 1 };
   function can(user, tool) {
     if (!tool) return true;
     if (MGMT_TOOLS[String(tool).toLowerCase()] && user && (user.r === 'مدير' || user.r === 'مدير تنفيذي' || user.r === 'مشرف')) return true;
+    if (String(tool).toLowerCase() === 'review' && user && user.r === 'جودة') return true;   // الجودة: مراجعة البيانات (اطلاع)
     var t = (user && user.t) || [];
     return t.indexOf('all') > -1 || t.indexOf(String(tool).toLowerCase()) > -1;
   }
@@ -306,7 +308,8 @@
     { ik: 'logE', g: 4, t: 'evaluation',  log: 1, ic: '📋', ar: 'سجل التقييمات',  en: 'Evaluation Log',    url: 'https://hanode40-sketch.github.io/OP/#log' },
     { ik: 'performance', g: 3, t: 'performance', ic: '📊', ar: 'أداء الموظفين',       en: 'Staff Performance', url: HOME_URL + 'performance.html' },
     { ik: 'stats', g: 3, t: 'stats',       ic: '📈', ar: 'إحصائيات العمل',      en: 'Work Statistics',   url: HOME_URL + 'stats.html' },
-    { ik: 'kpi', g: 3, t: 'kpi',         ic: '🎯', ar: 'المؤشرات التشغيلية',  en: 'Operational KPIs',  url: HOME_URL + 'kpi.html' }
+    { ik: 'kpi', g: 3, t: 'kpi',         ic: '🎯', ar: 'المؤشرات التشغيلية',  en: 'Operational KPIs',  url: HOME_URL + 'kpi.html' },
+    { ik: 'review', g: 3, t: 'review',      ic: '🔎', ar: 'مراجعة البيانات',     en: 'Data Review',       url: HOME_URL + 'review.html' }
   ];
   var SIDE_GROUPS = [null, ['التشغيل اليومي', 'Daily operations'], ['التقارير والسلامة', 'Reports & safety'], ['الإدارة', 'Management'], ['السجلات', 'Records']];
   var ROLE_EN = { 'مدير': 'Manager', 'مدير تنفيذي': 'Executive Manager', 'جودة': 'Quality', 'علاقات حكومية': 'Government Relations', 'مشرف': 'Supervisor', 'مرحّل': 'Dispatcher', 'مرحل': 'Dispatcher', 'موظف': 'Employee' };
@@ -505,7 +508,7 @@
   }
 
   /* ---------- شريط عنوان ثابت موحّد لكل البرامج (نفس شكل صفحة المؤشرات) ---------- */
-  var OWN_HEAD = { stats: 1, kpi: 1, performance: 1, drivers: 1 };        // صفحات لها شريطها الخاص
+  var OWN_HEAD = { stats: 1, kpi: 1, performance: 1, drivers: 1, review: 1 };        // صفحات لها شريطها الخاص
   // عنوان البرنامج القديم (الشعار + الاسم) يتخفى لأن الشريط الجديد يعرضه
   var HIDE_OLD = {
     accident:   '.e-logo,.e-title,.e-sub',

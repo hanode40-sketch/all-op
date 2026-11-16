@@ -81,7 +81,7 @@
   .arrow, .open { display: none; }
   a.card[data-tool="shift"]{--acc:#d97706} a.card[data-tool="tasks"]{--acc:#16a34a} a.card[data-tool="trip"]{--acc:#0d9488} a.card[data-tool="drivers"]{--acc:#0369a1}
   a.card[data-tool="violation"]{--acc:#dc2626} a.card[data-tool="accident"]{--acc:#ea580c} a.card[data-tool="evaluation"]{--acc:#ca8a04}
-  a.card[data-tool="performance"]{--acc:#7c3aed} a.card[data-tool="stats"]{--acc:#0284c7} a.card[data-tool="kpi"]{--acc:#db2777}
+  a.card[data-tool="performance"]{--acc:#7c3aed} a.card[data-tool="stats"]{--acc:#0284c7} a.card[data-tool="kpi"]{--acc:#db2777} a.card[data-tool="review"]{--acc:#0f766e}
   .icon .nwi { color: var(--acc); }
   @supports (background: color-mix(in srgb, red 10%, white)) {
     .icon { background: color-mix(in srgb, var(--acc) 11%, var(--nw-card)) !important; }
@@ -258,6 +258,15 @@
       <div class="arrow">‹</div>
       <div class="open" data-ar="فتح البرنامج" data-en="Open">فتح البرنامج</div>
     </a>
+    <a class="card" href="review.html" data-tool="review">
+      <div class="icon icon-kpi">🔎</div>
+      <div class="card-text">
+        <p class="card-title" data-ar="مراجعة البيانات" data-en="Data Review">مراجعة البيانات</p>
+        <p class="card-sub" data-ar="سجلات كل البرامج في مكان واحد مع كشف النواقص وتصدير Excel" data-en="All programs' records in one place, with missing-data checks and Excel export">سجلات كل البرامج في مكان واحد مع كشف النواقص وتصدير Excel</p>
+      </div>
+      <div class="arrow">‹</div>
+      <div class="open" data-ar="فتح البرنامج" data-en="Open">فتح البرنامج</div>
+    </a>
     </div>
   </section>
   </main>
@@ -355,7 +364,7 @@
     $('sc-foot').innerHTML='<span>'+rng+'</span><span>'+lt+'</span>';
   }
   /* أيقونات احترافية بدل الإيموجي */
-  var IK={shift:'shift',tasks:'tasks',trip:'trip',drivers:'drivers',violation:'violation',accident:'accident',evaluation:'evaluation',performance:'performance',stats:'stats',kpi:'kpi'};
+  var IK={shift:'shift',tasks:'tasks',trip:'trip',drivers:'drivers',violation:'violation',accident:'accident',evaluation:'evaluation',performance:'performance',stats:'stats',kpi:'kpi',review:'review'};
   function icons(){
     if(!window.NWIcon) return;
     document.querySelectorAll('a.card[data-tool]').forEach(function(a){ var k=IK[a.dataset.tool], ic=a.querySelector('.icon'); if(k&&ic&&!ic.querySelector('svg')) ic.innerHTML=NWIcon(k,24); });
