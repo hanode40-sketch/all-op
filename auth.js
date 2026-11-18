@@ -14,7 +14,7 @@
   var HOME_URL  = 'https://hanode40-sketch.github.io/all-op/';
   var KEY = 'nw_auth_v1';
   var IDLE_KEY = 'nw_last_active';
-  var AUTH_VERSION = '2026-11-19.1';   // غيّره عند كل تعديل على هذا الملف (يجبر الأجهزة على التحديث)
+  var AUTH_VERSION = '2026-11-19.2';   // غيّره عند كل تعديل على هذا الملف (يجبر الأجهزة على التحديث)
   var IDLE_MS = 2 * 60 * 60 * 1000;   // يقفل بعد ساعتين بدون أي نشاط (غيّر الرقم 2 لتغيير المدة)
 
   /* ===== ألوان موحدة لكل البرامج (نهاري / ليلي) — أي برنامج يستخدم var(--nw-...) ياخذ نفس الشكل ===== */
@@ -57,6 +57,8 @@
     bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/>',
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     card: '<rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/><path d="M6 15h4"/>',
+    fines: '<rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="7" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="17" r="1.6"/>',
+    settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
     arrow: '<path d="M15 6l-6 6 6 6"/>'
   };
   function icon(k, size) { var p = NW_IC[k]; if (!p) return ''; return '<svg class="nwi" width="' + (size || 20) + '" height="' + (size || 20) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; }
@@ -300,6 +302,7 @@
     { ik: 'trip', g: 1, t: 'trip',        ic: '🚌', ar: 'مسار الرحلة',         en: 'Trip Route',        url: 'https://hanode40-sketch.github.io/trip/' },
     { ik: 'drivers', g: 1, t: 'drivers',     ic: '👨‍✈️', ar: 'إدارة السائقين',     en: 'Drivers Management', url: HOME_URL + 'drivers.html' },
     { ik: 'violation', g: 2, t: 'violation',   ic: '📝', ar: 'محضر مخالفة',         en: 'Violation Report',  url: 'https://hanode40-sketch.github.io/violation/' },
+    { ik: 'fines', g: 2, t: '', ext: 1, ic: '🚦', ar: 'نظام المخالفات المرورية', en: 'Traffic Violations', url: 'https://hanode40-sketch.github.io/fines/' },
     { ik: 'accident', g: 2, t: 'accident',    ic: '🚨', ar: 'تقرير حادث',          en: 'Accident Report',   url: 'https://hanode40-sketch.github.io/accident_report/' },
     { ik: 'evaluation', g: 2, t: 'evaluation',  ic: '⭐', ar: 'تقييم السائقين',      en: 'Driver Evaluation', url: 'https://hanode40-sketch.github.io/OP/' },
     // السجلات: نفس صلاحية البرنامج، وتفتح تبويب السجل مباشرة (#log)
@@ -363,6 +366,7 @@
     function isOn(it) {
       if (TOOL) return it.t === TOOL && !!it.log === (location.hash === '#log');
       if (it.adm) return /\/settings\.html$/.test(here);
+      if (it.ext) return here.indexOf(it.url) === 0;
       if (!it.t) return /\/all-op\/(index\.html)?$/.test(here);
       return false;
     }
