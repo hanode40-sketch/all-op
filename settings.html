@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<script>try{var t=localStorage.getItem('nwTheme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<script src="https://hanode40-sketch.github.io/all-op/auth.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#13274f">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<title>الإعدادات — أدوات التشغيل</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 18px 16px 40px; min-height: 100vh; font-family: var(--nw-font, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif);
+    background: var(--nw-bg, #eef2f8); color: var(--nw-ink, #0f1e3d); -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1240px; margin: 0 auto; }
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+  h1 { margin: 0; font-size: 20px; font-weight: 800; }
+  .sub { color: var(--nw-muted, #64748b); font-size: 12.5px; margin-top: 3px; }
+  .back { font-size: 13px; font-weight: 700; color: var(--nw-ink); background: var(--nw-card, #fff); border: 1px solid var(--nw-line, #dbe3ef); border-radius: 999px; padding: 7px 14px; text-decoration: none; }
+  .card { background: var(--nw-card, #fff); border-radius: 16px; padding: 16px 18px; box-shadow: var(--nw-shadow, 0 2px 10px rgba(0,0,0,.06)); }
+  .card h2 { margin: 0 0 6px; font-size: 17px; }
+  .muted { color: var(--nw-muted, #64748b); } .small { font-size: 12.5px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .item { display: flex; gap: 14px; align-items: center; text-align: start; background: var(--nw-card, #fff); border: 1px solid transparent; border-radius: 16px; padding: 16px;
+    box-shadow: var(--nw-shadow, 0 2px 10px rgba(0,0,0,.06)); cursor: pointer; color: inherit; font: inherit; transition: transform .15s, border-color .15s; }
+  .item:hover { transform: translateY(-2px); border-color: var(--nw-line, #dbe3ef); }
+  .item .ic { width: 48px; height: 48px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 23px; background: #FDECEC; flex-shrink: 0; }
+  html[data-theme="dark"] .item .ic { background: #3a1e22; }
+  .item b { display: block; font-size: 15px; margin-bottom: 3px; }
+  .grp-t { display: flex; align-items: center; gap: 12px; margin: 4px 2px 10px; font-size: 14px; font-weight: 800; color: var(--nw-muted); }
+  .grp-t::after { content: ""; flex: 1; height: 1px; background: var(--nw-line); }
+  .btn { font: inherit; font-size: 13px; font-weight: 700; color: #fff; background: var(--nw-navy, #1d4ed8); border: 0; border-radius: 10px; padding: 8px 14px; cursor: pointer; }
+  .btn.sm { padding: 5px 11px; font-size: 12.5px; } .btn.sec { background: transparent; color: inherit; border: 1px solid var(--nw-line); }
+  .btn:disabled { opacity: .6; cursor: wait; }
+  input[type=search], select { font: inherit; width: 100%; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--nw-line, #dbe3ef); background: var(--nw-card, #fff); color: inherit; }
+  select { width: auto; }
+  .scroll { max-height: 68vh; overflow: auto; border: 1px solid var(--nw-line); border-radius: 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  th, td { padding: 9px 12px; border-bottom: 1px solid var(--nw-line); text-align: start; vertical-align: top; }
+  th { position: sticky; top: 0; background: var(--nw-card); font-size: 12.5px; color: var(--nw-muted); z-index: 1; }
+  .pill { display: inline-block; border-radius: 999px; padding: 1px 9px; font-size: 12px; font-weight: 600; white-space: nowrap; border: 1px solid var(--nw-line); }
+  .pill.off { color: #dc2626; border-color: #fca5a5; }
+  .modal { position: fixed; inset: 0; background: rgba(10,20,40,.55); z-index: 999; display: flex; align-items: flex-start; justify-content: center; padding: 20px 10px; overflow: auto; }
+  .modal .box { background: var(--nw-card, #fff); border-radius: 16px; max-width: 760px; width: 100%; padding: 16px 18px; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+  .modal .hd { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; } .modal .hd h2 { margin: 0; font-size: 17px; }
+  .x { background: none; border: 0; font-size: 22px; cursor: pointer; color: inherit; }
+  .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 8px; }
+  .chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 6px 14px; margin: 6px 0 10px; }
+  .chk { display: flex; align-items: center; gap: 6px; font-size: 13.5px; cursor: pointer; }
+  .chk input { width: 17px; height: 17px; }
+  .toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: #0f1e3d; color: #fff; padding: 10px 18px; border-radius: 12px; z-index: 2000; }
+  .toast.err { background: #991b1b; }
+  .loader { padding: 30px; text-align: center; color: var(--nw-muted); }
+  .bar { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div><h1>⚙️ الإعدادات</h1><div class="sub">Northwest Bus · إعدادات البرامج والصلاحيات</div></div>
+    <a class="back" href="./">← أدوات التشغيل</a>
+  </header>
+  <main id="main"><div class="loader">جاري التحميل…</div></main>
+</div>
+<script>
+const FINES_API = 'https://script.google.com/macros/s/AKfycbyhMGws-oWKytVX3_tG_C9SsEwvf6cyLzCJmuiRpm4OyCS3xYcoFmjFfxuRcOrNDTmxfw/exec';
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(msg, err) { const t = document.createElement('div'); t.className = 'toast' + (err ? ' err' : ''); t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), err ? 6000 : 3000); }
+function modal(title, html) { const m = document.createElement('div'); m.className = 'modal';
+  m.innerHTML = `<div class="box"><div class="hd"><h2>${title}</h2><button class="x" title="إغلاق">×</button></div><div>${html}</div></div>`;
+  m.querySelector('.x').onclick = () => m.remove(); m.addEventListener('mousedown', e => { if (e.target === m) m.remove(); });
+  document.body.appendChild(m); return m; }
+async function busy(b, fn) { b.disabled = true; try { await fn(); } catch (e) { toast(e.message || String(e), 1); } finally { b.disabled = false; } }
+async function finesApi(action, data) {
+  const body = NWAuth.attach(Object.assign({ action }, data || {}));
+  const r = await fetch(FINES_API, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
+  const j = await r.json();
+  if (j.error === 'AUTH') { NWAuth.relogin && NWAuth.relogin(); throw new Error('انتهت الجلسة — سجّل الدخول من جديد'); }
+  if (!j.ok) throw new Error(j.message || j.error || 'خطأ');
+  return j;
+}
+
+/* ============ قائمة الإعدادات — أضف هنا أي إعدادات جديدة ============ */
+const SECTIONS = [
+  { id: 'fines-users', grp: 'نظام المخالفات المرورية', ic: '🚦', ar: 'المستخدمون والصلاحيات', desc: 'منح وتعديل صلاحيات المستخدمين في نظام المخالفات المرورية', view: vFinesUsers }
+];
+const isAdmin = () => window.NWAuth && NWAuth.role === 'مدير';
+
+function render() {
+  const m = $('main');
+  if (!isAdmin()) { m.innerHTML = '<div class="card"><h2>🔒 صفحة الإعدادات للمدير فقط</h2><p class="muted">ارجع إلى <a href="./">أدوات التشغيل</a>.</p></div>'; return; }
+  const sec = SECTIONS.find(s => s.id === location.hash.slice(1));
+  if (sec) {
+    m.innerHTML = `<div class="bar"><button class="btn sec sm" id="bk">→ رجوع للإعدادات</button><span class="muted small">${esc(sec.grp)} · ${esc(sec.ar)}</span></div><div id="body"></div>`;
+    $('bk').onclick = () => { location.hash = ''; };
+    return sec.view($('body'));
+  }
+  const groups = [...new Set(SECTIONS.map(s => s.grp))];
+  m.innerHTML = groups.map(g => `<h2 class="grp-t">${esc(g)}</h2><div class="grid">${SECTIONS.filter(s => s.grp === g).map(s =>
+    `<button class="item" data-s="${s.id}"><div class="ic">${s.ic}</div><div><b>${esc(s.ar)}</b><span class="small muted">${esc(s.desc)}</span></div></button>`).join('')}</div>`).join('');
+  m.querySelectorAll('[data-s]').forEach(b => b.onclick = () => { location.hash = b.dataset.s; });
+}
+window.addEventListener('hashchange', render);
+
+/* ============ نظام المخالفات: المستخدمون والصلاحيات ============ */
+const PERM_LABEL = {
+  dashboard: 'عرض لوحة التحكم', view: 'عرض المخالفات', import: 'استيراد Excel (للمدير فقط)', print: 'الطباعة', stamp: 'التبصيم (إعداد النماذج ورفع الإثبات)',
+  drivers: 'إدارة ملفات السائقين', archive: 'الأرشيف', cancelReq: 'تقديم طلبات الإلغاء', cancelApprove: 'مراجعة واعتماد طلبات الإلغاء', reports: 'التقارير',
+  vehicles: 'إدارة المركبات', finance: 'الاطلاع على البيانات المالية', audit: 'الاطلاع على سجل العمليات', whatsapp: 'إرسال المخالفات عبر واتساب',
+  transferReq: 'تقديم طلبات تحويل المخالفات', transferApprove: 'مراجعة واعتماد طلبات التحويل', stampApprove: 'مراجعة واعتماد التبصيم',
+  docsApprove: 'مراجعة واعتماد المرفقات والتحديثات', docs: 'رفع المستندات والملاحظات (تتطلب اعتماد)'
+};
+async function vFinesUsers(m) {
+  m.innerHTML = '<div class="loader">جاري التحميل…</div>';
+  let j; try { j = await finesApi('users'); } catch (e) { m.innerHTML = `<div class="card"><b style="color:#dc2626">${esc(e.message)}</b></div>`; return; }
+  const P = {}; j.perms.forEach(p => P[String(p.username).toLowerCase()] = p);
+  const list = j.users.map(u => Object.assign({}, u, { p: P[u.username] }))
+    .concat(j.perms.filter(p => !j.users.find(u => u.username === String(p.username).toLowerCase())).map(p => ({ username: p.username, name: p.name, p })));
+  m.innerHTML = `<div class="card"><h2>المستخدمون والصلاحيات — نظام المخالفات المرورية</h2>
+   <p class="small muted">المستخدمون من نظام الدخول الموحّد. كل صلاحية مستقلة وتُفعّل لكل حساب على حدة. صلاحية «استيراد Excel» حصرية للمدير ولا يمكن منحها. صاحب دور «مدير» في الدخول الموحّد مدير في النظام تلقائياً.</p>
+   <input id="uq" type="search" placeholder="بحث بالاسم أو اسم المستخدم" style="margin-bottom:10px">
+   <div class="scroll"><table><thead><tr><th>المستخدم</th><th>الدور في الدخول</th><th>الدور في النظام</th><th>الصلاحيات</th><th></th></tr></thead><tbody id="ub"></tbody></table></div></div>`;
+  const me = String(NWAuth.username || '').toLowerCase();
+  const draw = () => { const q = $('uq').value.trim().toLowerCase();
+    $('ub').innerHTML = list.filter(u => !q || (u.name + ' ' + u.username).toLowerCase().indexOf(q) > -1).map(u => { const p = u.p || {}; const ps = String(p.perms || '').split(',').filter(Boolean);
+      return `<tr><td><b>${esc(u.name)}</b><br><span class="small muted">${esc(u.username)}</span>${u.loginActive === false ? ' <span class="pill off">غير فعّال في الدخول</span>' : ''}</td>
+       <td>${esc(u.loginRole || '')}</td>
+       <td>${u.loginRole === 'مدير' ? '<span class="pill">مدير (تلقائي)</span>' : p.role ? `<span class="pill${p.active === 'لا' ? ' off' : ''}">${esc(p.role)}${p.active === 'لا' ? ' — معطّل' : ''}</span>` : '<span class="muted small">لا يوجد</span>'}</td>
+       <td class="small">${u.loginRole === 'مدير' ? 'كل الصلاحيات' : esc(ps.map(x => PERM_LABEL[x] || x).join('، ')) || '—'}</td>
+       <td>${u.loginRole === 'مدير' || u.username === me ? '' : `<button class="btn sm" data-u="${esc(u.username)}">تعديل</button>`}</td></tr>`; }).join('');
+    $('ub').querySelectorAll('[data-u]').forEach(b => b.onclick = () => userDlg(list.find(x => x.username === b.dataset.u), j.permKeys, () => vFinesUsers(m)));
+  };
+  $('uq').oninput = draw; draw();
+}
+function userDlg(u, keys, done) {
+  const p = u.p || {}; const ps = String(p.perms || '').split(',');
+  const preset = { 'موظف': ['dashboard', 'view', 'print', 'whatsapp', 'drivers', 'cancelReq', 'transferReq', 'docs'], 'مشرف': ['dashboard', 'view', 'print', 'drivers', 'archive', 'reports', 'cancelApprove', 'transferApprove', 'stampApprove', 'docsApprove'] };
+  const m = modal('صلاحيات — ' + esc(u.name), `<div class="row"><label>الدور <select id="ur"><option>موظف</option><option>مشرف</option><option>مدير</option></select></label>
+    <label class="chk"><input type="checkbox" id="ua" ${p.active === 'لا' ? '' : 'checked'}> الحساب مفعّل في نظام المخالفات</label><button class="btn sec sm" id="upre">تعبئة الصلاحيات المقترحة للدور</button></div>
+   <b>الصلاحيات</b><div class="chips">${keys.filter(k => k !== 'import').map(k => `<label class="chk"><input type="checkbox" data-p="${k}" ${ps.indexOf(k) > -1 ? 'checked' : ''}> ${esc(PERM_LABEL[k] || k)}</label>`).join('')}</div>
+   <p class="small muted">الدور «مدير» يعطي كل الصلاحيات الإدارية. الصلاحيات لا تُمنح تلقائياً للموظف أو المشرف — حدّدها لكل حساب.</p>
+   <button class="btn" id="us">حفظ</button>`);
+  m.querySelector('#ur').value = p.role || 'موظف';
+  m.querySelector('#upre').onclick = () => { const l = preset[m.querySelector('#ur').value] || keys; m.querySelectorAll('[data-p]').forEach(c => c.checked = l.indexOf(c.dataset.p) > -1); };
+  m.querySelector('#us').onclick = e => busy(e.target, async () => {
+    await finesApi('userSave', { username: u.username, name: u.name, role: m.querySelector('#ur').value, active: m.querySelector('#ua').checked, perms: [...m.querySelectorAll('[data-p]:checked')].map(c => c.dataset.p) });
+    toast('تم حفظ الصلاحيات'); m.remove(); done();
+  });
+}
+
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render); else render();
+</script>
+</body>
+</html>

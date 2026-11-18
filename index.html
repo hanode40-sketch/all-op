@@ -134,7 +134,7 @@
         <div class="brand-s">Northwest Bus · <span data-ar="منصة العمليات" data-en="Operations platform">منصة العمليات</span></div>
       </div>
     </div>
-    <div class="lang-bar"><div id="nw-user-slot"></div><button class="lang-btn theme-btn" id="theme-btn" type="button" aria-label="الوضع الليلي">🌙</button><button class="lang-btn" id="lang-btn" type="button">English</button></div>
+    <div class="lang-bar"><div id="nw-user-slot"></div><a class="lang-btn" id="set-btn" href="settings.html" hidden style="text-decoration:none">⚙️ <span data-ar="الإعدادات" data-en="Settings">الإعدادات</span></a><button class="lang-btn theme-btn" id="theme-btn" type="button" aria-label="الوضع الليلي">🌙</button><button class="lang-btn" id="lang-btn" type="button">English</button></div>
   </header>
 
   <section class="hero">
@@ -311,6 +311,7 @@
   });
 })();
 </script>
+<script>try{ if(window.NWAuth&&NWAuth.role==='مدير') document.getElementById('set-btn').hidden=false; }catch(e){}</script>
 <script>
 (function(){
   var btn=document.getElementById('lang-btn');

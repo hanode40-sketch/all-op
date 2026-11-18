@@ -14,7 +14,7 @@
   var HOME_URL  = 'https://hanode40-sketch.github.io/all-op/';
   var KEY = 'nw_auth_v1';
   var IDLE_KEY = 'nw_last_active';
-  var AUTH_VERSION = '2026-11-16.1';   // غيّره عند كل تعديل على هذا الملف (يجبر الأجهزة على التحديث)
+  var AUTH_VERSION = '2026-11-19.1';   // غيّره عند كل تعديل على هذا الملف (يجبر الأجهزة على التحديث)
   var IDLE_MS = 2 * 60 * 60 * 1000;   // يقفل بعد ساعتين بدون أي نشاط (غيّر الرقم 2 لتغيير المدة)
 
   /* ===== ألوان موحدة لكل البرامج (نهاري / ليلي) — أي برنامج يستخدم var(--nw-...) ياخذ نفس الشكل ===== */
@@ -309,9 +309,11 @@
     { ik: 'performance', g: 3, t: 'performance', ic: '📊', ar: 'أداء الموظفين',       en: 'Staff Performance', url: HOME_URL + 'performance.html' },
     { ik: 'stats', g: 3, t: 'stats',       ic: '📈', ar: 'إحصائيات العمل',      en: 'Work Statistics',   url: HOME_URL + 'stats.html' },
     { ik: 'kpi', g: 3, t: 'kpi',         ic: '🎯', ar: 'المؤشرات التشغيلية',  en: 'Operational KPIs',  url: HOME_URL + 'kpi.html' },
-    { ik: 'review', g: 3, t: 'review',      ic: '🔎', ar: 'مراجعة البيانات',     en: 'Data Review',       url: HOME_URL + 'review.html' }
+    { ik: 'review', g: 3, t: 'review',      ic: '🔎', ar: 'مراجعة البيانات',     en: 'Data Review',       url: HOME_URL + 'review.html' },
+    // الإعدادات: للمدير فقط
+    { ik: 'settings', g: 5, t: '', adm: 1, ic: '⚙️', ar: 'الإعدادات',           en: 'Settings',          url: HOME_URL + 'settings.html' }
   ];
-  var SIDE_GROUPS = [null, ['التشغيل اليومي', 'Daily operations'], ['التقارير والسلامة', 'Reports & safety'], ['الإدارة', 'Management'], ['السجلات', 'Records']];
+  var SIDE_GROUPS = [null, ['التشغيل اليومي', 'Daily operations'], ['التقارير والسلامة', 'Reports & safety'], ['الإدارة', 'Management'], ['السجلات', 'Records'], ['الإعدادات', 'Settings']];
   var ROLE_EN = { 'مدير': 'Manager', 'مدير تنفيذي': 'Executive Manager', 'جودة': 'Quality', 'علاقات حكومية': 'Government Relations', 'مشرف': 'Supervisor', 'مرحّل': 'Dispatcher', 'مرحل': 'Dispatcher', 'موظف': 'Employee' };
   var sideCss =
     '.nws{display:none}' +
@@ -360,6 +362,7 @@
     var here = location.href.split('#')[0].split('?')[0];
     function isOn(it) {
       if (TOOL) return it.t === TOOL && !!it.log === (location.hash === '#log');
+      if (it.adm) return /\/settings\.html$/.test(here);
       if (!it.t) return /\/all-op\/(index\.html)?$/.test(here);
       return false;
     }
@@ -377,6 +380,7 @@
       var lastG = -1;
       SIDE_ITEMS.forEach(function (it) {
         if (it.t && !can(user, it.t)) return;
+        if (it.adm && user.r !== 'مدير') return;
         if (it.g !== lastG && SIDE_GROUPS[it.g]) h += '<div class="nws-g">' + SIDE_GROUPS[it.g][en ? 1 : 0] + '</div>';
         lastG = it.g;
         var name = en ? it.en : it.ar;
