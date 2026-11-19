@@ -505,7 +505,9 @@ function showCached() {
     return true;
   } catch (e) { return false; }
 }
-async function load() {
+let LOADP = null, ROSTER_P = null;   // تحميل جاري (الداش بورد ينتظره)
+function load() { LOADP = load_(); const p = LOADP; p.finally(() => { if (LOADP === p) LOADP = null; }); return p; }
+async function load_() {
   if (!showCached()) $('list').innerHTML = `<div class="msg">${t_('loading')}</div>`;
   try {
     const a = await NWAuth.call('driversList', {});
@@ -524,7 +526,8 @@ async function load() {
    يومين متتاليين أو أقل = راحة، أكثر من يومين = استعداد */
 const ymd = d => d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 const addD = (ds, n) => { const d = new Date(ds + 'T12:00:00'); d.setDate(d.getDate() + n); return ymd(d); };
-async function loadRoster() {
+function loadRoster() { const p = ROSTER_P = loadRoster_(); p.finally(() => { if (ROSTER_P === p) ROSTER_P = null; }); return p; }
+async function loadRoster_() {
   ROSTER = {}; ROSTER_N = 0; ABSENT = {}; SINCE = {}; WEEK_N = 0;
   const date = $('fDate').value, from = addD(date, -30), to = addD(date, 6);
   let days = null;
@@ -705,7 +708,13 @@ $('bExport').onclick = async () => {
 };
 
 /* ---------- تصدير الداش بورد (نفس شكل ملف Excel) — طباعة / PDF / صورة ---------- */
-$('bDash').onclick = () => {
+$('bDash').onclick = async () => {
+  let w0 = null;
+  if (LOADP || ROSTER_P) {                 // البيانات لسا تتحمّل (مثلاً بعد تحديث الصفحة مباشرة): نفتح النافذة وننتظر
+    w0 = window.open('', '_blank');
+    if (w0) w0.document.write('<p dir="rtl" style="font-family:Tahoma;padding:40px;text-align:center">⏳ جاري تحميل الروستر والبيانات...</p>');
+    try { await (LOADP || ROSTER_P); if (ROSTER_P) await ROSTER_P; } catch (e) {}
+  }
   const depot = $('fDepot').value, rows = filtered(depot), cnt = st => rows.filter(r => r[C.ST] === st).length;
   const op = cnt('operation'), an = cnt('Annual Leave'), em = cnt('Emergency Leave'), sk = cnt('Sick Leave');
   const nr = cnt('Not Returned'), su = cnt('Suspended'), ab = cnt('Absconding'), te = cnt('Termination of services');
@@ -815,7 +824,7 @@ document.getElementById('png').onclick=function(){var b=this;b.disabled=true;b.t
  function go(){(function(){var dk=document.body.classList.contains('v-dark');return html2canvas(document.getElementById(dk?'dash2':'dash'),{scale:2,useCORS:true,backgroundColor:dk?'#0b1530':'#ffffff'})})().then(function(c){var a=document.createElement('a');a.download='Drivers_Dashboard_${date}.png';a.href=c.toDataURL('image/png');a.click();b.disabled=false;b.textContent='🖼️ حفظ صورة PNG';});}
  if(window.html2canvas)return go();var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=go;s.onerror=function(){alert('تعذّر تحميل أداة الصور — استخدم الطباعة / PDF');b.disabled=false;};document.head.appendChild(s);};
 <\/script></body></html>`;
-  const w = window.open('', '_blank');
+  const w = w0 || window.open('', '_blank');
   if (!w) { alert(LANG === 'en' ? 'Allow pop-ups to open the dashboard' : 'اسمح بالنوافذ المنبثقة لفتح الداش بورد'); return; }
   w.document.open(); w.document.write(html); w.document.close();
 };
