@@ -59,6 +59,7 @@
   .iss.w{background:#fef3c7;color:#92400e}
   html[data-theme="dark"] .iss{background:#4a1d1d;color:#fca5a5} html[data-theme="dark"] .iss.w{background:#45340f;color:#fcd34d}
   .ok{color:#16a34a;font-weight:800}
+  .rh{margin:6px 0 8px;font-size:15px}.grid2r{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:900px){.grid2r{grid-template-columns:1fr}}
   .sub{font-size:12px;color:var(--nw-muted)}
   .scroll{overflow:auto;max-height:70vh;border-radius:10px}
   .pager{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:12px;font-size:13px}
@@ -407,42 +408,71 @@ async function loadTrips() {
   return TR;
 }
 
+/* موعد الإرسال: قبل المغادرة بـ 6 ساعات · الرحلة اللي ما حان موعدها ما تنحسب "لم يُرسل" */
+const SEND_H = 6;
+const tms = v => { if (v instanceof Date) return v.getTime(); const x = String(v || ''); if (!x) return NaN; if (/[zZ]|[+-]\d\d:?\d\d$/.test(x)) return Date.parse(x); return Date.parse(x.replace(' ', 'T') + '+03:00'); };
+const depAt = i => { const m = String(i.dep || '').match(/(\d{1,2}):(\d{2})/); return m ? Date.parse(i.date + 'T' + String(m[1]).padStart(2, '0') + ':' + m[2] + ':00+03:00') : Date.parse(i.date + 'T23:59:00+03:00'); };
+const hm = t => { const d = new Date(t); return isNaN(d) ? '' : ymd(d) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+function tripState(i, now) {
+  const dl = depAt(i) - SEND_H * H; i.deadline = dl;
+  if (i.sent) { const at = tms(i.hit.at); i.late = !isNaN(at) && at > dl; i.st = i.late ? 'late' : 'ok'; }
+  else i.st = now < dl ? 'wait' : 'miss';
+  return i;
+}
+const pc = (a, b) => b ? Math.round(a / b * 100) : 0;
+const pcol = p => p >= 95 ? '#16a34a' : p >= 80 ? '#f59e0b' : '#dc2626';
+const barH = p => `<div style="display:flex;align-items:center;gap:8px"><div class="bar"><i style="width:${p}%;background:${pcol(p)}"></i></div>${p}%</div>`;
+
 async function drawTrip() {
   const R = await loadTrips(); if (!R || VIEW !== 'trip') return;
-  const g = $('garage').value, q = $('q').value.trim().toLowerCase();
-  R.items.forEach(i => i.off = isOff(i.code));
+  const g = $('garage').value, q = $('q').value.trim().toLowerCase(), now = Date.now();
+  R.items.forEach(i => { i.off = isOff(i.code); tripState(i, now); });
   const offN = new Set(R.items.filter(i => i.off).map(i => i.date + '|' + cN(i.code))).size;
   const all0 = R.items.filter(i => (!g || i.garage === g) && (!q || [i.code, i.name, i.iq, i.from, i.to, i.hit && i.hit.by].join(' ').toLowerCase().includes(q)));
-  const all = all0.filter(i => !i.off);
-  const sent = all.filter(i => i.sent).length, trips = new Set(all.map(i => i.date + '|' + cN(i.code))).size;
-  const pct = all.length ? Math.round(sent / all.length * 100) : 0;
-  $('tiles').innerHTML = [['#13274f', trips, 'رحلات مطلوبة (حسب الروستر)'], ['#16a34a', sent, 'سائق أُرسل له المسار'], ['#dc2626', all.length - sent, 'سائق لم يُرسل له'], [pct >= 95 ? '#16a34a' : pct >= 80 ? '#f59e0b' : '#dc2626', pct + '%', 'نسبة الإرسال' + (offN ? ` <small>(مستبعد ${offN} رحلة غير مفعلة)</small>` : '')]]
+  const all = all0.filter(i => !i.off), due = all.filter(i => i.st !== 'wait');
+  const nOk = due.filter(i => i.st === 'ok').length, nLate = due.filter(i => i.st === 'late').length, nMiss = due.filter(i => i.st === 'miss').length, nWait = all.length - due.length;
+  const pct = pc(nOk + nLate, due.length), pOn = pc(nOk, due.length);
+  $('tiles').innerHTML = [['#16a34a', nOk, 'أُرسل في الموعد (قبل ' + SEND_H + ' ساعات)'], ['#f59e0b', nLate, 'أُرسل متأخر'], ['#dc2626', nMiss, 'لم يُرسل (فات موعده)'],
+    [pcol(pct), pct + '%', `نسبة الإرسال · في الموعد ${pOn}%` + (nWait ? ` · ${nWait} لم يحن موعدها` : '') + (offN ? ` · مستبعد ${offN} رحلة غير مفعلة` : '')]]
     .map(([c, v, t]) => `<div class="tile" style="--c:${c}"><b>${v}</b><span>${t}</span></div>`).join('');
   if (!R.days.length) { $('view').innerHTML = '<div class="msg">ما فيه روستر مرفوع لهذه الفترة</div>'; return; }
-  // ملخص يومي
-  const byDay = R.days.map(D => { const L = all.filter(i => i.date === D), s = L.filter(i => i.sent).length;
-    return { D, trips:new Set(L.map(i => cN(i.code))).size, n:L.length, s, p:L.length ? Math.round(s / L.length * 100) : 0 }; });
+  const byDay = R.days.map(D => { const L = all.filter(i => i.date === D), Ld = L.filter(i => i.st !== 'wait');
+    return { D, trips:new Set(L.map(i => cN(i.code))).size, n:L.length, due:Ld.length, ok:Ld.filter(i => i.st === 'ok').length, late:Ld.filter(i => i.st === 'late').length, miss:Ld.filter(i => i.st === 'miss').length, wait:L.length - Ld.length }; });
+  // حسب الكراج
+  const grp = (key) => { const m = {}; due.forEach(i => { const k = key(i); if (!k) return; const o = m[k] = m[k] || { k, n:0, ok:0, late:0, miss:0 }; o.n++; o[i.st]++; }); return Object.values(m); };
+  const byG = grp(i => i.garage || 'غير محدد').sort((a, b) => pc(a.ok + a.late, a.n) - pc(b.ok + b.late, b.n));
+  // حسب المرحّل (من أرسل)
+  const byS = {}; due.filter(i => i.sent).forEach(i => { const k = i.hit.by || '—'; const o = byS[k] = byS[k] || { k, n:0, ok:0, late:0, gs:new Set() }; o.n++; o[i.st]++; if (i.garage) o.gs.add(i.garage); });
+  const SL = Object.values(byS).sort((a, b) => pc(b.ok, b.n) - pc(a.ok, a.n) || b.n - a.n);
   const day = TRDAY && R.days.includes(TRDAY) ? TRDAY : '';
-  let L = (TRF === 'off' ? all0.filter(i => i.off) : all).filter(i => (!day || i.date === day) && (TRF === 'all' || TRF === 'off' || (TRF === 'miss' ? !i.sent : i.sent)));
+  let L = (TRF === 'off' ? all0.filter(i => i.off) : all).filter(i => (!day || i.date === day) && (TRF === 'all' || TRF === 'off' || (TRF === 'miss' ? i.st === 'miss' : TRF === 'late' ? i.st === 'late' : TRF === 'wait' ? i.st === 'wait' : i.sent)));
   L.sort((a, b) => b.date.localeCompare(a.date) || String(a.dep).localeCompare(String(b.dep)) || cN(a.code).localeCompare(cN(b.code)));
   const wd = D => new Date(D + 'T12:00:00').toLocaleDateString('ar-SA-u-ca-gregory', { weekday:'long' });
+  const stCell = i => i.off ? '<span class="iss w">غير مفعلة</span>'
+    : i.st === 'ok' ? `<span class="ok">✓ ${esc(i.hit.by)}</span><div class="sub">${esc(fmtT(i.hit.at))}${/بطاقة/.test(i.hit.act) ? ' · بطاقة جدول' : ''}</div>`
+    : i.st === 'late' ? `<span class="iss w">⚠ متأخر — ${esc(i.hit.by)}</span><div class="sub">${esc(fmtT(i.hit.at))} · الموعد ${esc(hm(i.deadline))}</div>`
+    : i.st === 'wait' ? `<span class="sub">⏳ لم يحن موعده — آخر موعد ${esc(hm(i.deadline))}</span>`
+    : `<span class="iss">✗ لم يُرسل</span><div class="sub">فات الموعد ${esc(hm(i.deadline))}</div>${i.other ? `<div><span class="iss w">أُرسل لسائق آخر: ${esc(i.other.name)}</span></div>` : ''}`;
   $('view').innerHTML =
-    `<div class="scroll" style="max-height:none;margin-bottom:16px"><table class="tbl"><thead><tr><th>اليوم</th><th>الرحلات المطلوبة</th><th>السائقين</th><th>تم الإرسال</th><th>لم يُرسل</th><th>النسبة</th><th></th></tr></thead><tbody>` +
-    byDay.map(d => `<tr class="${d.n - d.s ? 'has' : ''}"><td><b>${d.D}</b> <span class="sub">${wd(d.D)}</span></td><td><b>${d.trips}</b></td><td>${d.n}</td><td class="ok">${d.s}</td>
-      <td>${d.n - d.s ? `<span class="iss">${d.n - d.s}</span>` : '<span class="ok">0</span>'}</td>
-      <td><div style="display:flex;align-items:center;gap:8px"><div class="bar"><i style="width:${d.p}%;background:${d.p >= 95 ? '#16a34a' : d.p >= 80 ? '#f59e0b' : '#dc2626'}"></i></div>${d.p}%</div></td>
+    `<h3 class="rh">📅 حسب اليوم</h3><div class="scroll" style="max-height:none;margin-bottom:16px"><table class="tbl"><thead><tr><th>اليوم</th><th>الرحلات</th><th>السائقين</th><th>في الموعد</th><th>متأخر</th><th>لم يُرسل</th><th>النسبة</th><th></th></tr></thead><tbody>` +
+    byDay.map(d => `<tr class="${d.miss ? 'has' : ''}"><td><b>${d.D}</b> <span class="sub">${wd(d.D)}</span>${d.wait ? ` <span class="iss w" title="رحلات ما حان موعد إرسالها">⏳ جاري · ${d.wait}</span>` : ''}</td><td><b>${d.trips}</b></td><td>${d.n}</td><td class="ok">${d.ok}</td>
+      <td>${d.late ? `<span class="iss w">${d.late}</span>` : '0'}</td><td>${d.miss ? `<span class="iss">${d.miss}</span>` : '<span class="ok">0</span>'}</td>
+      <td>${d.due ? barH(pc(d.ok + d.late, d.due)) : '<span class="sub">لم يحن الموعد</span>'}</td>
       <td><button class="btn light sm" data-day="${d.D}">${day === d.D ? '✓ معروض' : 'التفاصيل'}</button></td></tr>`).join('') + '</tbody></table></div>' +
+    `<div class="grid2r">
+      <div><h3 class="rh">🏢 حسب الكراج <span class="sub">(الأضعف أولاً)</span></h3><div class="scroll" style="max-height:340px"><table class="tbl"><thead><tr><th>الكراج</th><th>المطلوب</th><th>في الموعد</th><th>متأخر</th><th>لم يُرسل</th><th>النسبة</th></tr></thead><tbody>` +
+      (byG.map(x => `<tr class="${x.miss ? 'has' : ''}"><td><b>${esc(x.k)}</b></td><td>${x.n}</td><td class="ok">${x.ok}</td><td>${x.late ? `<span class="iss w">${x.late}</span>` : '0'}</td><td>${x.miss ? `<span class="iss">${x.miss}</span>` : '0'}</td><td>${barH(pc(x.ok + x.late, x.n))}</td></tr>`).join('') || '<tr><td colspan="6" class="sub">—</td></tr>') + `</tbody></table></div></div>
+      <div><h3 class="rh">👤 حسب المرحّل <span class="sub">(من أرسل · الالتزام بالموعد)</span></h3><div class="scroll" style="max-height:340px"><table class="tbl"><thead><tr><th>#</th><th>المرحّل</th><th>أرسل</th><th>في الموعد</th><th>متأخر</th><th>الالتزام</th></tr></thead><tbody>` +
+      (SL.map((x, k) => `<tr><td>${k + 1}</td><td><b>${esc(x.k)}</b><div class="sub">${esc([...x.gs].join('، '))}</div></td><td>${x.n}</td><td class="ok">${x.ok}</td><td>${x.late ? `<span class="iss w">${x.late}</span>` : '0'}</td><td>${barH(pc(x.ok, x.n))}</td></tr>`).join('') || '<tr><td colspan="6" class="sub">—</td></tr>') + `</tbody></table></div></div>
+    </div><p class="sub" style="margin:4px 0 16px">«لم يُرسل» = فات موعده (قبل المغادرة بـ ${SEND_H} ساعات) وما انرسل. «متأخر» = انرسل بعد الموعد. الرحلات اللي لسا ما حان موعدها ما تنحسب في النسبة.</p>` +
     `<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px"><b>${day ? 'تفاصيل ' + day : 'تفاصيل كل الفترة'}</b>${day ? '<button class="btn light sm" data-day="">كل الأيام</button>' : ''}<span class="grow"></span>
-      ${[['miss', 'لم يُرسل'], ['sent', 'تم الإرسال'], ['all', 'الكل المفعّل'], ['off', 'غير مفعلة']].map(([k, t]) => `<button class="tool${TRF === k ? ' on' : ''}" data-trf="${k}">${t}</button>`).join('')}<button class="btn light sm" id="flagBtn">⚙️ تفعيل الرحلات</button></div>` +
+      ${[['miss', 'لم يُرسل'], ['late', 'متأخر'], ['wait', 'لم يحن موعده'], ['sent', 'تم الإرسال'], ['all', 'الكل المفعّل'], ['off', 'غير مفعلة']].map(([k, t]) => `<button class="tool${TRF === k ? ' on' : ''}" data-trf="${k}">${t}</button>`).join('')}<button class="btn light sm" id="flagBtn">⚙️ تفعيل الرحلات</button></div>` +
     (L.length ? `<div class="scroll"><table class="tbl"><thead><tr><th>التاريخ</th><th>الرحلة</th><th>المسار</th><th>المغادرة</th><th>الكراج</th><th>السائق</th><th>الإرسال</th></tr></thead><tbody>` +
-      L.map(i => `<tr class="${i.sent ? '' : 'has'}"><td style="white-space:nowrap">${i.date}</td><td dir="ltr" style="text-align:end;white-space:nowrap"><b>${esc(i.code)}</b></td>
+      L.map(i => `<tr class="${i.st === 'miss' && !i.off ? 'has' : ''}"><td style="white-space:nowrap">${i.date}</td><td dir="ltr" style="text-align:end;white-space:nowrap"><b>${esc(i.code)}</b></td>
         <td><bdi>${esc(i.from)}</bdi>${i.to ? ' ← <bdi>' + esc(i.to) + '</bdi>' : ''}</td><td>${esc(i.dep)}</td><td>${esc(i.garage)}</td>
-        <td>${esc(i.name)}<div class="sub">${esc(i.iq)}${i.seat === 2 ? ' · السائق الثاني' : ''}</div></td>
-        <td>${i.off ? '<span class="iss w">غير مفعلة</span>' : i.sent ? `<span class="ok">✓ ${esc(i.hit.by)}</span><div class="sub">${esc(fmtT(i.hit.at))}${/بطاقة/.test(i.hit.act) ? ' · بطاقة جدول' : ''}</div>`
-          : `<span class="iss">✗ لم يُرسل</span>${i.other ? `<div><span class="iss w">أُرسل لسائق آخر: ${esc(i.other.name)}</span></div>` : ''}`}</td></tr>`).join('') + '</tbody></table></div>'
-      : `<div class="msg">${TRF === 'miss' ? '✓ كل المسارات انرسلت' : TRF === 'off' ? 'ما فيه رحلات غير مفعلة في هذه الفترة' : 'لا توجد بيانات'}</div>`) +
+        <td>${esc(i.name)}<div class="sub">${esc(i.iq)}${i.seat === 2 ? ' · الكابتن الثاني' : ''}</div></td><td>${stCell(i)}</td></tr>`).join('') + '</tbody></table></div>'
+      : `<div class="msg">${TRF === 'miss' ? '✓ ما فيه مسارات فات موعدها بدون إرسال' : TRF === 'late' ? '✓ ما فيه إرسال متأخر' : TRF === 'off' ? 'ما فيه رحلات غير مفعلة في هذه الفترة' : 'لا توجد بيانات'}</div>`) +
     (R.extra.length ? `<div class="warn">ℹ️ ${R.extra.length} إرسال لرحلات مو موجودة في روستر نفس اليوم (ممكن تاريخ الرحلة انكتب غلط في برنامج المسار): ${R.extra.slice(0, 8).map(x => esc(x.code) + ' · ' + esc(x.date)).join('، ')}${R.extra.length > 8 ? '…' : ''}</div>` : '');
-  // الكراجات في الفلتر
   const gs = [...new Set(R.items.map(i => i.garage).filter(Boolean))].sort(), g0 = $('garage').value;
   $('garage').innerHTML = '<option value="">كل الكراجات</option>' + gs.map(x => `<option${x === g0 ? ' selected' : ''}>${esc(x)}</option>`).join('');
 }
@@ -494,20 +524,22 @@ function openFlags() {
 async function exportTrip() {
   const R = await loadTrips(); if (!R) return;
   if (!window.ExcelJS) return alert('مكتبة Excel ما تحمّلت — تأكد من الإنترنت');
-  R.items.forEach(i => i.off = isOff(i.code));
+  const now = Date.now(); R.items.forEach(i => { i.off = isOff(i.code); tripState(i, now); });
   const g = $('garage').value, all = R.items.filter(i => (!g || i.garage === g) && !i.off);
+  const ST_AR = { ok:'في الموعد', late:'متأخر', miss:'لم يُرسل', wait:'لم يحن موعده' };
   const wb = new ExcelJS.Workbook();
   const head = ws => { ws.views = [{ rightToLeft:true, state:'frozen', ySplit:1 }]; const r = ws.getRow(1); r.font = { bold:true, color:{ argb:'FFFFFFFF' } }; r.fill = { type:'pattern', pattern:'solid', fgColor:{ argb:'FF13274F' } }; ws.autoFilter = { from:{ row:1, column:1 }, to:{ row:1, column:ws.columnCount } }; };
   const red = { type:'pattern', pattern:'solid', fgColor:{ argb:'FFFDE2E2' } };
   const s1 = wb.addWorksheet('ملخص يومي');
-  s1.columns = [{ header:'اليوم', width:13 }, { header:'الرحلات المطلوبة', width:16 }, { header:'السائقين', width:11 }, { header:'تم الإرسال', width:12 }, { header:'لم يُرسل', width:11 }, { header:'النسبة %', width:10 }];
-  R.days.forEach(D => { const L = all.filter(i => i.date === D), s = L.filter(i => i.sent).length; const row = s1.addRow([D, new Set(L.map(i => cN(i.code))).size, L.length, s, L.length - s, L.length ? Math.round(s / L.length * 100) : 0]); if (L.length - s) row.getCell(5).fill = red; });
+  s1.columns = [{ header:'اليوم', width:13 }, { header:'الرحلات المطلوبة', width:16 }, { header:'السائقين', width:11 }, { header:'في الموعد', width:12 }, { header:'متأخر', width:10 }, { header:'لم يُرسل', width:11 }, { header:'لم يحن موعده', width:13 }, { header:'النسبة %', width:10 }];
+  R.days.forEach(D => { const L = all.filter(i => i.date === D), c = k => L.filter(i => i.st === k).length, dueN = L.length - c('wait');
+    const row = s1.addRow([D, new Set(L.map(i => cN(i.code))).size, L.length, c('ok'), c('late'), c('miss'), c('wait'), dueN ? Math.round((c('ok') + c('late')) / dueN * 100) : '']); if (c('miss')) row.getCell(6).fill = red; });
   head(s1);
   const s2 = wb.addWorksheet('التفاصيل');
   s2.columns = [{ header:'التاريخ', width:12 }, { header:'الرحلة', width:22 }, { header:'من', width:24 }, { header:'إلى', width:24 }, { header:'المغادرة', width:10 }, { header:'الكراج', width:12 }, { header:'السائق', width:28 }, { header:'الإقامة', width:13 }, { header:'الحالة', width:12 }, { header:'أرسله', width:22 }, { header:'وقت الإرسال', width:17 }, { header:'ملاحظة', width:30 }];
   all.slice().sort((a, b) => a.date.localeCompare(b.date) || String(a.dep).localeCompare(String(b.dep))).forEach(i => {
-    const row = s2.addRow([i.date, i.code, i.from, i.to, i.dep, i.garage, i.name, i.iq, i.sent ? 'تم الإرسال' : 'لم يُرسل', i.hit ? i.hit.by : '', i.hit ? fmtT(i.hit.at) : '', !i.sent && i.other ? 'أُرسل لسائق آخر: ' + i.other.name : '']);
-    if (!i.sent) row.getCell(9).fill = red;
+    const row = s2.addRow([i.date, i.code, i.from, i.to, i.dep, i.garage, i.name, i.iq, ST_AR[i.st], i.hit ? i.hit.by : '', i.hit ? fmtT(i.hit.at) : '', !i.sent && i.other ? 'أُرسل لسائق آخر: ' + i.other.name : '']);
+    if (i.st === 'miss') row.getCell(9).fill = red;
   });
   head(s2);
   const buf = await wb.xlsx.writeBuffer();
