@@ -108,6 +108,8 @@
   .install-close { background: none; border: 0; font-size: 18px; color: var(--nw-muted); cursor: pointer; padding: 0 4px; }
   .foot { text-align: center; color: var(--nw-muted); font-size: 12.5px; margin-top: 34px; padding-top: 18px; border-top: 1px solid var(--nw-line); }
   #nw-user-slot { margin-inline-end: auto; }
+  .lang-bar { flex-wrap: wrap; min-width: 0; max-width: 100%; }
+  @media (max-width: 560px) { #set-btn span { display: none; } #set-btn { padding-inline: 11px; } #nw-user-slot { min-width: 0; max-width: 100%; } }
 
   @media (max-width: 1180px) { .cards { grid-template-columns: repeat(3, 1fr); } }
   @media (max-width: 900px) { .cards { grid-template-columns: repeat(2, 1fr); } }
