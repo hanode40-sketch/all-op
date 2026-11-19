@@ -394,7 +394,9 @@ function render() {
   const swN = Object.keys(SWIN).filter(k => !isX(k)).length + Object.keys(SWIN).filter(isX).length / 2;
   $('alerts').innerHTML = (swN ? `<div class="alert blue" data-f="swap">${esc(t_('swapA')(swN))}</div>` : '') + (due.length ? `<div class="alert blue" data-f="due">${esc(t_('due')(due.length, dueT))}</div>` : '') + (late.length ? `<div class="alert" data-f="late">${esc(t_('late')(late.length))}</div>` : '') +
     (ce ? `<div class="alert red" data-f="cexp">${esc(t_('cardExp')(ce))}</div>` : '') +
-    (cs ? `<div class="alert" data-f="csoon">${esc(t_('cardSoon')(cs))}</div>` : '');
+    (cs ? `<div class="alert" data-f="csoon">${esc(t_('cardSoon')(cs))}</div>` : '') +
+    (() => { const g = rosterGaps(depot), n = g.unknown.length + g.notOp.length + g.dup.length; return n ? `<div class="alert red" id="gapA" style="cursor:pointer">⚠️ ${n} ${LANG === 'en' ? 'scheduled captain(s) in this date\'s roster are not counted "On trips" — tap for details' : 'كابتن مجدول في روستر هذا التاريخ ما انحسب «على الرحلات» — اضغط للتفاصيل'}</div>` : ''; })();
+  const ga = $('gapA'); if (ga) ga.onclick = e => { e.stopPropagation(); showGaps(depot); };
   renderList();
 }
 
@@ -505,7 +507,7 @@ function showCached() {
     return true;
   } catch (e) { return false; }
 }
-let LOADP = null, ROSTER_P = null;   // تحميل جاري (الداش بورد ينتظره)
+let LOADP = null, ROSTER_P = null, ROSTER_ROWS = [];   // تحميل جاري (الداش بورد ينتظره)
 function load() { LOADP = load_(); const p = LOADP; p.finally(() => { if (LOADP === p) LOADP = null; }); return p; }
 async function load_() {
   if (!showCached()) $('list').innerHTML = `<div class="msg">${t_('loading')}</div>`;
@@ -528,7 +530,7 @@ const ymd = d => d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 const addD = (ds, n) => { const d = new Date(ds + 'T12:00:00'); d.setDate(d.getDate() + n); return ymd(d); };
 function loadRoster() { const p = ROSTER_P = loadRoster_(); p.finally(() => { if (ROSTER_P === p) ROSTER_P = null; }); return p; }
 async function loadRoster_() {
-  ROSTER = {}; ROSTER_N = 0; ABSENT = {}; SINCE = {}; WEEK_N = 0;
+  ROSTER = {}; ROSTER_N = 0; ROSTER_ROWS = []; ABSENT = {}; SINCE = {}; WEEK_N = 0;
   const date = $('fDate').value, from = addD(date, -30), to = addD(date, 6);
   let days = null;
   let subs = [], marks = [];
@@ -540,7 +542,7 @@ async function loadRoster_() {
   const SETS = {}; LAST = {};
   Object.keys(days).filter(k => (days[k] || []).length).forEach(k => {
     const set = {}; days[k].forEach(r => [r[1], r[2]].forEach(x => { if (x) set[String(x).trim()] = String(r[0]); }));
-    SETS[k] = set; if (k === date) { ROSTER = set; ROSTER_N = days[k].length; }
+    SETS[k] = set; if (k === date) { ROSTER = set; ROSTER_N = days[k].length; ROSTER_ROWS = days[k]; }
   });
   WEEK_N = Object.keys(SETS).filter(k => k >= addD(date, -6)).length;
   // آخر رحلة لكل سائق قبل التاريخ المختار (حتى 30 يوم)
@@ -566,6 +568,29 @@ function fillFilters() {
   keep('fNat', `<option value="">${t_('allNat')}</option>` + nats.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join(''));
   $('eStatus').innerHTML = STATUSES.map(s => `<option value="${s}">${esc(stName(s))}</option>`).join('');
   $('eDepot').innerHTML = DEPOTS.map(d => `<option value="${d}">${esc(depName(d))}</option>`).join('');
+}
+
+/* ---------- فرق الروستر: كباتن مجدولين ما انحسبوا «على الرحلات» ---------- */
+function rosterGaps(depot) {
+  const seen = {}, unknown = [], notOp = [], dup = [];
+  (ROSTER_ROWS || []).forEach(row => [row[1], row[2]].forEach(x => { const iq = String(x || '').trim(); if (!iq) return;
+    if (seen[iq]) { dup.push({ iq, trips:[seen[iq], String(row[0])] }); return; } seen[iq] = String(row[0]); }));
+  Object.keys(seen).forEach(iq => { const r = D.find(x => String(x[C.IQ]) === iq);
+    if (!r) { if (!depot) unknown.push({ iq, trip:seen[iq] }); return; }
+    if (r[C.ST] !== 'operation' && inDep(r[C.DEP], depot)) notOp.push({ r, trip:seen[iq] }); });
+  return { unknown, notOp, dup:dup.filter(x => { const r = D.find(y => String(y[C.IQ]) === x.iq); return !depot || (r && inDep(r[C.DEP], depot)); }) };
+}
+function showGaps(depot) {
+  const g = rosterGaps(depot), m = document.createElement('div'); m.className = 'ov on';
+  const sec = (t, sub, body) => body ? `<h4 style="margin:14px 0 4px">${t}</h4><div class="sub" style="margin-bottom:6px">${sub}</div><div class="tw"><table><tbody>${body}</tbody></table></div>` : '';
+  m.innerHTML = `<div class="md" style="max-width:760px"><h3 style="margin:0">⚠️ فرق روستر ${esc($('fDate').value)}</h3>
+    <div class="sub">«على الرحلات» = الكباتن المسجّلين في روستر اليوم وحالتهم «على رأس العمل». هؤلاء موجودين في الروستر وما انحسبوا:</div>
+    ${sec('🌴 مجدول وحالته مو «على رأس العمل»', 'إما الحالة في إدارة السائقين لازم تتحدّث، أو الروستر لازم يتعدّل ويتبدّل الكابتن', g.notOp.map(x => `<tr><td><b>${esc(x.r[C.NAME])}</b><br><span class="sub">${esc(x.r[C.IQ])} · ${esc(depName(x.r[C.DEP]))}</span></td><td dir="ltr">${esc(x.trip)}</td><td><b>${esc(stName(x.r[C.ST]))}</b>${x.r[C.TO] ? '<br><span class="sub">يرجع ' + esc(x.r[C.TO]) + '</span>' : ''}</td><td><button class="btn light" data-ed="${esc(x.r[C.IQ])}">فتح</button></td></tr>`).join(''))}
+    ${sec('❓ رقم إقامة مو موجود في قائمة السائقين', 'غالباً رقم الإقامة مكتوب غلط في ملف الروستر، أو الكابتن جديد ما انضاف', g.unknown.map(x => `<tr><td dir="ltr"><b>${esc(x.iq)}</b></td><td dir="ltr">${esc(x.trip)}</td></tr>`).join(''))}
+    ${sec('🔁 نفس الكابتن في أكثر من رحلة', 'الكابتن ينحسب مرة وحدة — تأكد إن الروستر صحيح', g.dup.map(x => { const r = D.find(y => String(y[C.IQ]) === x.iq); return `<tr><td><b>${esc(r ? r[C.NAME] : x.iq)}</b><br><span class="sub">${esc(x.iq)}</span></td><td dir="ltr">${x.trips.map(esc).join(' · ')}</td></tr>`; }).join(''))}
+    <div class="mbtns"><button class="btn light" data-x>إغلاق</button></div></div>`;
+  document.body.appendChild(m);
+  m.addEventListener('click', e => { if (e.target === m || e.target.closest('[data-x]')) m.remove(); const b = e.target.closest('[data-ed]'); if (b) { m.remove(); openEdit(b.dataset.ed); } });
 }
 
 /* ---------- التعديل ---------- */
