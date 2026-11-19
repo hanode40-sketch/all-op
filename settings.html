@@ -138,7 +138,7 @@ function userDlg(u, keys, done) {
   const preset = { 'موظف': ['dashboard', 'view', 'print', 'whatsapp', 'drivers', 'cancelReq', 'transferReq', 'docs'], 'مشرف': ['dashboard', 'view', 'print', 'drivers', 'archive', 'reports', 'cancelApprove', 'transferApprove', 'stampApprove', 'docsApprove'] };
   const m = modal('صلاحيات — ' + esc(u.name), `<div class="row"><label>الدور <select id="ur"><option>موظف</option><option>مشرف</option><option>مدير</option></select></label>
     <label class="chk"><input type="checkbox" id="ua" ${p.active === 'لا' ? '' : 'checked'}> الحساب مفعّل في نظام المخالفات</label><button class="btn sec sm" id="upre">تعبئة الصلاحيات المقترحة للدور</button></div>
-   <b>الصلاحيات</b><div class="chips">${keys.filter(k => k !== 'import').map(k => `<label class="chk"><input type="checkbox" data-p="${k}" ${ps.indexOf(k) > -1 ? 'checked' : ''}> ${esc(PERM_LABEL[k] || k)}</label>`).join('')}</div>
+   <b>الصلاحيات</b><div class="chips">${keys.filter(k => k !== 'import' && k !== 'vehicles').map(k => `<label class="chk"><input type="checkbox" data-p="${k}" ${ps.indexOf(k) > -1 ? 'checked' : ''}> ${esc(PERM_LABEL[k] || k)}</label>`).join('')}</div>
    <p class="small muted">الدور «مدير» يعطي كل الصلاحيات الإدارية. الصلاحيات لا تُمنح تلقائياً للموظف أو المشرف — حدّدها لكل حساب.</p>
    <button class="btn" id="us">حفظ</button>`);
   m.querySelector('#ur').value = p.role || 'موظف';
