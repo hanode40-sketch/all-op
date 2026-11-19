@@ -67,6 +67,15 @@
   .alert.blue{background:#eff6ff;border-color:#93c5fd;color:#1e3a8a}
   .alert.red{background:#fdecea;border-color:#f87171;color:#991b1b}
   .alert{padding:12px 16px;border-radius:14px;background:#fff7ed;border:1px solid #fdba74;color:#7c2d12;font-weight:700;cursor:pointer}
+
+  .rp-k{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:10px 0}
+  .rp-k div{border:1px solid var(--nw-line,#e5e7eb);border-radius:12px;padding:10px;text-align:center}.rp-k b{display:block;font-size:22px}.rp-k span{font-size:12px;opacity:.75}
+  .rp-t{width:100%;border-collapse:collapse;font-size:13px}.rp-t th,.rp-t td{padding:7px 8px;border-bottom:1px solid var(--nw-line,#e5e7eb);text-align:start;white-space:nowrap}
+  .rp-t th{position:sticky;top:0;background:var(--nw-card,#fff);font-size:12px;opacity:.85}.rp-t tr.cl{cursor:pointer}.rp-t tr.cl:hover td{background:rgba(59,130,246,.08)}
+  .rp-w{max-height:60vh;overflow:auto;border:1px solid var(--nw-line,#e5e7eb);border-radius:12px}
+  .rp-b{display:inline-block;border-radius:999px;padding:1px 9px;font-size:12px;font-weight:700;color:#fff}
+  .rp-trip{background:#16a34a}.rp-rest{background:#64748b}.rp-sb{background:#7c3aed}.rp-leave{background:#2563eb}.rp-swap{background:#ea580c}.rp-out{background:#dc2626}.rp-none{background:#cbd5e1;color:#334155}
+  .rp-acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-bottom:6px}
   .ov{position:fixed;inset:0;z-index:100000;background:rgba(8,15,30,.55);display:none;align-items:flex-start;justify-content:center;padding:4vh 12px;overflow:auto}
   .ov.on{display:flex}
   .md{background:#fff;border-radius:18px;width:100%;max-width:720px;padding:20px;box-shadow:0 30px 80px rgba(0,0,0,.35)}
@@ -124,6 +133,7 @@
       <button class="btn light" id="bRefresh" data-i="refresh">↻ تحديث</button>
       <button class="btn light" id="bExport" data-i="export">⬇️ Excel</button>
       <button class="btn light" id="bDash" data-i="dash">📊 الداش بورد</button>
+      <button class="btn light" id="bRpt" data-i="rpt">📄 تقرير عمل السائقين</button>
       <button class="btn" id="bAdd" style="display:none" data-i="add">➕ سائق جديد</button>
       <button class="btn light" id="bCards" style="display:none" data-i="cards">🪪 تحديث الكروت</button>
       <button class="btn light" id="bImport" style="display:none" data-i="import">📤 استيراد من Excel</button>
@@ -153,6 +163,18 @@
   <div class="note" data-i="note">..</div>
 </div>
 
+<!-- تقرير عمل السائقين -->
+<div class="ov" id="rpOv"><div class="md" style="max-width:1100px">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h3 style="margin:0">📄 تقرير عمل السائقين</h3><button class="btn light" id="rpX">✕</button></div>
+  <div class="sub" id="rpSub">يوضح عمل كل سائق يوم بيوم حسب الروستر المرفوع: الرحلات، الراحة، الاستعداد، الإجازات، والتبديلات.</div>
+  <div class="bar" style="margin-top:10px;align-items:flex-end">
+    <div><label>من تاريخ</label><input id="rpFrom" type="date"></div>
+    <div><label>إلى تاريخ</label><input id="rpTo" type="date"></div>
+    <div style="flex:2;position:relative"><label>السائق (اتركه فاضي لكل السائقين)</label><input id="rpDrv" type="search" autocomplete="off" list="rpDl" placeholder="اسم السائق أو رقم الإقامة"><datalist id="rpDl"></datalist></div>
+    <div style="flex:0 0 auto;display:flex;gap:6px"><button class="btn green" id="rpGo">عرض التقرير</button></div>
+  </div>
+  <div id="rpOut" style="margin-top:12px"></div>
+</div></div>
 <!-- نافذة التبديل -->
 <div class="ov" id="swOv"><div class="md" style="max-width:560px">
   <h3 data-i="swTitle">🔄 تبديل سائق</h3><div class="sub" id="swSub"></div>
@@ -219,7 +241,7 @@ const C = { IQ:0, EMP:1, NAME:2, NAT:3, ST:4, DEP:5, SB:6, MOB:7, FROM:8, TO:9, 
 
 let LANG = (() => { try { return localStorage.getItem('hubLang') === 'en' ? 'en' : 'ar'; } catch (e) { return 'ar'; } })();
 const I18N = {
-  ar:{ title:'إدارة السائقين', subtitle:'Drivers Management', back:'← أدوات التشغيل', lDate:'تاريخ الروستر (على الرحلات / الاستعداد)', lDepot:'الكراج',
+  ar:{ rpt:'📄 تقرير عمل السائقين', title:'إدارة السائقين', subtitle:'Drivers Management', back:'← أدوات التشغيل', lDate:'تاريخ الروستر (على الرحلات / الاستعداد)', lDepot:'الكراج',
     refresh:'↻ تحديث', cards:'🪪 تحديث الكروت', cardsHow:'اختر ملف Excel فيه عمود «رقم الإقامة» (أو ID Number) وعمود «تاريخ انتهاء كرت التشغيل» (أو oc). يتحدث تاريخ الكرت فقط وما يتغير أي شي ثاني.\n\nتقدر تصدّر القائمة من زر Excel وتعدّل عمود Operating card expiry وترفعها.', cardsBad:'ما لقيت عمود رقم الإقامة وعمود تاريخ انتهاء الكرت في الملف', cardsAsk:(n,f,c,x)=>`في الملف ${n} سائق:\n• موجودين في البرنامج: ${f}\n• تاريخ كرتهم بيتغير: ${c}\n• غير موجودين: ${x}\n\nتحديث؟`, cardsDone:(c,x)=>`✅ تم تحديث ${c} كرت${x ? `\n⚠️ ${x} رقم إقامة غير موجود:` : ''}`, export:'⬇️ Excel', dash:'📊 الداش بورد', add:'➕ سائق جديد', import:'📤 استيراد من Excel', secSum:'الملخص', secList:'قائمة السائقين', loading:'جاري التحميل...',
     natTitle:'السائقون حسب الجنسية والحالة', depTitle:'سائقو التشغيل والاستعداد في الكراجات', search:'ابحث برقم الإقامة أو الاسم أو الرحلة...',
     note:'«على الرحلات» = سائقو التشغيل المسجّلون في روستر التاريخ المختار. السائق اللي مو في روستر اليوم: إذا كان غير مجدول يومين متتاليين أو أقل = «راحة»، وإذا أكثر من يومين متتاليين = «استعداد». و«الاستعداد» اليدوي يبقى استعداد. ارفعوا الروستر يوم بيوم عشان يطلع الحساب دقيق.',
@@ -235,7 +257,7 @@ const I18N = {
     eIq:'رقم الإقامة غير صحيح', eName:'اكتب اسم السائق', exists:'السائق موجود — افتحه من القائمة وعدّله',
     impAsk:n=>`استيراد ${n} سائق من الملف؟ هذا يستبدل القائمة الحالية (الجوال والملاحظات الموجودة تبقى).`, impDone:n=>`✅ تم استيراد ${n} سائق`, impBad:'ما لقيت أعمدة Employee ID / ID Number / Driver Name / Status في الملف',
     saved:'✅ تم الحفظ', fCard:'🪪 انتهاء كرت التشغيل', cardExp:n=>`🪪 ${n} سائق كرت التشغيل حقه منتهي`, cardSoon:n=>`🪪 ${n} سائق كرت التشغيل ينتهي خلال 30 يوم`, cExp:'كرت منتهي', cSoon:'كرت ينتهي', results:n=>`${n} سائق`, more:n=>`يظهر أول 300 من ${n} — استخدم البحث أو الفلتر` },
-  en:{ title:'Drivers Management', subtitle:'إدارة السائقين', back:'← Operations Tools', lDate:'Roster date (on trips / standby)', lDepot:'Depot',
+  en:{ rpt:'📄 Drivers work report', title:'Drivers Management', subtitle:'إدارة السائقين', back:'← Operations Tools', lDate:'Roster date (on trips / standby)', lDepot:'Depot',
     refresh:'↻ Refresh', cards:'🪪 Update cards', cardsHow:'Choose an Excel file with an Iqama (ID Number) column and an operating card expiry (oc) column. Only the card date is updated.\n\nTip: export with the Excel button, edit the Operating card expiry column and upload it back.', cardsBad:'Could not find Iqama and card expiry columns', cardsAsk:(n,f,c,x)=>`${n} drivers in file:\n• found: ${f}\n• card date will change: ${c}\n• not found: ${x}\n\nUpdate?`, cardsDone:(c,x)=>`✅ ${c} cards updated${x ? `\n⚠️ ${x} Iqama numbers not found:` : ''}`, export:'⬇️ Excel', dash:'📊 Dashboard', add:'➕ New driver', import:'📤 Import from Excel', secSum:'Summary', secList:'Drivers list', loading:'Loading...',
     natTitle:'Drivers by nationality & status', depTitle:'Operational & standby drivers by depot', search:'Search by Iqama, name or trip...',
     note:'"On trips" = operational drivers in the roster of the selected date. A driver missing from today\'s roster is on a "Rest day" if unscheduled for 2 consecutive days or fewer, otherwise "Standby". Manual standby always counts as standby.',
@@ -953,6 +975,136 @@ $('fDate').value = today();
 if (window.NWIcon) $('tIc').innerHTML = NWIcon('drivers', 26);
 applyLang(); fillFilters();
 if (window.NWAuth) load();
+</script>
+
+<script>
+/* ====================== تقرير عمل السائقين ====================== */
+(function(){
+  const KIND = { trip:['على رحلة','rp-trip'], rest:['راحة','rp-rest'], sb:['استعداد','rp-sb'], leave:['إجازة','rp-leave'], swap:['اعتذر / تم تبديله','rp-swap'], out:['خارج الخدمة','rp-out'], none:['لا يوجد روستر','rp-none'] };
+  const WD = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  const wd = k => WD[new Date(k + 'T12:00:00').getDay()];
+  const dmy = k => k ? k.slice(8, 10) + '/' + k.slice(5, 7) + '/' + k.slice(0, 4) : '';
+  let LAST_RES = null;
+  const rpDrivers = () => D.filter(r => inDep(r[C.DEP], $('fDepot').value));
+  $('bRpt').onclick = () => {
+    const sel = $('fDate').value || ymd(new Date());
+    if (!$('rpFrom').value) { $('rpFrom').value = sel.slice(0, 8) + '01'; $('rpTo').value = sel; }
+    $('rpDl').innerHTML = rpDrivers().map(r => `<option value="${esc(r[C.NAME])} — ${esc(r[C.IQ])}">`).join('');
+    $('rpOut').innerHTML = ''; $('rpOv').classList.add('on');
+  };
+  $('rpX').onclick = () => $('rpOv').classList.remove('on');
+  $('rpOv').addEventListener('click', e => { if (e.target.id === 'rpOv') $('rpOv').classList.remove('on'); });
+
+  async function fetchRange(from, to) {
+    const days = {}, subs = [], marks = [];
+    let a = from;
+    while (a <= to) {                          // على دفعات 31 يوم
+      let b = addD(a, 30); if (b > to) b = to;
+      const j = await NWAuth.call('rosterRange', { from: a, to: b });
+      if (j && j.error === 'AUTH') { NWAuth.relogin && NWAuth.relogin(); throw new Error(t_('eAuth')); }
+      if (j && j.ok) { Object.assign(days, j.days || {}); (j.subs || []).forEach(x => subs.push(x)); (j.marks || []).forEach(x => marks.push(x)); }
+      a = addD(b, 1);
+    }
+    return { days, subs, marks };
+  }
+  // تصنيف يوم كل سائق
+  function build(from, to, data, list) {
+    const SET = {}, SWO = {}, SWI = {}, MK = {};
+    Object.keys(data.days).forEach(k => { const rows = data.days[k] || []; if (!rows.length) return; const set = {}; rows.forEach(r => [r[1], r[2]].forEach(x => { if (x) set[String(x).trim()] = String(r[0]); })); SET[k] = set; });
+    data.subs.forEach(x => { (SWO[x.date] = SWO[x.date] || {})[String(x.orig)] = x; (SWI[x.date] = SWI[x.date] || {})[String(x.rep)] = x; });
+    data.marks.forEach(x => { (MK[x.date] = MK[x.date] || {})[String(x.iqama)] = x.mark; });
+    const allDays = []; for (let k = from; k <= to; k = addD(k, 1)) allDays.push(k);
+    const sched = (iq, k) => { if (!SET[k]) return null; const o = SWO[k] && SWO[k][iq], i = SWI[k] && SWI[k][iq]; if (i) return true; if (o) return false; return !!SET[k][iq]; };
+    return list.map(r => {
+      const iq = String(r[C.IQ]), st = ST[r[C.ST]] || {}, rows = [];
+      const leaveOn = k => st.grp === 'leave' && r[C.FROM] && k >= String(r[C.FROM]).slice(0, 10) && (!r[C.TO] || k <= String(r[C.TO]).slice(0, 10));
+      allDays.forEach(k => {
+        const x = { date: k, kind: 'none', trip: '', note: '' };
+        if (SET[k]) {
+          const i = SWI[k] && SWI[k][iq], o = SWO[k] && SWO[k][iq];
+          if (i) { x.kind = 'trip'; x.trip = String(i.trip || ''); x.note = 'بديل' + (i.reason ? ' — ' + i.reason : ''); }
+          else if (o) { x.kind = 'swap'; x.trip = String(o.trip || SET[k][iq] || ''); x.note = (o.reason || '') + (o.note ? ' — ' + o.note : ''); }
+          else if (SET[k][iq]) { x.kind = 'trip'; x.trip = SET[k][iq]; }
+          else if (MK[k] && MK[k][iq] === 'rest') { x.kind = 'rest'; x.note = 'راحة يدوية'; }
+          else if (leaveOn(k)) { x.kind = 'leave'; x.note = stName(r[C.ST]); }
+          else if (st.grp === 'out') { x.kind = 'out'; x.note = stName(r[C.ST]); }
+          else if (r[C.SB] === 'نعم') { x.kind = 'sb'; x.note = 'استعداد يدوي'; }
+          else {                                // يومين متتاليين أو أقل بدون جدولة = راحة، أكثر = استعداد
+            let n = 1;
+            for (let d = 1; d <= 30; d++) { const s2 = sched(iq, addD(k, -d)); if (s2 !== false) break; n++; }
+            for (let d = 1; d <= 30; d++) { const s2 = sched(iq, addD(k, d)); if (s2 !== false) break; n++; }
+            x.kind = n <= 2 ? 'rest' : 'sb';
+          }
+        } else if (leaveOn(k)) { x.kind = 'leave'; x.note = stName(r[C.ST]); }
+        rows.push(x);
+      });
+      const c = {}; Object.keys(KIND).forEach(q => c[q] = rows.filter(x => x.kind === q).length);
+      c.trips = new Set(rows.filter(x => x.kind === 'trip').map(x => x.date + x.trip)).size;
+      c.sub = rows.filter(x => x.kind === 'trip' && x.note.indexOf('بديل') === 0).length;
+      return { r, iq, rows, c };
+    });
+  }
+  const badge = k => `<span class="rp-b ${KIND[k][1]}">${KIND[k][0]}</span>`;
+  function showAll(res) {
+    const tot = q => res.reduce((s2, x) => s2 + x.c[q], 0);
+    $('rpOut').innerHTML = `<div class="rp-acts"><b>${res.length} سائق · من ${dmy(LAST_RES.from)} إلى ${dmy(LAST_RES.to)} · ${esc(LAST_RES.scope)}</b><span style="display:flex;gap:6px"><button class="btn light" id="rpPrint">🖨️ طباعة / PDF</button><button class="btn light" id="rpXls">⬇️ Excel</button></span></div>
+     <div class="rp-k"><div><b>${tot('trip')}</b><span>يوم على رحلة</span></div><div><b>${tot('rest')}</b><span>يوم راحة</span></div><div><b>${tot('sb')}</b><span>يوم استعداد</span></div><div><b>${tot('leave')}</b><span>يوم إجازة</span></div><div><b>${tot('swap')}</b><span>اعتذار / تبديل</span></div></div>
+     <div class="rp-w"><table class="rp-t"><thead><tr><th>#</th><th>السائق</th><th>رقم الإقامة</th><th>الكراج</th><th>الحالة الحالية</th><th>على رحلة</th><th>منها بديل</th><th>راحة</th><th>استعداد</th><th>إجازة</th><th>اعتذر / تبديل</th><th>خارج الخدمة</th><th>بدون روستر</th></tr></thead><tbody>
+     ${res.map((x, i) => `<tr class="cl" data-iq="${esc(x.iq)}"><td>${i + 1}</td><td><b>${esc(x.r[C.NAME])}</b></td><td>${esc(x.iq)}</td><td>${esc(depName(x.r[C.DEP]))}</td><td>${esc(stName(x.r[C.ST]))}</td><td><b>${x.c.trip}</b></td><td>${x.c.sub || ''}</td><td>${x.c.rest}</td><td>${x.c.sb}</td><td>${x.c.leave}</td><td>${x.c.swap || ''}</td><td>${x.c.out || ''}</td><td>${x.c.none || ''}</td></tr>`).join('')}</tbody></table></div>
+     <div class="sub" style="margin-top:6px">اضغط على أي سائق لعرض تفاصيل عمله يوم بيوم.</div>`;
+    $('rpOut').querySelectorAll('[data-iq]').forEach(tr => tr.onclick = () => showOne(res.find(x => x.iq === tr.dataset.iq), true));
+    $('rpPrint').onclick = () => printIt(allHtml(res)); $('rpXls').onclick = () => xls(res, null);
+  }
+  function oneTable(x) {
+    return `<table class="rp-t"><thead><tr><th>التاريخ</th><th>اليوم</th><th>الحالة</th><th>الرحلة</th><th>ملاحظة</th></tr></thead><tbody>${x.rows.map(d => `<tr><td>${dmy(d.date)}</td><td>${wd(d.date)}</td><td>${badge(d.kind)}</td><td dir="ltr" style="text-align:start">${esc(d.trip)}</td><td>${esc(d.note)}</td></tr>`).join('')}</tbody></table>`;
+  }
+  function kpis(x) { return `<div class="rp-k"><div><b>${x.c.trip}</b><span>يوم على رحلة</span></div><div><b>${x.c.rest}</b><span>راحة</span></div><div><b>${x.c.sb}</b><span>استعداد</span></div><div><b>${x.c.leave}</b><span>إجازة</span></div><div><b>${x.c.swap}</b><span>اعتذر / تبديل</span></div><div><b>${x.c.sub}</b><span>عمل كبديل</span></div></div>`; }
+  function showOne(x, back) {
+    $('rpOut').innerHTML = `<div class="rp-acts"><div>${back ? '<button class="btn light" id="rpBack">→ رجوع لكل السائقين</button> ' : ''}<b>${esc(x.r[C.NAME])}</b> · ${esc(x.iq)} · ${esc(depName(x.r[C.DEP]))} · ${esc(stName(x.r[C.ST]))} · من ${dmy(LAST_RES.from)} إلى ${dmy(LAST_RES.to)}</div>
+      <span style="display:flex;gap:6px"><button class="btn light" id="rpPrint">🖨️ طباعة / PDF</button><button class="btn light" id="rpXls">⬇️ Excel</button></span></div>${kpis(x)}<div class="rp-w">${oneTable(x)}</div>`;
+    if (back) $('rpBack').onclick = () => showAll(LAST_RES.res);
+    $('rpPrint').onclick = () => printIt(oneHtml(x)); $('rpXls').onclick = () => xls([x], x);
+  }
+  const head = t => `<div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #1F3864;padding-bottom:8px;margin-bottom:10px"><div><h1 style="margin:0;font-size:20px;color:#1F3864">${t}</h1><div style="font-size:12px;color:#555">Northwest Bus · من ${dmy(LAST_RES.from)} إلى ${dmy(LAST_RES.to)} · ${esc(LAST_RES.scope)}</div></div><div style="font-size:11px;color:#777">طُبع: ${new Date().toLocaleString('en-GB')}${window.NWAuth && NWAuth.name ? ' · ' + esc(NWAuth.name) : ''}</div></div>`;
+  function oneHtml(x) { return head('تقرير عمل السائق — ' + esc(x.r[C.NAME])) + `<p style="margin:0 0 6px">رقم الإقامة: <b>${esc(x.iq)}</b> · الكراج: <b>${esc(depName(x.r[C.DEP]))}</b> · الحالة الحالية: <b>${esc(stName(x.r[C.ST]))}</b></p>` + kpis(x) + oneTable(x); }
+  function allHtml(res) { const t = $('rpOut').querySelector('.rp-t').outerHTML; return head('تقرير عمل السائقين') + $('rpOut').querySelector('.rp-k').outerHTML + t; }
+  function printIt(body) {
+    const w = window.open('', '_blank'); if (!w) return alert('اسمح بالنوافذ المنبثقة للطباعة');
+    w.document.write(`<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>تقرير عمل السائقين</title><style>body{font-family:Tahoma,Arial,sans-serif;margin:18px;color:#111}
+      .rp-k{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:8px 0}.rp-k div{border:1px solid #ccc;border-radius:8px;padding:6px;text-align:center}.rp-k b{display:block;font-size:18px}.rp-k span{font-size:11px;color:#555}
+      table{width:100%;border-collapse:collapse;font-size:11.5px}th,td{border:1px solid #bbb;padding:4px 6px;text-align:right}th{background:#1F3864;color:#fff}tr:nth-child(even) td{background:#f5f7fb}
+      .rp-b{font-weight:700}.rp-trip{color:#15803d}.rp-rest{color:#475569}.rp-sb{color:#6d28d9}.rp-leave{color:#1d4ed8}.rp-swap{color:#c2410c}.rp-out{color:#b91c1c}.rp-none{color:#94a3b8}
+      @page{size:A4 landscape;margin:10mm}</style></head><body>${body}<script>setTimeout(()=>print(),300)<\/script></body></html>`);
+    w.document.close();
+  }
+  async function xls(res, one) {
+    await loadXlsx(); const wb = XLSX.utils.book_new();
+    const sum = [['السائق', 'رقم الإقامة', 'الكراج', 'الحالة الحالية', 'على رحلة', 'منها بديل', 'راحة', 'استعداد', 'إجازة', 'اعتذر / تبديل', 'خارج الخدمة', 'بدون روستر']]
+      .concat(res.map(x => [x.r[C.NAME], x.iq, depName(x.r[C.DEP]), stName(x.r[C.ST]), x.c.trip, x.c.sub, x.c.rest, x.c.sb, x.c.leave, x.c.swap, x.c.out, x.c.none]));
+    const ws1 = XLSX.utils.aoa_to_sheet(sum); ws1['!cols'] = sum[0].map((_, i) => ({ wch: i ? 14 : 32 })); XLSX.utils.book_append_sheet(wb, ws1, 'الملخص');
+    const det = [['السائق', 'رقم الإقامة', 'التاريخ', 'اليوم', 'الحالة', 'الرحلة', 'ملاحظة']];
+    res.forEach(x => x.rows.forEach(d => det.push([x.r[C.NAME], x.iq, d.date, wd(d.date), KIND[d.kind][0], d.trip, d.note])));
+    const ws2 = XLSX.utils.aoa_to_sheet(det); ws2['!cols'] = [{ wch: 32 }, { wch: 13 }, { wch: 12 }, { wch: 10 }, { wch: 16 }, { wch: 22 }, { wch: 30 }]; XLSX.utils.book_append_sheet(wb, ws2, 'التفاصيل اليومية');
+    wb.Workbook = { Views: [{ RTL: true }] };
+    XLSX.writeFile(wb, (one ? 'تقرير عمل ' + one.r[C.NAME] : 'تقرير عمل السائقين') + ' ' + LAST_RES.from + ' — ' + LAST_RES.to + '.xlsx');
+  }
+  $('rpGo').onclick = async () => {
+    const from = $('rpFrom').value, to = $('rpTo').value;
+    if (!from || !to || from > to) return alert('حدد الفترة بشكل صحيح');
+    if ((new Date(to) - new Date(from)) / 864e5 > 92) return alert('أقصى فترة للتقرير 3 أشهر');
+    const q = $('rpDrv').value.trim(); let list = rpDrivers();
+    if (q) { const iq = (q.match(/(\d{6,})\s*$/) || [])[1]; list = list.filter(r => iq ? String(r[C.IQ]) === iq : (r[C.NAME] + ' ' + r[C.IQ]).toLowerCase().includes(q.toLowerCase())); if (!list.length) return alert('ما لقيت السائق'); }
+    const b = $('rpGo'); b.disabled = true; $('rpOut').innerHTML = '<div class="msg">⏳ جاري تجهيز التقرير...</div>';
+    try {
+      const data = await fetchRange(addD(from, -31), addD(to, 7));
+      const res = build(from, to, data, list).sort((a, z) => z.c.trip - a.c.trip || String(a.r[C.NAME]).localeCompare(z.r[C.NAME]));
+      const dv = $('fDepot').value; LAST_RES = { from, to, res, scope: dv ? (dv === '*mine' ? (MINE || []).map(depName).join('، ') : depName(dv)) : 'كل الكراجات' };
+      if (!Object.keys(data.days).some(k => k >= from && k <= to && (data.days[k] || []).length)) $('rpOut').innerHTML = '<div class="msg err">لا يوجد روستر مرفوع في هذي الفترة</div>';
+      else if (list.length === 1) showOne(res[0], false); else showAll(res);
+    } catch (e) { $('rpOut').innerHTML = `<div class="msg err">${esc(e.message || t_('eNet'))}</div>`; }
+    finally { b.disabled = false; }
+  };
+})();
 </script>
 </body>
 </html>
