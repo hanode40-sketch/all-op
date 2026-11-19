@@ -730,12 +730,12 @@ $('bDash').onclick = () => {
   const dMax = Math.max(1, ...dRows.map(x => Math.max(x[1], x[2] + x[3] + x[4])));
   const pct = rows.length ? Math.round(op / rows.length * 100) : 0;
   const dark = `<div id="dash2" dir="rtl"><div class="hd2"><div><h1>لوحة السائقين · Drivers Overview</h1><small>${dTxt} · ${esc(scope)}</small></div><img src="${new URL('icon-192.png', location.href).href}" alt="" onerror="this.style.display='none'"></div>
-<div class="k5">${[['إجمالي الاحتياج', rows.length, '', ''], ['على رأس العمل', op + an + em + sk, '', ''], ['المتاحين للتشغيل', op, '', pct + '% من الإجمالي'], ['في إجازات', an + em + sk, '#60a5fa', ''], ['خارج الخدمة', nr + su + ab + te, '#f87171', '']].map(x => `<div class="c2"><span>${x[0]}</span><b style="color:${x[2] || '#fff'}">${x[1]}</b>${x[3] ? `<i>${x[3]}</i>` : ''}</div>`).join('')}</div>
+<div class="k5">${[['إجمالي الاحتياج', rows.length, '', ''], ['على رأس العمل', op + an + em, '', ''], ['المتاحين للتشغيل', op, '', pct + '% من الإجمالي'], ['في إجازات', an + em, '#60a5fa', ''], ['خارج الخدمة', sk + nr + su + ab + te, '#f87171', '']].map(x => `<div class="c2"><span>${x[0]}</span><b style="color:${x[2] || '#fff'}">${x[1]}</b>${x[3] ? `<i>${x[3]}</i>` : ''}</div>`).join('')}</div>
 <div class="g2"><div class="c2 dn"><h3>توزيع المتاحين اليوم</h3><div class="dw">${donut}<div class="ctr"><b>${op}</b><span>متاح</span></div></div>
 <div class="lg">${parts.map(x => `<div><span><em style="background:${x[2]}"></em>${x[0]}</span><b>${x[0] === 'استعداد' || ROSTER_N ? x[1] : '—'}</b></div>`).join('')}</div></div>
 <div class="c2 bars"><h3>الكراجات: <em style="background:#2dd4bf"></em>رحلات · <em style="background:#94a3b8"></em>راحة · <em style="background:#a78bfa"></em>استعداد</h3>
 ${dRows.map(x => `<div class="br"><span>${esc(depName(x[0]))}</span><div class="tr"><i style="width:${x[2] / dMax * 100}%;background:#2dd4bf"></i><i style="width:${x[3] / dMax * 100}%;background:#94a3b8"></i><i style="width:${x[4] / dMax * 100}%;background:#a78bfa"></i></div><b>${x[1]}</b><small>${x[2]} · ${x[3]} · ${x[4]}</small></div>`).join('')}</div></div>
-<div class="k7">${[['إجازة سنوية', an, '#60a5fa'], ['اضطرارية', em, '#60a5fa'], ['مرضية', sk, '#f9a8d4'], ['لم يعد', nr, '#f87171'], ['موقوف', su, '#f87171'], ['هروب', ab, '#f87171'], ['إنهاء خدمات', te, '#f87171']].map(x => `<div class="c2"><span>${x[0]}</span><b style="color:${x[2]}">${x[1]}</b></div>`).join('')}</div>
+<div class="k7">${[['إجازة سنوية', an, '#60a5fa'], ['اضطرارية', em, '#60a5fa'], ['مرضية', sk, '#f87171'], ['لم يعد', nr, '#f87171'], ['موقوف', su, '#f87171'], ['هروب', ab, '#f87171'], ['إنهاء خدمات', te, '#f87171']].map(x => `<div class="c2"><span>${x[0]}</span><b style="color:${x[2]}">${x[1]}</b></div>`).join('')}</div>
 <div class="nat2">${nats.map(n => { const v = rows.filter(r => (r[C.NAT] || '—') === n).length; return `<div><span>${esc(n)}</span><b>${v}</b></div>`; }).join('')}</div>
 <div class="ft2">NORTHWEST BUS · OPERATIONS MANAGEMENT · ${esc(new Date().toLocaleString('en-GB'))}</div></div>`;
   const box = (cls, en, ar, v, ic) => `<div class="k ${cls}"><div class="ic">${ic}</div><div class="t"><b>${en}</b><span>${ar}</span></div><div class="v">${v}</div></div>`;
@@ -753,7 +753,7 @@ ${dRows.map(x => `<div class="br"><span>${esc(depName(x[0]))}</span><div class="
 .col{display:flex;flex-direction:column;gap:10px;justify-content:flex-start}.col>*{flex:none}.col>.fill{flex:1;align-items:stretch}.col>.fill .s{align-self:stretch;justify-content:center}.row{align-items:start}.s{align-self:start}.top{align-items:stretch}
 .k{display:flex;align-items:center;gap:12px;border-radius:12px;padding:12px 16px}.k .ic{font-size:30px}.k .t{flex:1;display:flex;flex-direction:column}.k .t b{font-size:16px}.k .t span{font-size:14px;color:#3b4b66}.k .v{font-size:34px;font-weight:900;background:rgba(255,255,255,.75);border-radius:10px;padding:2px 18px;min-width:96px;text-align:center}
 .g{background:#dcfce7}.bl{background:#dbeafe}.gr{background:#e8f5e9}.rd{background:#fee2e2}.or{background:#ffedd5}.pu{background:#ede9fe}.gy{background:#eef1f5}
-.row{display:grid;gap:10px}.r3{grid-template-columns:repeat(3,1fr)}.r4{grid-template-columns:repeat(4,1fr)}
+.row{display:grid;gap:10px}.r2{grid-template-columns:repeat(2,1fr)}.r3{grid-template-columns:repeat(3,1fr)}.r4{grid-template-columns:repeat(4,1fr)}.r5{grid-template-columns:repeat(5,1fr);align-items:stretch}.r5>*{height:auto}
 .s{border-radius:12px;padding:10px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}.s .ic{font-size:24px}.s b{font-size:14px}.s span{font-size:13px;color:#3b4b66}.s .v{font-size:28px;font-weight:900;background:rgba(255,255,255,.8);border-radius:8px;padding:0 18px;margin-top:4px}
 .sec{margin:6px 24px 0;background:#0f2447;color:#fff;border-radius:10px 10px 0 0;padding:10px 16px;font-weight:800;font-size:18px;display:flex;justify-content:space-between}
 table{width:100%;border-collapse:collapse;font-size:15px}th{background:#e8eef7;color:#0f2447;padding:8px 6px;font-size:13px;border-bottom:2px solid #0f2447}th span{display:block;font-weight:600;color:#5b6b85}
@@ -780,15 +780,15 @@ body.v-dark{background:#050b1c}body.v-dark #dash{display:none}body:not(.v-dark) 
 <div class="top">
  <div class="req"><div><b>Total Operational Requirement</b><br><span>إجمالي احتياج التشغيل</span></div><div class="v">${rows.length}</div><div style="height:6px;border-radius:3px;background:linear-gradient(90deg,#f97316 ${rows.length ? Math.round((op / rows.length) * 100) : 0}%,rgba(255,255,255,.25) 0)"></div></div>
  <div class="col">
-  ${box('g', 'Active Drivers (On Duty)', 'السائقون على رأس العمل', op + an + em + sk, '👥')}
+  ${box('g', 'Active Drivers (On Duty)', 'السائقون على رأس العمل', op + an + em, '👥')}
   ${box('bl', 'Available for Operation', 'المتاحون للتشغيل', op, '🚌')}
   <div class="row r3 fill">${small('bl', 'OnTrips', 'على الرحلات', ROSTER_N ? trips : '—', '🚌')}${small('gy', 'Rest Day', 'راحة', ROSTER_N ? rest : '—', '😴')}${small('or', 'Standby', 'الاستعداد', sb, '⏱️')}</div>
  </div>
  <div class="col">
-  ${box('gr', 'Drivers on Leave', 'السائقون في إجازات', an + em + sk, '🌴')}
-  <div class="row r3">${small('gr', 'Annual Leave', 'إجازة سنوية', an, '📅')}${small('gr', 'Emergency Leave', 'إجازة اضطرارية', em, '🚨')}${small('gr', 'Sick Leave', 'إجازة مرضية', sk, '🩺')}</div>
-  ${box('rd', 'Out of Service / Replacement Required', 'خارج الخدمة / مطلوب تعويضهم', nr + su + ab + te, '⚙️')}
-  <div class="row r4">${small('rd', 'Not Returned', 'لم يعد من الإجازة', nr, '↩️')}${small('rd', 'Suspended', 'موقوف عن العمل', su, '⏸️')}${small('rd', 'Absconding', 'هروب', ab, '🏃')}${small('rd', 'Termination', 'إنهاء خدمات', te, '📄')}</div>
+  ${box('gr', 'Drivers on Leave', 'السائقون في إجازات', an + em, '🌴')}
+  <div class="row r2">${small('gr', 'Annual Leave', 'إجازة سنوية', an, '📅')}${small('gr', 'Emergency Leave', 'إجازة اضطرارية', em, '🚨')}</div>
+  ${box('rd', 'Out of Service / Replacement Required', 'خارج الخدمة / مطلوب تعويضهم', sk + nr + su + ab + te, '⚙️')}
+  <div class="row r5">${small('rd', 'Sick Leave', 'إجازة مرضية', sk, '🩺')}${small('rd', 'Not Returned', 'لم يعد من الإجازة', nr, '↩️')}${small('rd', 'Suspended', 'موقوف عن العمل', su, '⏸️')}${small('rd', 'Absconding', 'هروب', ab, '🏃')}${small('rd', 'Termination', 'إنهاء خدمات', te, '📄')}</div>
  </div>
 </div>
 <div class="sec"><span>👥 DRIVERS BY NATIONALITY &amp; STATUS</span><span>السائقون حسب الجنسية والحالة</span></div>
