@@ -134,6 +134,7 @@
       <button class="btn light" id="bExport" data-i="export">⬇️ Excel</button>
       <button class="btn light" id="bDash" data-i="dash">📊 الداش بورد</button>
       <button class="btn light" id="bRpt" data-i="rpt">📄 تقرير عمل السائقين</button>
+      <button class="btn light" id="bCmp">⚖️ مقارنة يومين</button>
       <button class="btn" id="bAdd" style="display:none" data-i="add">➕ سائق جديد</button>
       <button class="btn light" id="bCards" style="display:none" data-i="cards">🪪 تحديث الكروت</button>
       <button class="btn light" id="bImport" style="display:none" data-i="import">📤 استيراد من Excel</button>
@@ -592,6 +593,50 @@ function showGaps(depot) {
   document.body.appendChild(m);
   m.addEventListener('click', e => { if (e.target === m || e.target.closest('[data-x]')) m.remove(); const b = e.target.closest('[data-ed]'); if (b) { m.remove(); openEdit(b.dataset.ed); } });
 }
+
+/* ---------- مقارنة روستر يومين: ليش اختلف عدد «على الرحلات» ---------- */
+$('bCmp').onclick = () => {
+  const d0 = $('fDate').value || ymd(new Date());
+  const m = document.createElement('div'); m.className = 'ov on';
+  m.innerHTML = `<div class="md" style="max-width:900px"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">⚖️ مقارنة روستر يومين</h3><button class="btn light" data-x>✕</button></div>
+    <div class="sub">يوضح ليش اختلف عدد «على الرحلات» بين يومين: الرحلات، والكباتن، والحالات.</div>
+    <div class="bar" style="margin-top:10px;align-items:flex-end"><div><label>اليوم الأول</label><input type="date" id="cA" value="${addD(d0, -1)}"></div><div><label>اليوم الثاني</label><input type="date" id="cB" value="${d0}"></div><div style="flex:0 0 auto"><button class="btn green" id="cGo">قارن</button></div></div>
+    <div id="cOut" style="margin-top:12px"></div></div>`;
+  document.body.appendChild(m);
+  m.addEventListener('click', e => { if (e.target === m || e.target.closest('[data-x]')) m.remove(); const b = e.target.closest('[data-ed]'); if (b) { m.remove(); openEdit(b.dataset.ed); } });
+  m.querySelector('#cGo').onclick = async () => {
+    const A = m.querySelector('#cA').value, B = m.querySelector('#cB').value, out = m.querySelector('#cOut'), depot = $('fDepot').value;
+    if (!A || !B || A === B) return alert('اختر يومين مختلفين');
+    out.innerHTML = '<div class="msg">⏳ جاري التحميل...</div>';
+    const from = A < B ? A : B, to = A < B ? B : A; let j = null;
+    try { j = await NWAuth.call('rosterRange', { from, to }); } catch (e) {}
+    if (!j || !j.ok) { out.innerHTML = '<div class="msg err">تعذّر تحميل الروستر</div>'; return; }
+    const info = k => { const rows = (j.days || {})[k] || [], trips = {}, iqs = {};
+      rows.forEach(r => { const t = String(r[0]).trim(), L = [r[1], r[2]].map(x => String(x || '').trim()).filter(Boolean); trips[t] = L; L.forEach(iq => iqs[iq] = t); });
+      const R0 = iq => D.find(x => String(x[C.IQ]) === iq);
+      const counted = Object.keys(iqs).filter(iq => { const r = R0(iq); return r && r[C.ST] === 'operation' && inDep(r[C.DEP], depot); });
+      return { rows, trips, iqs, counted, R0 }; };
+    const a = info(A), b = info(B);
+    if (!a.rows.length || !b.rows.length) { out.innerHTML = `<div class="msg err">ما فيه روستر مرفوع ليوم ${!a.rows.length ? A : B}</div>`; return; }
+    const nm = (x, iq) => { const r = x.R0(iq); return r ? `<b>${esc(r[C.NAME])}</b> <span class="sub">${esc(iq)} · ${esc(stName(r[C.ST]))}</span>` : `<b dir="ltr">${esc(iq)}</b> <span class="sub">مو موجود في قائمة السائقين</span>`; };
+    const onlyA = Object.keys(a.trips).filter(t => !b.trips[t]), onlyB = Object.keys(b.trips).filter(t => !a.trips[t]);
+    const seatDiff = Object.keys(a.trips).filter(t => b.trips[t] && a.trips[t].length !== b.trips[t].length);
+    const why = (x, k) => Object.keys(x.iqs).filter(iq => !x.counted.includes(iq)).map(iq => { const r = x.R0(iq); if (r && !inDep(r[C.DEP], depot)) return ''; return `<tr><td>${nm(x, iq)}</td><td dir="ltr">${esc(x.iqs[iq])}</td></tr>`; }).join('');
+    const tb = (head, body) => body ? `<div class="tw" style="margin-bottom:10px"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>` : '<div class="sub" style="margin-bottom:10px">— لا يوجد</div>';
+    out.innerHTML = `<div class="tw" style="margin-bottom:12px"><table><thead><tr><th></th><th>${A}</th><th>${B}</th><th>الفرق</th></tr></thead><tbody>
+      <tr><td>عدد الرحلات في الروستر</td><td>${Object.keys(a.trips).length}</td><td>${Object.keys(b.trips).length}</td><td><b>${Object.keys(b.trips).length - Object.keys(a.trips).length}</b></td></tr>
+      <tr><td>الكباتن المسجّلين في الروستر</td><td>${Object.keys(a.iqs).length}</td><td>${Object.keys(b.iqs).length}</td><td><b>${Object.keys(b.iqs).length - Object.keys(a.iqs).length}</b></td></tr>
+      <tr><td><b>على الرحلات</b> (على رأس العمل${depot ? ' · الكراج المختار' : ''})</td><td><b>${a.counted.length}</b></td><td><b>${b.counted.length}</b></td><td><b>${b.counted.length - a.counted.length}</b></td></tr></tbody></table></div>
+      <h4 style="margin:8px 0 4px">🚌 رحلات موجودة في يوم وناقصة في الثاني</h4>
+      ${tb('<th>الرحلة</th><th>موجودة في</th><th>الكباتن</th>', onlyA.map(t => `<tr><td dir="ltr"><b>${esc(t)}</b></td><td>${A} فقط</td><td>${a.trips[t].length}</td></tr>`).concat(onlyB.map(t => `<tr><td dir="ltr"><b>${esc(t)}</b></td><td>${B} فقط</td><td>${b.trips[t].length}</td></tr>`)).join(''))}
+      <h4 style="margin:8px 0 4px">👥 نفس الرحلة وعدد الكباتن مختلف</h4>
+      ${tb(`<th>الرحلة</th><th>${A}</th><th>${B}</th>`, seatDiff.map(t => `<tr><td dir="ltr"><b>${esc(t)}</b></td><td>${a.trips[t].length}</td><td>${b.trips[t].length}</td></tr>`).join(''))}
+      <h4 style="margin:8px 0 4px">🌴 مسجّلين في الروستر وما انحسبوا — ${A}</h4>${tb('<th>الكابتن</th><th>الرحلة</th>', why(a, A))}
+      <h4 style="margin:8px 0 4px">🌴 مسجّلين في الروستر وما انحسبوا — ${B}</h4>${tb('<th>الكابتن</th><th>الرحلة</th>', why(b, B))}
+      <div class="sub">«على الرحلات» يحسب الكابتن مرة وحدة حتى لو مكرر في أكثر من رحلة. حالة الكابتن المعروضة هي حالته الحالية في إدارة السائقين.</div>`;
+  };
+  m.querySelector('#cGo').click();
+};
 
 /* ---------- التعديل ---------- */
 let EDIT = null;
