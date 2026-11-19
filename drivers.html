@@ -612,10 +612,11 @@ $('bCmp').onclick = () => {
     try { j = await NWAuth.call('rosterRange', { from, to }); } catch (e) {}
     if (!j || !j.ok) { out.innerHTML = '<div class="msg err">تعذّر تحميل الروستر</div>'; return; }
     const info = k => { const rows = (j.days || {})[k] || [], trips = {}, iqs = {};
-      rows.forEach(r => { const t = String(r[0]).trim(), L = [r[1], r[2]].map(x => String(x || '').trim()).filter(Boolean); trips[t] = L; L.forEach(iq => iqs[iq] = t); });
+      const dup = {}; let seats = 0;
+      rows.forEach(r => { const t = String(r[0]).trim(), L = [r[1], r[2]].map(x => String(x || '').trim()).filter(Boolean); trips[t] = L; seats += L.length; L.forEach(iq => { if (iqs[iq]) (dup[iq] = dup[iq] || [iqs[iq]]).push(t); else iqs[iq] = t; }); });
       const R0 = iq => D.find(x => String(x[C.IQ]) === iq);
       const counted = Object.keys(iqs).filter(iq => { const r = R0(iq); return r && r[C.ST] === 'operation' && inDep(r[C.DEP], depot); });
-      return { rows, trips, iqs, counted, R0 }; };
+      return { rows, trips, iqs, counted, R0, dup, seats }; };
     const a = info(A), b = info(B);
     if (!a.rows.length || !b.rows.length) { out.innerHTML = `<div class="msg err">ما فيه روستر مرفوع ليوم ${!a.rows.length ? A : B}</div>`; return; }
     const nm = (x, iq) => { const r = x.R0(iq); return r ? `<b>${esc(r[C.NAME])}</b> <span class="sub">${esc(iq)} · ${esc(stName(r[C.ST]))}</span>` : `<b dir="ltr">${esc(iq)}</b> <span class="sub">مو موجود في قائمة السائقين</span>`; };
@@ -625,12 +626,15 @@ $('bCmp').onclick = () => {
     const tb = (head, body) => body ? `<div class="tw" style="margin-bottom:10px"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>` : '<div class="sub" style="margin-bottom:10px">— لا يوجد</div>';
     out.innerHTML = `<div class="tw" style="margin-bottom:12px"><table><thead><tr><th></th><th>${A}</th><th>${B}</th><th>الفرق</th></tr></thead><tbody>
       <tr><td>عدد الرحلات في الروستر</td><td>${Object.keys(a.trips).length}</td><td>${Object.keys(b.trips).length}</td><td><b>${Object.keys(b.trips).length - Object.keys(a.trips).length}</b></td></tr>
-      <tr><td>الكباتن المسجّلين في الروستر</td><td>${Object.keys(a.iqs).length}</td><td>${Object.keys(b.iqs).length}</td><td><b>${Object.keys(b.iqs).length - Object.keys(a.iqs).length}</b></td></tr>
+      <tr><td>خانات الكباتن في الرحلات</td><td>${a.seats}</td><td>${b.seats}</td><td><b>${b.seats - a.seats}</b></td></tr>
+      <tr><td>الكباتن المسجّلين في الروستر (بدون تكرار)</td><td>${Object.keys(a.iqs).length}</td><td>${Object.keys(b.iqs).length}</td><td><b>${Object.keys(b.iqs).length - Object.keys(a.iqs).length}</b></td></tr>
       <tr><td><b>على الرحلات</b> (على رأس العمل${depot ? ' · الكراج المختار' : ''})</td><td><b>${a.counted.length}</b></td><td><b>${b.counted.length}</b></td><td><b>${b.counted.length - a.counted.length}</b></td></tr></tbody></table></div>
       <h4 style="margin:8px 0 4px">🚌 رحلات موجودة في يوم وناقصة في الثاني</h4>
       ${tb('<th>الرحلة</th><th>موجودة في</th><th>الكباتن</th>', onlyA.map(t => `<tr><td dir="ltr"><b>${esc(t)}</b></td><td>${A} فقط</td><td>${a.trips[t].length}</td></tr>`).concat(onlyB.map(t => `<tr><td dir="ltr"><b>${esc(t)}</b></td><td>${B} فقط</td><td>${b.trips[t].length}</td></tr>`)).join(''))}
       <h4 style="margin:8px 0 4px">👥 نفس الرحلة وعدد الكباتن مختلف</h4>
       ${tb(`<th>الرحلة</th><th>${A}</th><th>${B}</th>`, seatDiff.map(t => `<tr><td dir="ltr"><b>${esc(t)}</b></td><td>${a.trips[t].length}</td><td>${b.trips[t].length}</td></tr>`).join(''))}
+      <h4 style="margin:8px 0 4px">🔁 نفس الكابتن في أكثر من رحلة (ينحسب مرة وحدة)</h4>
+      ${tb('<th>اليوم</th><th>الكابتن</th><th>الرحلات</th>', [[A, a], [B, b]].map(([k, x]) => Object.keys(x.dup).map(iq => `<tr><td>${k}</td><td>${nm(x, iq)} <button class="btn light" data-ed="${esc(iq)}" style="padding:3px 9px">فتح</button></td><td dir="ltr">${x.dup[iq].map(esc).join(' · ')}</td></tr>`).join('')).join(''))}
       <h4 style="margin:8px 0 4px">🌴 مسجّلين في الروستر وما انحسبوا — ${A}</h4>${tb('<th>الكابتن</th><th>الرحلة</th>', why(a, A))}
       <h4 style="margin:8px 0 4px">🌴 مسجّلين في الروستر وما انحسبوا — ${B}</h4>${tb('<th>الكابتن</th><th>الرحلة</th>', why(b, B))}
       <div class="sub">«على الرحلات» يحسب الكابتن مرة وحدة حتى لو مكرر في أكثر من رحلة. حالة الكابتن المعروضة هي حالته الحالية في إدارة السائقين.</div>`;
