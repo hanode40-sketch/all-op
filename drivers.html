@@ -637,7 +637,11 @@ const xlDate = v => {
   if ((m = s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/))) return m[3] + '-' + pad(m[2]) + '-' + pad(m[1]);
   return '';
 };
-const normDep = d => { d = String(d || '').trim().toLowerCase(); return DEPOTS.find(x => x.toLowerCase() === d) || 'Unassigned'; };
+/* الكراج من ملف Excel: نقبل اختلاف الكتابة (Ha'il / Hayel / حائل / Hail Depot / Shumaisi / Qassim ...) */
+const DEP_RE = [[/sh?uma[iy]?s[iy]?|الشميسي|شميسي/i, 'Shumaysi'], [/madin|medin|المدينة/i, 'Madinah'], [/tab[ou]k|تبوك/i, 'Tabuk'], [/riya?dh|الرياض/i, 'Riyadh'],
+  [/ja[zs]an|jizan|gizan|جازان|جيزان/i, 'Jazan'], [/khamis|mushait|خميس/i, 'Khamis Mushait'], [/bash?a[iy]er|البشائر/i, 'Al Bashayer'], [/buray?dah|buraidah|qassim|qaseem|بريدة|القصيم/i, 'Buraydah'],
+  [/ha'?[iy]e?l|hayel|حائل|حايل/i, 'Hail']];
+const normDep = d => { d = String(d || '').trim(); const x = DEPOTS.find(k => k.toLowerCase() === d.toLowerCase()); if (x) return x; for (const [re, k] of DEP_RE) if (re.test(d)) return k; return 'Unassigned'; };
 $('bImport').onclick = () => $('impFile').click();
 /* تحديث كروت التشغيل من ملف: عمود رقم الإقامة + عمود تاريخ انتهاء الكرت (أي ترتيب) — ما يغيّر شي ثاني */
 $('bCards').onclick = () => { alert(t_('cardsHow')); $('cardFile').click(); };
