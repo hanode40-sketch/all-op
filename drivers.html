@@ -1192,63 +1192,89 @@ if (window.NWAuth) load();
     wb.Workbook = { Views: [{ RTL: true }] };
     XLSX.writeFile(wb, (one ? 'تقرير عمل ' + one.r[C.NAME] : 'تقرير عمل السائقين') + ' ' + LAST_RES.from + ' — ' + LAST_RES.to + '.xlsx');
   }
-  /* ===== ملف الموارد الشهري (Daily driver) — من 21 الشهر السابق إلى 20 ===== */
+  /* ===== ملف الموارد الشهري (Daily driver) — من 21 الشهر السابق إلى 20، بنفس تنسيق ملف الموارد (hr_template.xlsx) ===== */
   const hrPeriod = () => { const t = new Date(), y = t.getFullYear(), m = t.getMonth(), end = t.getDate() > 20 ? new Date(y, m, 20) : new Date(y, m - 1, 20), st = new Date(end.getFullYear(), end.getMonth() - 1, 21); return [ymd(st), ymd(end)]; };
   const hrCode = (d, r) => { switch (d.kind) { case 'trip': return 1; case 'rest': return 'R'; case 'sb': return 'SB'; case 'leave': return r[C.ST] === 'Sick Leave' ? 'SL' : 'V'; case 'swap': return 'A'; case 'out': return r[C.ST] === 'Suspended' ? 'SUS' : r[C.ST] === 'Termination of services' ? '' : 'A'; default: return ''; } };
-  const xd = k => { const [y, m, d] = k.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d)); };
-  const numOr = v => { const n = Number(v); return v !== '' && v != null && isFinite(n) ? n : (v == null ? '' : v); };
+  const HR_CODES = ['NW01','NW02','NW03','NW04','NW05','NW06','NW07','NW08','NW10','NW11','NW12','NW13','NW14','NW15','NW15B','NW16B','NW16','NW17','NW18','NW18B','NW19','NW20','NW21','NW22','NW23','NW26','NW27','NW28','NW29','NW30','NW31','NW32','NW33','NW35'];
+  const colL = n => { let s2 = ''; n++; while (n) { const m = (n - 1) % 26; s2 = String.fromCharCode(65 + m) + s2; n = Math.floor((n - 1) / 26); } return s2; };   // 0 → A
+  const colN = l => l.split('').reduce((a, ch) => a * 26 + ch.charCodeAt(0) - 64, 0) - 1;
+  const serial = k => { const [y, m, d] = k.split('-').map(Number); return (Date.UTC(y, m - 1, d) - Date.UTC(1899, 11, 30)) / 864e5; };
+  const xe = v => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const numOr = v => { const s2 = String(v == null ? '' : v).trim(); return /^\d{1,15}$/.test(s2) ? Number(s2) : s2; };
+  function cx(ref, s, v) {                       // خلية XML بنفس الستايل
+    const a = `<c r="${ref}"${s ? ` s="${s}"` : ''}`;
+    if (v == null || v === '') return a + '/>';
+    if (typeof v === 'object' && v.f != null) return `${a}><f>${v.raw ? v.f : xe(v.f)}</f></c>`;
+    if (typeof v === 'number') return `${a}><v>${v}</v></c>`;
+    return `${a} t="inlineStr"><is><t xml:space="preserve">${xe(v)}</t></is></c>`;
+  }
+  function setCell(xml, ref, v) {
+    const re = new RegExp(`<c r="${ref}"([^>]*?)(?:/>|>[\\s\\S]*?</c>)`);
+    return xml.replace(re, (m0, at) => cx(ref, (at.match(/s="(\d+)"/) || [])[1], v));
+  }
+  function fillSheet(xml, start, data) {          // data: [{A:..., B:...}]
+    const proto = xml.match(/<!--PROTO([\s\S]*?)PROTO-->/)[1], open = proto.match(/^<row [^>]*>/)[0];
+    const cells = [...proto.matchAll(/<c r="([A-Z]+)\{R\}"([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g)].map(x => ({ col: x[1], s: (x[2].match(/s="(\d+)"/) || [])[1], f: ((x[3] || '').match(/<f[^>]*>([\s\S]*?)<\/f>/) || [])[1] }));
+    const last = Math.max(start, start + data.length - 1);
+    const rows = data.map((d, i) => { const R = start + i, cols = new Set(cells.map(c => c.col)), out = [];
+      const all = cells.map(c => c.col).concat(Object.keys(d).filter(k => !cols.has(k))).sort((a, z) => colN(a) - colN(z));
+      all.forEach(col => { const c = cells.find(x => x.col === col) || {}; let v = d[col];
+        if (v === undefined && c.f) v = { f: c.f.replace(/\{R\}/g, R), raw: true };
+        if (v && v.f && !v.raw) v = { f: v.f.replace(/\{R\}/g, R).replace(/\{L\}/g, last) };
+        out.push(cx(col + R, c.s, v)); });
+      return open.replace('{R}', R) + out.join('') + '</row>'; }).join('');
+    // مدى الصيغ في صفوف العناوين (SUBTOTAL ...) حتى آخر صف — قبل إضافة صفوف البيانات
+    const at = xml.indexOf('<!--PROTO'), headPart = xml.slice(0, at).replace(/(<f[^>]*>)([^<]*)<\/f>/g, (m0, o, f) => o + f.replace(new RegExp(`([A-Z]{1,3})${start}:([A-Z]{1,3})(\\d+)`, 'g'), (m1, a, b) => `${a}${start}:${b}${last}`) + '</f>');
+    return (headPart + xml.slice(at)).replace(/<!--PROTO[\s\S]*?PROTO-->/, rows).replace(/\{L\}/g, last);
+  }
+  const loadZip = () => window.JSZip ? Promise.resolve() : new Promise((ok, bad) => { const s2 = document.createElement('script'); s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'; s2.onload = ok; s2.onerror = () => bad(new Error('تعذر تحميل مكتبة Excel — تأكد من الإنترنت')); document.head.appendChild(s2); });
   $('rpHr').onclick = async () => {
     let from = $('rpFrom').value, to = $('rpTo').value;
     if (!from || from.slice(8) !== '21' || !to || to < from) { [from, to] = hrPeriod(); $('rpFrom').value = from; $('rpTo').value = to; }
-    if ((new Date(to) - new Date(from)) / 864e5 > 40) return alert('ملف الموارد لشهر واحد فقط (من 21 إلى 20)');
+    if ((new Date(to) - new Date(from)) / 864e5 > 30) return alert('ملف الموارد لشهر واحد فقط (من 21 إلى 20)');
     const list = D.filter(r => inDep(r[C.DEP], $('fDepot').value));
     const b = $('rpHr'); b.disabled = true; $('rpOut').innerHTML = `<div class="msg">⏳ جاري تجهيز ملف الموارد من ${dmy(from)} إلى ${dmy(to)}...</div>`;
     try {
-      const [data] = await Promise.all([fetchRange(addD(from, -31), addD(to, 7)), loadRates(), loadXlsx()]);
+      const [data, , , tplBuf] = await Promise.all([fetchRange(addD(from, -31), addD(to, 7)), loadRates(), loadZip(), fetch('hr_template.xlsx?v=1').then(r => { if (!r.ok) throw new Error('ما لقيت قالب ملف الموارد'); return r.arrayBuffer(); })]);
       if (!Object.keys(data.days).some(k => k >= from && k <= to && (data.days[k] || []).length)) { $('rpOut').innerHTML = '<div class="msg err">لا يوجد روستر مرفوع في هذي الفترة</div>'; return; }
       const res = build(from, to, data, list).sort((a, z) => String(a.r[C.NAME]).localeCompare(z.r[C.NAME]));
-      const days = res.length ? res[0].rows.map(d => d.date) : [];
-      const BY = {}; D.forEach(r => BY[String(r[C.IQ])] = r);
-      const wb = XLSX.utils.book_new();
-      // 1) الحضور
-      const at = [[], ['', '', '', '', 'START', '', '', xd(from), '', 'A', 'Absence', '', '', '', '', '', 'R', 'Daily Rest', '', '', '', '', 'SL', 'Sick Leave'], ['', '', '', '', 'END', '', '', xd(to)], ['', '', '', '', '', '', '', '', '', 'SUS', 'SUSPENDED', '', '', '', '', '', 'SB', 'STAND-BY DUTY', '', '', '', '', 'V', 'Vacation'], [],
-        ['', 'Employee ID', 'ID Number', 'NAME', ...days.map(xd), '', 'Total TRIP', 'A', 'SUS', 'SL', 'R', 'SB', 'V', 'Total Days', 'الحالة']];
-      res.forEach((x, i) => { const cs = x.rows.map(d => hrCode(d, x.r)), n = v => cs.filter(c => c === v).length;
-        at.push([i + 1, numOr(x.r[C.EMP]), numOr(x.iq), x.r[C.NAME], ...cs, '', n(1), n('A'), n('SUS'), n('SL'), n('R'), n('SB'), n('V'), cs.filter(c => c !== '').length, x.r[C.ST] === 'operation' ? '' : stName(x.r[C.ST])]); });
-      const ws1 = XLSX.utils.aoa_to_sheet(at, { cellDates: true }); ws1['!cols'] = [{ wch: 5 }, { wch: 11 }, { wch: 12 }, { wch: 32 }, ...days.map(() => ({ wch: 5.5 })), { wch: 2 }, ...Array(8).fill({ wch: 8 }), { wch: 18 }];
-      days.forEach((_, j) => { const c = XLSX.utils.encode_cell({ r: 5, c: 4 + j }); if (ws1[c]) ws1[c].z = 'dd-mmm'; }); ['H2', 'H3'].forEach(c => { if (ws1[c]) ws1[c].z = 'dd/mm/yyyy'; });
-      XLSX.utils.book_append_sheet(wb, ws1, 'DRIVERS SUMMARY Attendance');
-      // 2) الرحلات حسب المسار + المبلغ
-      const R = (RATES && RATES.rates) || {}, keys = Object.keys(R), extra = {};
-      res.forEach(x => x.rows.forEach(d => { if (d.kind === 'trip') String(d.trip).split('+').forEach(t => { const k = routeKey(t); if (k && !R[k] && !R[k.replace(/[A-Z]$/, '')]) extra[k] = 1; }); }));
-      const cols = keys.concat(Object.keys(extra)).sort((a, z) => (parseInt(a.slice(2)) - parseInt(z.slice(2))) || a.localeCompare(z));
-      const rate = k => { const r = R[k] || R[k.replace(/[A-Z]$/, '')]; return r ? Number(r.amt) || 0 : 0; };
-      const legsOf = x => { const m = {}; x.rows.forEach(d => { if (d.kind === 'trip') String(d.trip).split('+').forEach(t => { let k = routeKey(t); if (!k) return; if (!R[k] && R[k.replace(/[A-Z]$/, '')] && !cols.includes(k)) k = k.replace(/[A-Z]$/, ''); m[k] = (m[k] || 0) + 1; }); }); return m; };
-      const body = res.map((x, i) => { const m = legsOf(x), cnt = cols.map(k => m[k] || 0), tot = cnt.reduce((a, z) => a + z, 0), amt = Math.round(cols.reduce((a, k, j) => a + cnt[j] * rate(k), 0) * 100) / 100;
-        return [i + 1, numOr(x.r[C.EMP]), numOr(x.iq), x.r[C.NAME], x.r[C.NAT] || '', ...cnt, tot, amt, x.r[C.ST] === 'operation' ? '' : stName(x.r[C.ST])]; });
-      const colTot = cols.map((_, j) => body.reduce((a, r) => a + r[5 + j], 0));
-      const tr = [['', '', '', 'Trip Value', '', ...cols.map(rate), 'Total Trips', 'Total Amount', 'STATUS'],
-        ['', '', '', 'Number of Completed Trips', 'ACTUAL TOTAL:', ...colTot, colTot.reduce((a, z) => a + z, 0), Math.round(body.reduce((a, r) => a + r[6 + cols.length], 0) * 100) / 100],
-        ['', '', '', 'Trip Route', '', ...cols.map(k => (R[k] && R[k].route) || '')],
-        ['', 'ID.NO', 'ID ', 'NAME', 'Nationality', ...cols, 'Total Trips', 'Total Amount', 'STATUS'], ...body];
-      const ws2 = XLSX.utils.aoa_to_sheet(tr); ws2['!cols'] = [{ wch: 5 }, { wch: 11 }, { wch: 12 }, { wch: 32 }, { wch: 12 }, ...cols.map(() => ({ wch: 8 })), { wch: 10 }, { wch: 12 }, { wch: 18 }];
-      XLSX.utils.book_append_sheet(wb, ws2, 'DRIVERS SUMMARY Trips');
-      // 3) تفاصيل الرحلات من الروستر
-      const det = [['DATE', 'ROUTE', 'TRIP', '1st driver ID', 'السائق الأول', '2nd driver ID', 'السائق الثاني']];
-      Object.keys(data.days).filter(k => k >= from && k <= to).sort().forEach(k => (data.days[k] || []).forEach(r => {
-        const a = String(r[1] || '').trim(), z = String(r[2] || '').trim();
-        det.push([xd(k), routeKey(r[0]), String(r[0]), numOr(a), a && BY[a] ? BY[a][C.NAME] : '', z ? numOr(z) : '', z && BY[z] ? BY[z][C.NAME] : '']); }));
-      const ws3 = XLSX.utils.aoa_to_sheet(det, { cellDates: true }); ws3['!cols'] = [{ wch: 11 }, { wch: 8 }, { wch: 16 }, { wch: 12 }, { wch: 32 }, { wch: 12 }, { wch: 32 }];
-      for (let i = 1; i < det.length; i++) { const c = 'A' + (i + 1); if (ws3[c]) ws3[c].z = 'dd/mm/yyyy'; }
-      XLSX.utils.book_append_sheet(wb, ws3, 'trip details');
-      // 4) قائمة السائقين
-      const ls = [['', 'Em.no', 'ID ', 'NAME', 'Nationality', 'Depot', 'Status', 'Comment']].concat(res.map((x, i) => [i + 1, numOr(x.r[C.EMP]), numOr(x.iq), x.r[C.NAME], x.r[C.NAT] || '', depName(x.r[C.DEP]), stName(x.r[C.ST]), x.r[C.NOTE] || '']));
-      const ws4 = XLSX.utils.aoa_to_sheet(ls); ws4['!cols'] = [{ wch: 5 }, { wch: 11 }, { wch: 12 }, { wch: 32 }, { wch: 12 }, { wch: 14 }, { wch: 18 }, { wch: 30 }];
-      XLSX.utils.book_append_sheet(wb, ws4, 'List');
-      const ed = xd(to), mon = ed.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' }).toUpperCase();
-      XLSX.writeFile(wb, `Daily_driver_20-${mon}${ed.getUTCFullYear()}.xlsx`);
+      const days = []; for (let k = from; k <= to; k = addD(k, 1)) days.push(k);
+      const stTxt = r => r[C.ST] === 'operation' ? '' : stName(r[C.ST]);
+      const zip = await JSZip.loadAsync(tplBuf), P = 'xl/worksheets/';
+      // 1) List
+      let x1 = await zip.file(P + 'sheet1.xml').async('string');
+      x1 = fillSheet(x1, 2, list.slice().sort((a, z) => String(a[C.NAME]).localeCompare(z[C.NAME])).map((r, i) => ({ A: i + 1, B: numOr(r[C.EMP]), C: numOr(r[C.IQ]), D: r[C.NAME], E: r[C.NAT] || '', G: (ST[r[C.ST]] || {}).grp === 'out' ? 'OUT' : 'IN', H: [stTxt(r), r[C.NOTE] || ''].filter(Boolean).join(' — ') })));
+      zip.file(P + 'sheet1.xml', x1);
+      // 2) trip details
+      let x2 = await zip.file(P + 'sheet2.xml').async('string');
+      const det = []; Object.keys(data.days).filter(k => k >= from && k <= to).sort().forEach(k => (data.days[k] || []).forEach(r => { const a = String(r[1] || '').trim(), z = String(r[2] || '').trim(); det.push({ B: serial(k), C: routeKey(r[0]), D: String(r[0]), N: a ? numOr(a) : '', P: z ? numOr(z) : '', ...(z ? {} : { Q: '' }), ...(a ? {} : { O: '' }) }); }));
+      x2 = setCell(x2, 'F1', `Schedule valid for period: ${dmy(from)} (00.01h) to ${dmy(to)} (23.59h)`);
+      x2 = fillSheet(x2, 8, det); zip.file(P + 'sheet2.xml', x2);
+      // 3) Attendance
+      let x3 = await zip.file(P + 'sheet3.xml').async('string');
+      for (let j = 0; j < 31; j++) x3 = setCell(x3, colL(4 + j) + '6', days[j] ? serial(days[j]) : '');
+      x3 = setCell(x3, 'H3', { f: colL(4 + days.length - 1) + '6' });
+      x3 = fillSheet(x3, 7, res.map((x, i) => { const o = { A: i + 1, B: numOr(x.r[C.EMP]), C: numOr(x.iq), D: x.r[C.NAME], AS: stTxt(x.r) }; x.rows.forEach((d, j) => { o[colL(4 + j)] = hrCode(d, x.r); }); for (let j = x.rows.length; j < 31; j++) o[colL(4 + j)] = ''; return o; }));
+      zip.file(P + 'sheet3.xml', x3);
+      // 4) Trips
+      let x4 = await zip.file(P + 'sheet4.xml').async('string');
+      const RT = (RATES && RATES.rates) || {}, extra = {};
+      HR_CODES.forEach((k, j) => { const r = RT[k]; if (r && r.amt != null) x4 = setCell(x4, colL(5 + j) + '1', Number(r.amt)); });
+      const colOf = t => { const k = routeKey(t); if (!k) return null; if (HR_CODES.includes(k)) return k; const k2 = k.replace(/[A-Z]$/, ''); if (HR_CODES.includes(k2)) return k2; extra[k] = 1; return null; };
+      x4 = fillSheet(x4, 5, res.map((x, i) => { const m = {}; x.rows.forEach(d => { if (d.kind === 'trip') String(d.trip).split('+').forEach(t => { const k = colOf(t); if (k) m[k] = (m[k] || 0) + 1; }); });
+        const o = { A: i + 1, B: numOr(x.r[C.EMP]), C: numOr(x.iq), D: x.r[C.NAME], E: x.r[C.NAT] || '', AP: { f: `IFERROR(""&VLOOKUP(C{R},'DRIVERS SUMMARY  Attendance2'!$C$7:$AS${7 + res.length - 1},43,FALSE()),"")` } };
+        HR_CODES.forEach((k, j) => o[colL(5 + j)] = m[k] || 0); return o; }));
+      zip.file(P + 'sheet4.xml', x4);
+      // اسم ورقة التفاصيل حسب الفترة
+      const d2 = k => (+k.slice(8)) + '-' + (+k.slice(5, 7));
+      let wbx = await zip.file('xl/workbook.xml').async('string');
+      wbx = wbx.replace(/name="[^"]*trip details"/, `name="${d2(from)} to ${d2(to)} trip details"`); zip.file('xl/workbook.xml', wbx);
+      const blob = await zip.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', compression: 'DEFLATE' });
+      const ed = new Date(to + 'T12:00:00'), mon = ed.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Daily_driver_20-${mon}${ed.getFullYear()}.xlsx`; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+      window.__hrLast = a.download;
       const miss = Object.keys(extra);
-      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ملف الموارد: ${res.length} سائق · من ${dmy(from)} إلى ${dmy(to)} · إجمالي المبلغ ${sar(tr[1][6 + cols.length])} ريال</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها سعر في جدول الحوافز (انحسبت صفر): ${miss.map(esc).join('، ')}</div>` : '');
+      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ملف الموارد بنفس التنسيق: ${res.length} سائق · ${det.length} رحلة · من ${dmy(from)} إلى ${dmy(to)}</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها عمود في ملف الموارد (ما انحسبت): ${miss.map(esc).join('، ')}</div>` : '');
     } catch (e) { $('rpOut').innerHTML = `<div class="msg err">${esc(e.message || t_('eNet'))}</div>`; }
     finally { b.disabled = false; }
   };
