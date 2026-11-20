@@ -347,7 +347,7 @@ function drawIss(L) {
    المطلوب: كل (رحلة × سائق) في الروستر لكل يوم — بعد التبديلات
    المنفّذ: سجل النشاط «إرسال مسار رحلة» / «إرسال بطاقة جدول رحلة» (المرجع = رقم الرحلة، والتفاصيل فيها اسم السائق وتاريخ الرحلة) */
 const SEND_RE = /إرسال (مسار|بطاقة جدول) رحلة/;
-const DEPOTS = [[/jeddah|makkah|mecca|jarwal|yanbu|جدة|مكة|ينبع/i, 'الشميسي'], [/madinah|medina|المدينة/i, 'المدينة'], [/tabuk|haql|تبوك|حقل/i, 'تبوك'],
+const DEPOTS = [[/shuma[iy]?s|jeddah|makkah|mecca|jarwal|yanbu|الشميسي|جدة|مكة|ينبع/i, 'الشميسي'], [/madinah|medina|المدينة/i, 'المدينة'], [/tabuk|haql|تبوك|حقل/i, 'تبوك'],
   [/riyadh|dawadmi|الرياض|الدوادمي/i, 'الرياض'], [/jazan|jizan|جازان/i, 'جازان'], [/khamis|خميس/i, 'خميس مشيط'], [/bashayer|البشائر/i, 'البشائر'],
   [/buraydah|qassim|بريدة|القصيم/i, 'بريدة'], [/hail|rafha|حائل|رفحاء/i, 'حائل']];
 const depotOf = st => { for (const [re, d] of DEPOTS) if (re.test(st || '')) return d; return ''; };
@@ -377,13 +377,17 @@ async function loadTrips() {
   if ((new Date(to) - new Date(from)) / DAY > 44) { $('view').innerHTML = '<div class="msg">تقرير المسارات: اختر فترة 45 يوم أو أقل</div>'; return null; }
   const key = from + '|' + to; if (TR && TRKEY === key) return TR;
   $('view').innerHTML = '<div class="msg">جاري تحميل الروستر وسجل الإرسال...</div>';
-  const [ro, dl, T, fl, logs] = await Promise.all([
+  const [ro, dl, T, fl, logs, sch] = await Promise.all([
     NWAuth.call('rosterRange', { from, to }).catch(e => ({ ok:false, error:String(e) })),
     NWAuth.call('driversList', {}).catch(() => ({ ok:false })),
     tripData(),
     NWAuth.call('tripFlags', {}).catch(() => null),
-    Promise.all(months(from, to).map(m => NWStats.fetchMonth(m, true).catch(() => null))).then(A => A.flatMap(j => (j && j.rows) || []))
+    Promise.all(months(from, to).map(m => NWStats.fetchMonth(m, true).catch(() => null))).then(A => A.flatMap(j => (j && j.rows) || [])),
+    NWAuth.call('scheduleGet', {}).catch(() => null)
   ]);
+  // كراج الرحلة = كراج الإرسال (Dispatch) من جدول الرحلات — مثل لوحة التوزيع؛ وإلا: رحلات العودة (I) لكراج الوصول، والذهاب لكراج الانطلاق
+  const DISP = {}; [].concat((sch && sch.trips) || [], (sch && sch.prev && sch.prev.trips) || []).forEach(t => { const g = depotOf(t.disp); if (g && t.trip && !DISP[cN(t.trip)]) DISP[cN(t.trip)] = g; });
+  const garOfTrip = (code, info) => DISP[cN(code)] || DISP[cParts(code)[0]] || (info ? (/-I-/i.test(code) ? depotOf(info.to) || depotOf(info.from) : depotOf(info.from) || depotOf(info.to)) : '');
   if (!ro || !ro.ok) { $('view').innerHTML = `<div class="msg">تعذّر تحميل الروستر (${esc((ro && ro.error) || '')})</div>`; return null; }
   const NAME = {}; ((dl && dl.drivers) || []).forEach(r => NAME[String(r[0])] = r[2]);
   TDATA = T; OFF = new Set(((fl && fl.off) || []).map(cN)); CANFLAG = !!(fl && fl.canEdit);
@@ -403,7 +407,7 @@ async function loadTrips() {
         const hits = S.filter(x => x.date === D && codeMatch(x.code, code) && (x.iq ? x.iq === iq : (nm && nN(x.name) === nN(nm))));
         hits.forEach(h => h.used = true);
         const other = !hits.length ? S.filter(x => x.date === D && codeMatch(x.code, code) && !(x.iq ? x.iq === iq : (nm && nN(x.name) === nN(nm)))) : [];
-        items.push({ date:D, code, iq, name:nm || iq, seat:k + 1, from:info ? info.from : '', to:info ? info.to : '', dep:info ? info.dep : '', garage:info ? depotOf(info.from) : '',
+        items.push({ date:D, code, iq, name:nm || iq, seat:k + 1, from:info ? info.from : '', to:info ? info.to : '', dep:info ? info.dep : '', garage:garOfTrip(code, info),
           off:false, sent:!!hits.length, hit:hits.sort((a, b) => String(a.at).localeCompare(String(b.at)))[0] || null, other:other[0] || null });
       });
     });
