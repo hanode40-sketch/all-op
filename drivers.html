@@ -293,9 +293,9 @@ let D = [], ROSTER = {}, ROSTER_N = 0, ABSENT = {}, SINCE = {}, WEEK_N = 0, canE
 const dep = r => r[C.DEP] || 'Unassigned';
 /* كراج الاستعداد حسب آخر رحلة نفّذها السائق: تنتهي في مكة أو جدة أو ينبع = الشميسي، والباقي حسب كراج مدينة الوصول */
 let TRIP_END = {}, LAST = {};
-const END_DEPOT = [[/jeddah|makkah|mecca|jarwal|yanbu|جدة|مكة|ينبع/i, 'Shumaysi'], [/madinah|medina|المدينة/i, 'Madinah'], [/tabuk|haql|تبوك|حقل/i, 'Tabuk'],
+const END_DEPOT = [[/jeddah|makkah|mecca|jarwal|yanbu|جدة|مكة|ينبع/i, 'Shumaysi'], [/madinah|medina|rafha|المدينة|رفحاء/i, 'Madinah'], [/tabuk|haql|تبوك|حقل/i, 'Tabuk'],
   [/riyadh|dawadmi|الرياض|الدوادمي/i, 'Riyadh'], [/jazan|jizan|جازان/i, 'Jazan'], [/khamis|خميس/i, 'Khamis Mushait'], [/bashayer|البشائر/i, 'Al Bashayer'],
-  [/buraydah|qassim|بريدة|القصيم/i, 'Buraydah'], [/hail|rafha|حائل|رفحاء/i, 'Hail']];
+  [/buraydah|qassim|بريدة|القصيم/i, 'Buraydah'], [/hail|حائل/i, 'Hail']];
 const endDepot = st => { for (const [re, d] of END_DEPOT) if (re.test(st || '')) return d; return ''; };
 function tripEnd(code) {
   code = String(code || '').toUpperCase().replace(/\s+/g, ' ').trim(); if (!code) return '';
@@ -724,7 +724,7 @@ const xlDate = v => {
   return '';
 };
 /* الكراج من ملف Excel: نقبل اختلاف الكتابة (Ha'il / Hayel / حائل / Hail Depot / Shumaisi / Qassim ...) */
-const DEP_RE = [[/sh?uma[iy]?s[iy]?|الشميسي|شميسي/i, 'Shumaysi'], [/madin|medin|المدينة/i, 'Madinah'], [/tab[ou]k|تبوك/i, 'Tabuk'], [/riya?dh|الرياض/i, 'Riyadh'],
+const DEP_RE = [[/sh?uma[iy]?s[iy]?|الشميسي|شميسي/i, 'Shumaysi'], [/madin|medin|rafha|المدينة|رفحاء/i, 'Madinah'], [/tab[ou]k|تبوك/i, 'Tabuk'], [/riya?dh|الرياض/i, 'Riyadh'],
   [/ja[zs]an|jizan|gizan|جازان|جيزان/i, 'Jazan'], [/khamis|mushait|خميس/i, 'Khamis Mushait'], [/bash?a[iy]er|البشائر/i, 'Al Bashayer'], [/buray?dah|buraidah|qassim|qaseem|بريدة|القصيم/i, 'Buraydah'],
   [/ha'?[iy]e?l|hayel|حائل|حايل/i, 'Hail']];
 const normDep = d => { d = String(d || '').trim(); const x = DEPOTS.find(k => k.toLowerCase() === d.toLowerCase()); if (x) return x; for (const [re, k] of DEP_RE) if (re.test(d)) return k; return 'Unassigned'; };

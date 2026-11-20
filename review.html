@@ -347,9 +347,9 @@ function drawIss(L) {
    المطلوب: كل (رحلة × سائق) في الروستر لكل يوم — بعد التبديلات
    المنفّذ: سجل النشاط «إرسال مسار رحلة» / «إرسال بطاقة جدول رحلة» (المرجع = رقم الرحلة، والتفاصيل فيها اسم السائق وتاريخ الرحلة) */
 const SEND_RE = /إرسال (مسار|بطاقة جدول) رحلة/;
-const DEPOTS = [[/shuma[iy]?s|jeddah|makkah|mecca|jarwal|yanbu|الشميسي|جدة|مكة|ينبع/i, 'الشميسي'], [/madinah|medina|المدينة/i, 'المدينة'], [/tabuk|haql|تبوك|حقل/i, 'تبوك'],
+const DEPOTS = [[/shuma[iy]?s|jeddah|makkah|mecca|jarwal|yanbu|الشميسي|جدة|مكة|ينبع/i, 'الشميسي'], [/madinah|medina|rafha|المدينة|رفحاء/i, 'المدينة'], [/tabuk|haql|تبوك|حقل/i, 'تبوك'],
   [/riyadh|dawadmi|الرياض|الدوادمي/i, 'الرياض'], [/jazan|jizan|جازان/i, 'جازان'], [/khamis|خميس/i, 'خميس مشيط'], [/bashayer|البشائر/i, 'البشائر'],
-  [/buraydah|qassim|بريدة|القصيم/i, 'بريدة'], [/hail|rafha|حائل|رفحاء/i, 'حائل']];
+  [/buraydah|qassim|بريدة|القصيم/i, 'بريدة'], [/hail|حائل/i, 'حائل']];
 const depotOf = st => { for (const [re, d] of DEPOTS) if (re.test(st || '')) return d; return ''; };
 const cN = c => String(c || '').toUpperCase().replace(/\s+/g, ' ').trim();
 const cParts = c => cN(c).split('+').map(x => x.trim()).filter(Boolean);
