@@ -1080,7 +1080,12 @@ if (window.NWAuth) load();
   const WD = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
   const wd = k => WD[new Date(k + 'T12:00:00').getDay()];
   const dmy = k => k ? k.slice(8, 10) + '/' + k.slice(5, 7) + '/' + k.slice(0, 4) : '';
-  let LAST_RES = null;
+  let LAST_RES = null, RATES = null;
+  /* حافز المسار: لكل رحلة باتجاه واحد، وكل كابتن ياخذه كامل — الأسعار من allowance.json */
+  async function loadRates() { if (RATES) return RATES; try { RATES = await (await fetch('allowance.json?v=' + Date.now())).json(); } catch (e) { RATES = { rates:{} }; } return RATES; }
+  const routeKey = c => { const m = String(c || '').toUpperCase().replace(/\s+/g, '').match(/^NW\d+[A-Z]?/); return m ? m[0] : ''; };
+  const incOf = code => { let sum = 0; const miss = []; String(code || '').split('+').map(x => x.trim()).filter(Boolean).forEach(c => { const k = routeKey(c), r = RATES && RATES.rates && (RATES.rates[k] || RATES.rates[k.replace(/[A-Z]$/, '')]); if (r) sum += Number(r.amt) || 0; else miss.push(c); }); return { sum: Math.round(sum * 100) / 100, miss }; };
+  const sar = v => (Math.round((v || 0) * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const rpDrivers = () => D.filter(r => inDep(r[C.DEP], $('fDepot').value));
   $('bRpt').onclick = () => {
     const sel = $('fDate').value || ymd(new Date());
@@ -1106,7 +1111,7 @@ if (window.NWAuth) load();
   // تصنيف يوم كل سائق
   function build(from, to, data, list) {
     const SET = {}, SWO = {}, SWI = {}, MK = {};
-    Object.keys(data.days).forEach(k => { const rows = data.days[k] || []; if (!rows.length) return; const set = {}; rows.forEach(r => [r[1], r[2]].forEach(x => { if (x) set[String(x).trim()] = String(r[0]); })); SET[k] = set; });
+    Object.keys(data.days).forEach(k => { const rows = data.days[k] || []; if (!rows.length) return; const set = {}; rows.forEach(r => [r[1], r[2]].forEach(x => { if (!x) return; const q = String(x).trim(); set[q] = set[q] ? set[q] + ' + ' + String(r[0]) : String(r[0]); })); SET[k] = set; });
     data.subs.forEach(x => { (SWO[x.date] = SWO[x.date] || {})[String(x.orig)] = x; (SWI[x.date] = SWI[x.date] || {})[String(x.rep)] = x; });
     data.marks.forEach(x => { (MK[x.date] = MK[x.date] || {})[String(x.iqama)] = x.mark; });
     const allDays = []; for (let k = from; k <= to; k = addD(k, 1)) allDays.push(k);
@@ -1134,7 +1139,9 @@ if (window.NWAuth) load();
         } else if (leaveOn(k)) { x.kind = 'leave'; x.note = stName(r[C.ST]); }
         rows.push(x);
       });
+      rows.forEach(x => { if (x.kind === 'trip') { const v = incOf(x.trip); x.inc = v.sum; x.miss = v.miss; } else x.inc = 0; });
       const c = {}; Object.keys(KIND).forEach(q => c[q] = rows.filter(x => x.kind === q).length);
+      c.inc = Math.round(rows.reduce((s2, x) => s2 + (x.inc || 0), 0) * 100) / 100; c.legs = rows.reduce((s2, x) => s2 + (x.kind === 'trip' ? String(x.trip).split('+').filter(t => t.trim()).length : 0), 0);
       c.trips = new Set(rows.filter(x => x.kind === 'trip').map(x => x.date + x.trip)).size;
       c.sub = rows.filter(x => x.kind === 'trip' && x.note.indexOf('بديل') === 0).length;
       return { r, iq, rows, c };
@@ -1144,20 +1151,21 @@ if (window.NWAuth) load();
   function showAll(res) {
     const tot = q => res.reduce((s2, x) => s2 + x.c[q], 0);
     $('rpOut').innerHTML = `<div class="rp-acts"><b>${res.length} سائق · من ${dmy(LAST_RES.from)} إلى ${dmy(LAST_RES.to)} · ${esc(LAST_RES.scope)}</b><span style="display:flex;gap:6px"><button class="btn light" id="rpPrint">🖨️ طباعة / PDF</button><button class="btn light" id="rpXls">⬇️ Excel</button></span></div>
-     <div class="rp-k"><div><b>${tot('trip')}</b><span>يوم على رحلة</span></div><div><b>${tot('rest')}</b><span>يوم راحة</span></div><div><b>${tot('sb')}</b><span>يوم استعداد</span></div><div><b>${tot('leave')}</b><span>يوم إجازة</span></div><div><b>${tot('swap')}</b><span>اعتذار / تبديل</span></div></div>
-     <div class="rp-w"><table class="rp-t"><thead><tr><th>#</th><th>السائق</th><th>رقم الإقامة</th><th>الكراج</th><th>الحالة الحالية</th><th>على رحلة</th><th>منها بديل</th><th>راحة</th><th>استعداد</th><th>إجازة</th><th>اعتذر / تبديل</th><th>خارج الخدمة</th><th>بدون روستر</th></tr></thead><tbody>
-     ${res.map((x, i) => `<tr class="cl" data-iq="${esc(x.iq)}"><td>${i + 1}</td><td><b>${esc(x.r[C.NAME])}</b></td><td>${esc(x.iq)}</td><td>${esc(depName(x.r[C.DEP]))}</td><td>${esc(stName(x.r[C.ST]))}</td><td><b>${x.c.trip}</b></td><td>${x.c.sub || ''}</td><td>${x.c.rest}</td><td>${x.c.sb}</td><td>${x.c.leave}</td><td>${x.c.swap || ''}</td><td>${x.c.out || ''}</td><td>${x.c.none || ''}</td></tr>`).join('')}</tbody></table></div>
-     <div class="sub" style="margin-top:6px">اضغط على أي سائق لعرض تفاصيل عمله يوم بيوم.</div>`;
+     <div class="rp-k"><div><b>${sar(tot('inc'))}</b><span>إجمالي الحوافز (ريال)</span></div><div><b>${tot('legs')}</b><span>رحلة منفّذة</span></div><div><b>${tot('trip')}</b><span>يوم على رحلة</span></div><div><b>${tot('rest')}</b><span>يوم راحة</span></div><div><b>${tot('sb')}</b><span>يوم استعداد</span></div><div><b>${tot('leave')}</b><span>يوم إجازة</span></div><div><b>${tot('swap')}</b><span>اعتذار / تبديل</span></div></div>
+     <div class="rp-w"><table class="rp-t"><thead><tr><th>#</th><th>السائق</th><th>رقم الإقامة</th><th>الكراج</th><th>الحالة الحالية</th><th>على رحلة</th><th>الرحلات</th><th>الحافز (ريال)</th><th>منها بديل</th><th>راحة</th><th>استعداد</th><th>إجازة</th><th>اعتذر / تبديل</th><th>خارج الخدمة</th><th>بدون روستر</th></tr></thead><tbody>
+     ${res.map((x, i) => `<tr class="cl" data-iq="${esc(x.iq)}"><td>${i + 1}</td><td><b>${esc(x.r[C.NAME])}</b></td><td>${esc(x.iq)}</td><td>${esc(depName(x.r[C.DEP]))}</td><td>${esc(stName(x.r[C.ST]))}</td><td><b>${x.c.trip}</b></td><td>${x.c.legs}</td><td><b>${sar(x.c.inc)}</b></td><td>${x.c.sub || ''}</td><td>${x.c.rest}</td><td>${x.c.sb}</td><td>${x.c.leave}</td><td>${x.c.swap || ''}</td><td>${x.c.out || ''}</td><td>${x.c.none || ''}</td></tr>`).join('')}</tbody></table></div>
+     <div class="sub" style="margin-top:6px">اضغط على أي سائق لعرض تفاصيل عمله يوم بيوم. الحوافز حسب جدول «${esc((RATES && RATES.title) || '')}» — لكل رحلة باتجاه واحد، وكل كابتن ياخذ الحافز كامل.</div>${missNote(res)}`;
     $('rpOut').querySelectorAll('[data-iq]').forEach(tr => tr.onclick = () => showOne(res.find(x => x.iq === tr.dataset.iq), true));
     $('rpPrint').onclick = () => printIt(allHtml(res)); $('rpXls').onclick = () => xls(res, null);
   }
+  function missNote(res) { const m = {}; res.forEach(x => x.rows.forEach(d => (d.miss || []).forEach(c => m[routeKey(c) || c] = 1))); const k = Object.keys(m); return k.length ? `<div class="msg err" style="margin-top:6px">⚠️ رحلات ما لها سعر حافز في الجدول (انحسبت صفر): ${k.map(esc).join('، ')}</div>` : ''; }
   function oneTable(x) {
-    return `<table class="rp-t"><thead><tr><th>التاريخ</th><th>اليوم</th><th>الحالة</th><th>الرحلة</th><th>ملاحظة</th></tr></thead><tbody>${x.rows.map(d => `<tr><td>${dmy(d.date)}</td><td>${wd(d.date)}</td><td>${badge(d.kind)}</td><td dir="ltr" style="text-align:start">${esc(d.trip)}</td><td>${esc(d.note)}</td></tr>`).join('')}</tbody></table>`;
+    return `<table class="rp-t"><thead><tr><th>التاريخ</th><th>اليوم</th><th>الحالة</th><th>الرحلة</th><th>الحافز (ريال)</th><th>ملاحظة</th></tr></thead><tbody>${x.rows.map(d => `<tr><td>${dmy(d.date)}</td><td>${wd(d.date)}</td><td>${badge(d.kind)}</td><td dir="ltr" style="text-align:start">${esc(d.trip)}</td><td>${d.inc ? sar(d.inc) : ''}${d.miss && d.miss.length ? ' ⚠️' : ''}</td><td>${esc(d.note)}</td></tr>`).join('')}<tr><td colspan="4"><b>الإجمالي</b></td><td><b>${sar(x.c.inc)}</b></td><td></td></tr></tbody></table>`;
   }
-  function kpis(x) { return `<div class="rp-k"><div><b>${x.c.trip}</b><span>يوم على رحلة</span></div><div><b>${x.c.rest}</b><span>راحة</span></div><div><b>${x.c.sb}</b><span>استعداد</span></div><div><b>${x.c.leave}</b><span>إجازة</span></div><div><b>${x.c.swap}</b><span>اعتذر / تبديل</span></div><div><b>${x.c.sub}</b><span>عمل كبديل</span></div></div>`; }
+  function kpis(x) { return `<div class="rp-k"><div><b>${sar(x.c.inc)}</b><span>الحافز (ريال)</span></div><div><b>${x.c.legs}</b><span>رحلة منفّذة</span></div><div><b>${x.c.trip}</b><span>يوم على رحلة</span></div><div><b>${x.c.rest}</b><span>راحة</span></div><div><b>${x.c.sb}</b><span>استعداد</span></div><div><b>${x.c.leave}</b><span>إجازة</span></div><div><b>${x.c.swap}</b><span>اعتذر / تبديل</span></div><div><b>${x.c.sub}</b><span>عمل كبديل</span></div></div>`; }
   function showOne(x, back) {
     $('rpOut').innerHTML = `<div class="rp-acts"><div>${back ? '<button class="btn light" id="rpBack">→ رجوع لكل السائقين</button> ' : ''}<b>${esc(x.r[C.NAME])}</b> · ${esc(x.iq)} · ${esc(depName(x.r[C.DEP]))} · ${esc(stName(x.r[C.ST]))} · من ${dmy(LAST_RES.from)} إلى ${dmy(LAST_RES.to)}</div>
-      <span style="display:flex;gap:6px"><button class="btn light" id="rpPrint">🖨️ طباعة / PDF</button><button class="btn light" id="rpXls">⬇️ Excel</button></span></div>${kpis(x)}<div class="rp-w">${oneTable(x)}</div>`;
+      <span style="display:flex;gap:6px"><button class="btn light" id="rpPrint">🖨️ طباعة / PDF</button><button class="btn light" id="rpXls">⬇️ Excel</button></span></div>${kpis(x)}<div class="rp-w">${oneTable(x)}</div>${missNote([x])}`;
     if (back) $('rpBack').onclick = () => showAll(LAST_RES.res);
     $('rpPrint').onclick = () => printIt(oneHtml(x)); $('rpXls').onclick = () => xls([x], x);
   }
@@ -1167,7 +1175,7 @@ if (window.NWAuth) load();
   function printIt(body) {
     const w = window.open('', '_blank'); if (!w) return alert('اسمح بالنوافذ المنبثقة للطباعة');
     w.document.write(`<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>تقرير عمل السائقين</title><style>body{font-family:Tahoma,Arial,sans-serif;margin:18px;color:#111}
-      .rp-k{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:8px 0}.rp-k div{border:1px solid #ccc;border-radius:8px;padding:6px;text-align:center}.rp-k b{display:block;font-size:18px}.rp-k span{font-size:11px;color:#555}
+      .rp-k{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin:8px 0}.rp-k div{border:1px solid #ccc;border-radius:8px;padding:6px;text-align:center}.rp-k b{display:block;font-size:18px}.rp-k span{font-size:11px;color:#555}
       table{width:100%;border-collapse:collapse;font-size:11.5px}th,td{border:1px solid #bbb;padding:4px 6px;text-align:right}th{background:#1F3864;color:#fff}tr:nth-child(even) td{background:#f5f7fb}
       .rp-b{font-weight:700}.rp-trip{color:#15803d}.rp-rest{color:#475569}.rp-sb{color:#6d28d9}.rp-leave{color:#1d4ed8}.rp-swap{color:#c2410c}.rp-out{color:#b91c1c}.rp-none{color:#94a3b8}
       @page{size:A4 landscape;margin:10mm}</style></head><body>${body}<script>setTimeout(()=>print(),300)<\/script></body></html>`);
@@ -1175,12 +1183,12 @@ if (window.NWAuth) load();
   }
   async function xls(res, one) {
     await loadXlsx(); const wb = XLSX.utils.book_new();
-    const sum = [['السائق', 'رقم الإقامة', 'الكراج', 'الحالة الحالية', 'على رحلة', 'منها بديل', 'راحة', 'استعداد', 'إجازة', 'اعتذر / تبديل', 'خارج الخدمة', 'بدون روستر']]
-      .concat(res.map(x => [x.r[C.NAME], x.iq, depName(x.r[C.DEP]), stName(x.r[C.ST]), x.c.trip, x.c.sub, x.c.rest, x.c.sb, x.c.leave, x.c.swap, x.c.out, x.c.none]));
+    const sum = [['السائق', 'رقم الإقامة', 'الكراج', 'الحالة الحالية', 'على رحلة', 'الرحلات', 'الحافز (ريال)', 'منها بديل', 'راحة', 'استعداد', 'إجازة', 'اعتذر / تبديل', 'خارج الخدمة', 'بدون روستر']]
+      .concat(res.map(x => [x.r[C.NAME], x.iq, depName(x.r[C.DEP]), stName(x.r[C.ST]), x.c.trip, x.c.legs, x.c.inc, x.c.sub, x.c.rest, x.c.sb, x.c.leave, x.c.swap, x.c.out, x.c.none]));
     const ws1 = XLSX.utils.aoa_to_sheet(sum); ws1['!cols'] = sum[0].map((_, i) => ({ wch: i ? 14 : 32 })); XLSX.utils.book_append_sheet(wb, ws1, 'الملخص');
-    const det = [['السائق', 'رقم الإقامة', 'التاريخ', 'اليوم', 'الحالة', 'الرحلة', 'ملاحظة']];
-    res.forEach(x => x.rows.forEach(d => det.push([x.r[C.NAME], x.iq, d.date, wd(d.date), KIND[d.kind][0], d.trip, d.note])));
-    const ws2 = XLSX.utils.aoa_to_sheet(det); ws2['!cols'] = [{ wch: 32 }, { wch: 13 }, { wch: 12 }, { wch: 10 }, { wch: 16 }, { wch: 22 }, { wch: 30 }]; XLSX.utils.book_append_sheet(wb, ws2, 'التفاصيل اليومية');
+    const det = [['السائق', 'رقم الإقامة', 'التاريخ', 'اليوم', 'الحالة', 'الرحلة', 'الحافز (ريال)', 'ملاحظة']];
+    res.forEach(x => x.rows.forEach(d => det.push([x.r[C.NAME], x.iq, d.date, wd(d.date), KIND[d.kind][0], d.trip, d.inc || 0, d.note])));
+    const ws2 = XLSX.utils.aoa_to_sheet(det); ws2['!cols'] = [{ wch: 32 }, { wch: 13 }, { wch: 12 }, { wch: 10 }, { wch: 16 }, { wch: 26 }, { wch: 12 }, { wch: 30 }]; XLSX.utils.book_append_sheet(wb, ws2, 'التفاصيل اليومية');
     wb.Workbook = { Views: [{ RTL: true }] };
     XLSX.writeFile(wb, (one ? 'تقرير عمل ' + one.r[C.NAME] : 'تقرير عمل السائقين') + ' ' + LAST_RES.from + ' — ' + LAST_RES.to + '.xlsx');
   }
@@ -1192,7 +1200,7 @@ if (window.NWAuth) load();
     if (q) { const iq = (q.match(/(\d{6,})\s*$/) || [])[1]; list = list.filter(r => iq ? String(r[C.IQ]) === iq : (r[C.NAME] + ' ' + r[C.IQ]).toLowerCase().includes(q.toLowerCase())); if (!list.length) return alert('ما لقيت السائق'); }
     const b = $('rpGo'); b.disabled = true; $('rpOut').innerHTML = '<div class="msg">⏳ جاري تجهيز التقرير...</div>';
     try {
-      const data = await fetchRange(addD(from, -31), addD(to, 7));
+      const [data] = await Promise.all([fetchRange(addD(from, -31), addD(to, 7)), loadRates()]);
       const res = build(from, to, data, list).sort((a, z) => z.c.trip - a.c.trip || String(a.r[C.NAME]).localeCompare(z.r[C.NAME]));
       const dv = $('fDepot').value; LAST_RES = { from, to, res, scope: dv ? (dv === '*mine' ? (MINE || []).map(depName).join('، ') : depName(dv)) : 'كل الكراجات' };
       if (!Object.keys(data.days).some(k => k >= from && k <= to && (data.days[k] || []).length)) $('rpOut').innerHTML = '<div class="msg err">لا يوجد روستر مرفوع في هذي الفترة</div>';

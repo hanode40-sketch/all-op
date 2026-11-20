@@ -1,0 +1,172 @@
+{
+ "title": "November schedule",
+ "updated": "2026-11-21",
+ "note": "حافز لكل رحلة باتجاه واحد · كل كابتن ياخذ الحافز كامل",
+ "rates": {
+  "NW01": {
+   "route": "Jeddah-Hail",
+   "km": 919,
+   "amt": 58.82
+  },
+  "NW02": {
+   "route": "Jeddah-Madinah",
+   "km": 431,
+   "amt": 34.48
+  },
+  "NW03": {
+   "route": "Jeddah-Tabuk",
+   "km": 1098,
+   "amt": 70.27
+  },
+  "NW04": {
+   "route": "Jeddah-Tabuk (Direct)",
+   "km": 1060,
+   "amt": 67.84
+  },
+  "NW05": {
+   "route": "Madinah-Tabuk(Umluj)",
+   "km": 944,
+   "amt": 60.42
+  },
+  "NW06": {
+   "route": "Jeddah-Yanbu",
+   "km": 343,
+   "amt": 27.44
+  },
+  "NW07": {
+   "route": "Jeddah-Jazan",
+   "km": 758,
+   "amt": 48.51
+  },
+  "NW08": {
+   "route": "Jeddah-Jazan(Direct)",
+   "km": 758,
+   "amt": 48.51
+  },
+  "NW10": {
+   "route": "Jeddah-Khamis Mushait",
+   "km": 636,
+   "amt": 40.7
+  },
+  "NW11": {
+   "route": "Jeddah-Al Bashayer",
+   "km": 531,
+   "amt": 33.98
+  },
+  "NW12": {
+   "route": "Jeddah-Taif",
+   "km": 230,
+   "amt": 18.4
+  },
+  "NW13": {
+   "route": "Jeddah-Makkah",
+   "km": 91,
+   "amt": 15.0
+  },
+  "NW14": {
+   "route": "Madinah - Tabuk (Al Ula)",
+   "km": 708,
+   "amt": 45.31
+  },
+  "NW15": {
+   "route": "Madinah-Riyadh (Unaizah)",
+   "km": 946,
+   "amt": 57.6
+  },
+  "NW15B": {
+   "route": "Riyadh SAB - Buraydah Airport",
+   "km": 374,
+   "amt": 29.92
+  },
+  "NW16B": {
+   "route": "Madinah-Riyadh (Semi-Direct)",
+   "km": 927,
+   "amt": 59.33
+  },
+  "NW16": {
+   "route": "Madinah-Riyadh (Direct)",
+   "km": 850,
+   "amt": 54.4
+  },
+  "NW17": {
+   "route": "Madinah-Riyadh (Dawadmi)",
+   "km": 907,
+   "amt": 58.05
+  },
+  "NW18": {
+   "route": "Jeddah-Riyadh",
+   "km": 1009,
+   "amt": 64.58
+  },
+  "NW18B": {
+   "route": "Jeddah-Riyadh (T1)",
+   "km": 980,
+   "amt": 62.72
+  },
+  "NW19": {
+   "route": "Makkah-Riyadh",
+   "km": 935,
+   "amt": 59.84
+  },
+  "NW20": {
+   "route": "Makkah-Riyadh (Direct)",
+   "km": 925,
+   "amt": 59.2
+  },
+  "NW21": {
+   "route": "Madinah-Rafha",
+   "km": 894,
+   "amt": 56.45
+  },
+  "NW22": {
+   "route": "Madinah-Yanbu",
+   "km": 253,
+   "amt": 20.24
+  },
+  "NW23": {
+   "route": "Makkah-Yanbu",
+   "km": 424,
+   "amt": 27.14
+  },
+  "NW26": {
+   "route": "Tabuk - Haql",
+   "km": 226,
+   "amt": 18.08
+  },
+  "NW27": {
+   "route": "Tabuk-Hail (Al Ula)",
+   "km": 730,
+   "amt": 46.72
+  },
+  "NW28": {
+   "route": "Makkah - Jeddah Airport North Terminal",
+   "km": 101,
+   "amt": 15.0
+  },
+  "NW29": {
+   "route": "hail-tabuk",
+   "km": 676,
+   "amt": 43.26
+  },
+  "NW30": {
+   "route": "Jeddah-Khamis Mushait (Bisha)",
+   "km": 902,
+   "amt": 57.73
+  },
+  "NW31": {
+   "route": "makkah-tabuk",
+   "km": 1084,
+   "amt": 69.38
+  },
+  "NW32": {
+   "route": "Jeddah-Buraydah",
+   "km": 1086,
+   "amt": 69.5
+  },
+  "NW33": {
+   "route": "Riyadh-Al Bashayer",
+   "km": 1004,
+   "amt": 64.26
+  }
+ }
+}
