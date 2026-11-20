@@ -172,7 +172,7 @@
     <div><label>من تاريخ</label><input id="rpFrom" type="date"></div>
     <div><label>إلى تاريخ</label><input id="rpTo" type="date"></div>
     <div style="flex:2;position:relative"><label>السائق (اتركه فاضي لكل السائقين)</label><input id="rpDrv" type="search" autocomplete="off" list="rpDl" placeholder="اسم السائق أو رقم الإقامة"><datalist id="rpDl"></datalist></div>
-    <div style="flex:0 0 auto;display:flex;gap:6px"><button class="btn green" id="rpGo">عرض التقرير</button></div>
+    <div style="flex:0 0 auto;display:flex;gap:6px"><button class="btn green" id="rpGo">عرض التقرير</button><button class="btn light" id="rpHr" title="نفس ملف Daily driver اللي ينرسل للموارد كل شهر — الفترة من 21 إلى 20">📤 ملف الموارد الشهري</button></div>
   </div>
   <div id="rpOut" style="margin-top:12px"></div>
 </div></div>
@@ -1192,6 +1192,66 @@ if (window.NWAuth) load();
     wb.Workbook = { Views: [{ RTL: true }] };
     XLSX.writeFile(wb, (one ? 'تقرير عمل ' + one.r[C.NAME] : 'تقرير عمل السائقين') + ' ' + LAST_RES.from + ' — ' + LAST_RES.to + '.xlsx');
   }
+  /* ===== ملف الموارد الشهري (Daily driver) — من 21 الشهر السابق إلى 20 ===== */
+  const hrPeriod = () => { const t = new Date(), y = t.getFullYear(), m = t.getMonth(), end = t.getDate() > 20 ? new Date(y, m, 20) : new Date(y, m - 1, 20), st = new Date(end.getFullYear(), end.getMonth() - 1, 21); return [ymd(st), ymd(end)]; };
+  const hrCode = (d, r) => { switch (d.kind) { case 'trip': return 1; case 'rest': return 'R'; case 'sb': return 'SB'; case 'leave': return r[C.ST] === 'Sick Leave' ? 'SL' : 'V'; case 'swap': return 'A'; case 'out': return r[C.ST] === 'Suspended' ? 'SUS' : r[C.ST] === 'Termination of services' ? '' : 'A'; default: return ''; } };
+  const xd = k => { const [y, m, d] = k.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d)); };
+  const numOr = v => { const n = Number(v); return v !== '' && v != null && isFinite(n) ? n : (v == null ? '' : v); };
+  $('rpHr').onclick = async () => {
+    let from = $('rpFrom').value, to = $('rpTo').value;
+    if (!from || from.slice(8) !== '21' || !to || to < from) { [from, to] = hrPeriod(); $('rpFrom').value = from; $('rpTo').value = to; }
+    if ((new Date(to) - new Date(from)) / 864e5 > 40) return alert('ملف الموارد لشهر واحد فقط (من 21 إلى 20)');
+    const list = D.filter(r => inDep(r[C.DEP], $('fDepot').value));
+    const b = $('rpHr'); b.disabled = true; $('rpOut').innerHTML = `<div class="msg">⏳ جاري تجهيز ملف الموارد من ${dmy(from)} إلى ${dmy(to)}...</div>`;
+    try {
+      const [data] = await Promise.all([fetchRange(addD(from, -31), addD(to, 7)), loadRates(), loadXlsx()]);
+      if (!Object.keys(data.days).some(k => k >= from && k <= to && (data.days[k] || []).length)) { $('rpOut').innerHTML = '<div class="msg err">لا يوجد روستر مرفوع في هذي الفترة</div>'; return; }
+      const res = build(from, to, data, list).sort((a, z) => String(a.r[C.NAME]).localeCompare(z.r[C.NAME]));
+      const days = res.length ? res[0].rows.map(d => d.date) : [];
+      const BY = {}; D.forEach(r => BY[String(r[C.IQ])] = r);
+      const wb = XLSX.utils.book_new();
+      // 1) الحضور
+      const at = [[], ['', '', '', '', 'START', '', '', xd(from), '', 'A', 'Absence', '', '', '', '', '', 'R', 'Daily Rest', '', '', '', '', 'SL', 'Sick Leave'], ['', '', '', '', 'END', '', '', xd(to)], ['', '', '', '', '', '', '', '', '', 'SUS', 'SUSPENDED', '', '', '', '', '', 'SB', 'STAND-BY DUTY', '', '', '', '', 'V', 'Vacation'], [],
+        ['', 'Employee ID', 'ID Number', 'NAME', ...days.map(xd), '', 'Total TRIP', 'A', 'SUS', 'SL', 'R', 'SB', 'V', 'Total Days', 'الحالة']];
+      res.forEach((x, i) => { const cs = x.rows.map(d => hrCode(d, x.r)), n = v => cs.filter(c => c === v).length;
+        at.push([i + 1, numOr(x.r[C.EMP]), numOr(x.iq), x.r[C.NAME], ...cs, '', n(1), n('A'), n('SUS'), n('SL'), n('R'), n('SB'), n('V'), cs.filter(c => c !== '').length, x.r[C.ST] === 'operation' ? '' : stName(x.r[C.ST])]); });
+      const ws1 = XLSX.utils.aoa_to_sheet(at, { cellDates: true }); ws1['!cols'] = [{ wch: 5 }, { wch: 11 }, { wch: 12 }, { wch: 32 }, ...days.map(() => ({ wch: 5.5 })), { wch: 2 }, ...Array(8).fill({ wch: 8 }), { wch: 18 }];
+      days.forEach((_, j) => { const c = XLSX.utils.encode_cell({ r: 5, c: 4 + j }); if (ws1[c]) ws1[c].z = 'dd-mmm'; }); ['H2', 'H3'].forEach(c => { if (ws1[c]) ws1[c].z = 'dd/mm/yyyy'; });
+      XLSX.utils.book_append_sheet(wb, ws1, 'DRIVERS SUMMARY Attendance');
+      // 2) الرحلات حسب المسار + المبلغ
+      const R = (RATES && RATES.rates) || {}, keys = Object.keys(R), extra = {};
+      res.forEach(x => x.rows.forEach(d => { if (d.kind === 'trip') String(d.trip).split('+').forEach(t => { const k = routeKey(t); if (k && !R[k] && !R[k.replace(/[A-Z]$/, '')]) extra[k] = 1; }); }));
+      const cols = keys.concat(Object.keys(extra)).sort((a, z) => (parseInt(a.slice(2)) - parseInt(z.slice(2))) || a.localeCompare(z));
+      const rate = k => { const r = R[k] || R[k.replace(/[A-Z]$/, '')]; return r ? Number(r.amt) || 0 : 0; };
+      const legsOf = x => { const m = {}; x.rows.forEach(d => { if (d.kind === 'trip') String(d.trip).split('+').forEach(t => { let k = routeKey(t); if (!k) return; if (!R[k] && R[k.replace(/[A-Z]$/, '')] && !cols.includes(k)) k = k.replace(/[A-Z]$/, ''); m[k] = (m[k] || 0) + 1; }); }); return m; };
+      const body = res.map((x, i) => { const m = legsOf(x), cnt = cols.map(k => m[k] || 0), tot = cnt.reduce((a, z) => a + z, 0), amt = Math.round(cols.reduce((a, k, j) => a + cnt[j] * rate(k), 0) * 100) / 100;
+        return [i + 1, numOr(x.r[C.EMP]), numOr(x.iq), x.r[C.NAME], x.r[C.NAT] || '', ...cnt, tot, amt, x.r[C.ST] === 'operation' ? '' : stName(x.r[C.ST])]; });
+      const colTot = cols.map((_, j) => body.reduce((a, r) => a + r[5 + j], 0));
+      const tr = [['', '', '', 'Trip Value', '', ...cols.map(rate), 'Total Trips', 'Total Amount', 'STATUS'],
+        ['', '', '', 'Number of Completed Trips', 'ACTUAL TOTAL:', ...colTot, colTot.reduce((a, z) => a + z, 0), Math.round(body.reduce((a, r) => a + r[6 + cols.length], 0) * 100) / 100],
+        ['', '', '', 'Trip Route', '', ...cols.map(k => (R[k] && R[k].route) || '')],
+        ['', 'ID.NO', 'ID ', 'NAME', 'Nationality', ...cols, 'Total Trips', 'Total Amount', 'STATUS'], ...body];
+      const ws2 = XLSX.utils.aoa_to_sheet(tr); ws2['!cols'] = [{ wch: 5 }, { wch: 11 }, { wch: 12 }, { wch: 32 }, { wch: 12 }, ...cols.map(() => ({ wch: 8 })), { wch: 10 }, { wch: 12 }, { wch: 18 }];
+      XLSX.utils.book_append_sheet(wb, ws2, 'DRIVERS SUMMARY Trips');
+      // 3) تفاصيل الرحلات من الروستر
+      const det = [['DATE', 'ROUTE', 'TRIP', '1st driver ID', 'السائق الأول', '2nd driver ID', 'السائق الثاني']];
+      Object.keys(data.days).filter(k => k >= from && k <= to).sort().forEach(k => (data.days[k] || []).forEach(r => {
+        const a = String(r[1] || '').trim(), z = String(r[2] || '').trim();
+        det.push([xd(k), routeKey(r[0]), String(r[0]), numOr(a), a && BY[a] ? BY[a][C.NAME] : '', z ? numOr(z) : '', z && BY[z] ? BY[z][C.NAME] : '']); }));
+      const ws3 = XLSX.utils.aoa_to_sheet(det, { cellDates: true }); ws3['!cols'] = [{ wch: 11 }, { wch: 8 }, { wch: 16 }, { wch: 12 }, { wch: 32 }, { wch: 12 }, { wch: 32 }];
+      for (let i = 1; i < det.length; i++) { const c = 'A' + (i + 1); if (ws3[c]) ws3[c].z = 'dd/mm/yyyy'; }
+      XLSX.utils.book_append_sheet(wb, ws3, 'trip details');
+      // 4) قائمة السائقين
+      const ls = [['', 'Em.no', 'ID ', 'NAME', 'Nationality', 'Depot', 'Status', 'Comment']].concat(res.map((x, i) => [i + 1, numOr(x.r[C.EMP]), numOr(x.iq), x.r[C.NAME], x.r[C.NAT] || '', depName(x.r[C.DEP]), stName(x.r[C.ST]), x.r[C.NOTE] || '']));
+      const ws4 = XLSX.utils.aoa_to_sheet(ls); ws4['!cols'] = [{ wch: 5 }, { wch: 11 }, { wch: 12 }, { wch: 32 }, { wch: 12 }, { wch: 14 }, { wch: 18 }, { wch: 30 }];
+      XLSX.utils.book_append_sheet(wb, ws4, 'List');
+      const ed = xd(to), mon = ed.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' }).toUpperCase();
+      XLSX.writeFile(wb, `Daily_driver_20-${mon}${ed.getUTCFullYear()}.xlsx`);
+      const miss = Object.keys(extra);
+      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ملف الموارد: ${res.length} سائق · من ${dmy(from)} إلى ${dmy(to)} · إجمالي المبلغ ${sar(tr[1][6 + cols.length])} ريال</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها سعر في جدول الحوافز (انحسبت صفر): ${miss.map(esc).join('، ')}</div>` : '');
+    } catch (e) { $('rpOut').innerHTML = `<div class="msg err">${esc(e.message || t_('eNet'))}</div>`; }
+    finally { b.disabled = false; }
+  };
   $('rpGo').onclick = async () => {
     const from = $('rpFrom').value, to = $('rpTo').value;
     if (!from || !to || from > to) return alert('حدد الفترة بشكل صحيح');
