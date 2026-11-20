@@ -1230,8 +1230,10 @@ if (window.NWAuth) load();
   const loadZip = () => window.JSZip ? Promise.resolve() : new Promise((ok, bad) => { const s2 = document.createElement('script'); s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'; s2.onload = ok; s2.onerror = () => bad(new Error('تعذر تحميل مكتبة Excel — تأكد من الإنترنت')); document.head.appendChild(s2); });
   $('rpHr').onclick = async () => {
     let from = $('rpFrom').value, to = $('rpTo').value;
-    if (!from || from.slice(8) !== '21' || !to || to < from) { [from, to] = hrPeriod(); $('rpFrom').value = from; $('rpTo').value = to; }
-    if ((new Date(to) - new Date(from)) / 864e5 > 30) return alert('ملف الموارد لشهر واحد فقط (من 21 إلى 20)');
+    // الفترة دايماً من 21 إلى 20 الشهر اللي بعده — نصححها تلقائياً بدل رسالة خطأ
+    if (!from || from.slice(8) !== '21') [from, to] = hrPeriod();
+    else { const f = new Date(from + 'T12:00:00'); to = ymd(new Date(f.getFullYear(), f.getMonth() + 1, 20)); }
+    $('rpFrom').value = from; $('rpTo').value = to;
     const list = D.filter(r => inDep(r[C.DEP], $('fDepot').value));
     const b = $('rpHr'); b.disabled = true; $('rpOut').innerHTML = `<div class="msg">⏳ جاري تجهيز ملف الموارد من ${dmy(from)} إلى ${dmy(to)}...</div>`;
     try {
