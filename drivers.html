@@ -1247,7 +1247,24 @@ if (window.NWAuth) load();
       zip.file(P + 'sheet1.xml', x1);
       // 2) trip details
       let x2 = await zip.file(P + 'sheet2.xml').async('string');
-      const det = []; Object.keys(data.days).filter(k => k >= from && k <= to).sort().forEach(k => (data.days[k] || []).forEach(r => { const a = String(r[1] || '').trim(), z = String(r[2] || '').trim(); det.push({ B: serial(k), C: routeKey(r[0]), D: String(r[0]), N: a ? numOr(a) : '', P: z ? numOr(z) : '', ...(z ? {} : { Q: '' }), ...(a ? {} : { O: '' }) }); }));
+      // جدول الرحلات (المحطات والأوقات وواجب الحافلة) + أرقام الحافلات من صفحة جدول الرحلة
+      const dts = Object.keys(data.days).filter(k => k >= from && k <= to && (data.days[k] || []).length).sort();
+      $('rpOut').innerHTML = `<div class="msg">⏳ جاري جلب جدول الرحلات وأرقام الحافلات...</div>`;
+      const sch = await NWAuth.call('scheduleGet', {}).catch(() => null);
+      const BUS = {}; for (let i = 0; i < dts.length; i += 6) await Promise.all(dts.slice(i, i + 6).map(k => NWAuth.call('routeDay', { date: k }).then(j => { BUS[k] = (j && j.ok && j.buses) || {}; }).catch(() => { BUS[k] = {}; })));
+      const nk = v => String(v || '').toUpperCase().replace(/\s+/g, ''), mins = v => { const m = String(v || '').match(/(\d{1,2}):(\d{2})/); return m ? +m[1] * 60 + +m[2] : null; };
+      const sStart = v => { const m = String(v || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m ? m[3] + '-' + m[2].padStart(2, '0') + '-' + m[1].padStart(2, '0') : ''; };
+      const idx = L => { const M = {}, by = {}; (L || []).forEach(t => (by[t.duty] = by[t.duty] || []).push(t));
+        Object.keys(by).forEach(du => { const T = by[du], d0 = T.find(t => !/no dispatch/i.test(t.disp || '')) || T[0], st = mins(d0.t0) || 0;
+          T.slice().sort((a, z) => ((mins(a.t0) - st + 1440) % 1440) - ((mins(z.t0) - st + 1440) % 1440)).forEach((t, i) => { M[nk(t.trip)] = Object.assign({}, t, { dd: du + '-' + (i + 1) }); }); }); return M; };
+      const CURI = idx(sch && sch.ok && sch.trips), PREVI = idx(sch && sch.ok && sch.prev && sch.prev.trips), cs = sStart(sch && sch.meta && sch.meta.valid);
+      const tday = v => { const m = mins(v); return m == null ? (v || '') : m / 1440; };
+      const det = []; dts.forEach(k => { const SI = cs && k < cs && Object.keys(PREVI).length ? PREVI : CURI;
+        (data.days[k] || []).forEach(r => { const a = String(r[1] || '').trim(), z = String(r[2] || '').trim(), code = String(r[0]);
+          const t = SI[nk(code)] || SI[nk(code.split('+')[0])] || CURI[nk(code)] || null;
+          const o = { B: serial(k), C: (t && t.route) || routeKey(code), D: code, N: a ? numOr(a) : '', P: z ? numOr(z) : '', ...(z ? {} : { Q: '' }), ...(a ? {} : { O: '' }) };
+          if (t) Object.assign(o, { E: t.duty || '', F: t.dd || '', G: t.disp || '', H: /no dispatch/i.test(t.disp || '') ? '<--Check info' : tday(t.dt), I: t.fr || '', J: tday(t.t0), K: t.to || '', L: tday(t.t1), M: numOr((BUS[k] || {})[t.duty] || '') });
+          det.push(o); }); });
       x2 = setCell(x2, 'F1', `Schedule valid for period: ${dmy(from)} (00.01h) to ${dmy(to)} (23.59h)`);
       x2 = fillSheet(x2, 8, det); zip.file(P + 'sheet2.xml', x2);
       // 3) Attendance
