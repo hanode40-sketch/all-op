@@ -1310,7 +1310,7 @@ if (window.NWAuth) load();
       let x3 = await zip.file(P + 'sheet3.xml').async('string');
       for (let j = 0; j < 31; j++) x3 = setCell(x3, colL(4 + j) + '6', days[j] ? serial(days[j]) : '');
       x3 = setCell(x3, 'H3', { f: colL(4 + days.length - 1) + '6' });
-      x3 = fillSheet(x3, 7, res.map((x, i) => { const o = { A: i + 1, B: numOr(x.r[C.EMP]), C: numOr(x.iq), D: x.r[C.NAME], AS: stTxt(x.r) }; x.rows.forEach((d, j) => { o[colL(4 + j)] = hrCode(d, x.r); }); for (let j = x.rows.length; j < 31; j++) o[colL(4 + j)] = ''; return o; }));
+      x3 = fillSheet(x3, 7, res.map((x, i) => { const o = { A: i + 1, B: numOr(x.r[C.EMP]), C: numOr(x.iq), D: x.r[C.NAME], AS: x.r[C.ST] === 'operation' && x.rows.some(d => d.kind === 'leave') ? 'عودة من إجازة' : stTxt(x.r) }; x.rows.forEach((d, j) => { o[colL(4 + j)] = hrCode(d, x.r); }); for (let j = x.rows.length; j < 31; j++) o[colL(4 + j)] = ''; return o; }));
       zip.file(P + 'sheet3.xml', x3);
       // 4) Trips
       let x4 = await zip.file(P + 'sheet4.xml').async('string');
@@ -1330,7 +1330,7 @@ if (window.NWAuth) load();
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Daily_driver_20-${mon}${ed.getFullYear()}.xlsx`; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
       window.__hrLast = a.download;
       const miss = Object.keys(extra);
-      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ملف الموارد بنفس التنسيق (إصدار 21/11-ب): ${res.length} سائق · ${det.length} رحلة · من ${dmy(from)} إلى ${dmy(to)}</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها عمود في ملف الموارد (ما انحسبت): ${miss.map(esc).join('، ')}</div>` : '');
+      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ملف الموارد بنفس التنسيق (إصدار 21/11-ج): ${res.length} سائق · ${det.length} رحلة · من ${dmy(from)} إلى ${dmy(to)}</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها عمود في ملف الموارد (ما انحسبت): ${miss.map(esc).join('، ')}</div>` : '');
     } catch (e) { $('rpOut').innerHTML = `<div class="msg err">${esc(e.message || t_('eNet'))}</div>`; }
     finally { b.disabled = false; }
   };
