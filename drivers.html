@@ -1112,19 +1112,22 @@ if (window.NWAuth) load();
   /* سجل الحالات: السائق اللي رجع من إجازة حالته الحين «على رأس العمل» — نرجع لسجل التغييرات عشان أيام الإجازة ما تطلع استعداد */
   let HIST = {};
   const stKey = v => { v = String(v || '').trim(); if (ST[v]) return v; return STATUSES.find(k => ST[k].ar === v || ST[k].en === v) || ''; };
-  const hDate = v => { v = String(v || ''); let m = v.match(/(\d{4})-(\d{2})-(\d{2})/); if (m) return m[1] + '-' + m[2] + '-' + m[3]; m = v.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m ? m[3] + '-' + m[2].padStart(2, '0') + '-' + m[1].padStart(2, '0') : ''; };
-  function histIntervals(h, r) {      // [{s,e,st}] فترات الحالات غير «على رأس العمل»
+  const hDates = v => { const out = []; String(v || '').replace(/(\d{4})-(\d{1,2})-(\d{1,2})|(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/g, (m, y, mo, d, d2, mo2, y2) => { out.push(y ? y + '-' + mo.padStart(2, '0') + '-' + d.padStart(2, '0') : y2 + '-' + mo2.padStart(2, '0') + '-' + d2.padStart(2, '0')); }); return out; };
+  const hDate = v => hDates(v)[0] || '';
+  /* فترات الإجازة = تقاطع (فترة الحالة «إجازة» في السجل) مع (تواريخ الإجازة المسجلة من/إلى) — بدون تواريخ ما نحسب شي */
+  function histIntervals(h, r) {
     const ev = (h || []).map(x => ({ d: hDate(x[0]), f: String(x[3] || ''), o: x[4], n: x[5] })).filter(x => x.d).sort((a, z) => a.d < z.d ? -1 : 1);
-    const stEv = ev.filter(x => (/status|الحالة|حالة/i.test(x.f) && (stKey(x.n) || stKey(x.o))) || (stKey(x.n) && stKey(x.o)));
-    const fromAt = d => { const e = ev.filter(x => /from|بداية|من تاريخ|^من$/i.test(x.f) && Math.abs(new Date(x.d) - new Date(d)) <= 2 * 864e5 && hDate(x.n)).pop(); return e ? hDate(e.n) : ''; };
+    const isSt = x => (/status|الحالة|حالة/i.test(x.f) && (stKey(x.n) || stKey(x.o))) || (stKey(x.n) && stKey(x.o));
+    const stEv = ev.filter(isSt);
+    // نطاقات التواريخ المسجلة: من حقول التاريخ في السجل (القيمة الجديدة والقديمة) + المحفوظ حالياً في بطاقة السائق
+    const R = [];
+    ev.filter(x => !isSt(x) && /تاريخ|date|from|to|من|إلى|عودة|بداية/i.test(x.f)).forEach(x => [x.n, x.o].forEach(v => { const d = hDates(v); if (d.length >= 2) R.push([d[0] < d[1] ? d[0] : d[1], d[0] < d[1] ? d[1] : d[0]]); }));
+    const f0 = hDate(r[C.FROM]), t0 = hDate(r[C.TO]); if (f0 && t0) R.push([f0 < t0 ? f0 : t0, f0 < t0 ? t0 : f0]);
     const out = []; let cur = null;
     if (stEv.length) { const o = stKey(stEv[0].o); if (o && o !== 'operation') cur = { s: '0000-00-00', st: o }; }
-    stEv.forEach(x => { const n = stKey(x.n);
-      if (cur) { cur.e = addD(x.d, -1); out.push(cur); cur = null; }
-      if (n && n !== 'operation') { const f = fromAt(x.d); cur = { s: f && f <= x.d ? f : x.d, st: n }; } });
-    if (cur) { cur.e = '9999-12-31'; out.push(cur); }
-    // أول فترة بدون بداية معروفة: نستخدم تاريخ بداية الإجازة المحفوظ لو موجود
-    if (out[0] && out[0].s === '0000-00-00') { const f = hDate(r[C.FROM]); out[0].s = f && f <= out[0].e ? f : '0000-00-00'; }
+    const close = e => { cur.e = e; R.forEach(([a, b]) => { const s2 = a > cur.s ? a : cur.s, e2 = b < cur.e ? b : cur.e; if (s2 <= e2) out.push({ s: s2, e: e2, st: cur.st }); }); cur = null; };
+    stEv.forEach(x => { const n = stKey(x.n); if (cur) close(addD(x.d, -1)); if (n && n !== 'operation' && (ST[n] || {}).grp === 'leave') cur = { s: '0000-00-00', st: n }; });
+    if (cur) close('9999-12-31');
     return out;
   }
   async function loadHist(list, from, to, data, prog) {
