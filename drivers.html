@@ -1141,10 +1141,12 @@ if (window.NWAuth) load();
   function build(from, to, data, list) {
     const SET = {}, SWO = {}, SWI = {}, MK = {};
     Object.keys(data.days).forEach(k => { const rows = data.days[k] || []; if (!rows.length) return; const set = {}; rows.forEach(r => [r[1], r[2]].forEach(x => { if (!x) return; const q = String(x).trim(); set[q] = set[q] ? set[q] + ' + ' + String(r[0]) : String(r[0]); })); SET[k] = set; });
-    data.subs.forEach(x => { (SWO[x.date] = SWO[x.date] || {})[String(x.orig)] = x; (SWI[x.date] = SWI[x.date] || {})[String(x.rep)] = x; });
+    data.subs.forEach((x, n) => { x.__n = n; (SWO[x.date] = SWO[x.date] || {})[String(x.orig)] = x; (SWI[x.date] = SWI[x.date] || {})[String(x.rep)] = x; });
+    // بديل ثم اعتذر (أو انتقلت رحلته لغيره) = ما نفّذ — الأحدث هو اللي يحكم
+    const subIn = (k, iq) => { const i = SWI[k] && SWI[k][iq], o = SWO[k] && SWO[k][iq]; if (i && o) { const later = (o.at && i.at && o.at !== i.at) ? String(o.at) > String(i.at) : o.__n > i.__n; return later ? { o } : { i }; } return { i, o }; };
     data.marks.forEach(x => { (MK[x.date] = MK[x.date] || {})[String(x.iqama)] = x.mark; });
     const allDays = []; for (let k = from; k <= to; k = addD(k, 1)) allDays.push(k);
-    const sched = (iq, k) => { if (!SET[k]) return null; const o = SWO[k] && SWO[k][iq], i = SWI[k] && SWI[k][iq]; if (i) return true; if (o) return false; return !!SET[k][iq]; };
+    const sched = (iq, k) => { if (!SET[k]) return null; const { i, o } = subIn(k, iq); if (i) return true; if (o) return false; return !!SET[k][iq]; };
     return list.map(r => {
       const iq = String(r[C.IQ]), st = ST[r[C.ST]] || {}, rows = [];
       const HI = HIST[iq] || [], hOn = k => HI.find(v => k >= v.s && k <= v.e);
@@ -1152,7 +1154,7 @@ if (window.NWAuth) load();
       allDays.forEach(k => {
         const x = { date: k, kind: 'none', trip: '', note: '' };
         if (SET[k]) {
-          const i = SWI[k] && SWI[k][iq], o = SWO[k] && SWO[k][iq];
+          const { i, o } = subIn(k, iq);
           if (i) { x.kind = 'trip'; x.trip = String(i.trip || ''); x.note = 'بديل' + (i.reason ? ' — ' + i.reason : ''); }
           else if (o) { x.kind = 'swap'; x.trip = String(o.trip || SET[k][iq] || ''); x.note = (o.reason || '') + (o.note ? ' — ' + o.note : ''); }
           else if (SET[k][iq]) { x.kind = 'trip'; x.trip = SET[k][iq]; }
