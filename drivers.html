@@ -508,7 +508,11 @@ function showCached() {
     return true;
   } catch (e) { return false; }
 }
-let LOADP = null, ROSTER_P = null, ROSTER_ROWS = [];   // تحميل جاري (الداش بورد ينتظره)
+let LOADP = null, ROSTER_P = null, ROSTER_ROWS = [];
+let SDUTY = null;   // رحلة → واجب (Nº Bus Duty) من جدول الرحلات المرفوع
+function loadDuties() { if (SDUTY) return Promise.resolve(SDUTY); return NWAuth.call('scheduleGet', {}).then(j => { const M = {}, nk = v => String(v || '').toUpperCase().replace(/\s+/g, '');
+  [((j && j.prev && j.prev.trips) || []), ((j && j.trips) || [])].forEach(L => L.forEach(t => { if (t.trip && t.duty) M[nk(t.trip)] = String(t.duty); }));
+  SDUTY = M; return M; }).catch(() => (SDUTY = {})); }   // تحميل جاري (الداش بورد ينتظره)
 function load() { LOADP = load_(); const p = LOADP; p.finally(() => { if (LOADP === p) LOADP = null; }); return p; }
 async function load_() {
   if (!showCached()) $('list').innerHTML = `<div class="msg">${t_('loading')}</div>`;
@@ -535,7 +539,7 @@ async function loadRoster_() {
   const date = $('fDate').value, from = addD(date, -30), to = addD(date, 6);
   let days = null;
   let subs = [], marks = [];
-  try { const j = await NWAuth.call('rosterRange', { from, to }); if (j && j.ok) { days = j.days || {}; subs = j.subs || []; marks = j.marks || []; } } catch (e) {}
+  try { const [j] = await Promise.all([NWAuth.call('rosterRange', { from, to }), loadDuties()]); if (j && j.ok) { days = j.days || {}; subs = j.subs || []; marks = j.marks || []; } } catch (e) {}
   if (!days) { try { const j = await NWAuth.call('rosterGet', { date }); days = {}; if (j && j.ok) { if ((j.rows || []).length) days[date] = j.rows; subs = j.subs || []; marks = j.marks || []; } } catch (e) { days = {}; } }
   RESTM = {}; marks.filter(x => x.date === date && x.mark === 'rest').forEach(x => { RESTM[x.iqama] = x; });
   SWOUT = {}; SWIN = {};
@@ -581,8 +585,12 @@ function rosterGaps(depot) {
   const rk = t => (String(t).toUpperCase().match(/^NW\d+/) || [''])[0], dir = t => (String(t).toUpperCase().match(/-([OI])-/) || [, ''])[1];
   const dup = [];
   Object.keys(all).forEach(iq => { const T = all[iq]; if (T.length < 2) return;
-    const odd = T.some((a, i) => T.some((b, j) => j > i && (a === b || (dir(a) && dir(a) === dir(b) && rk(a) !== rk(b)))));
-    if (odd) dup.push({ iq, trips: T }); });
+    // الأساس: رقم الواجب من جدول الرحلات — كل الرحلات في نفس الواجب = طبيعي، واجبين مختلفين = مشكوك
+    const du = T.map(t => (SDUTY || {})[String(t).toUpperCase().replace(/\s+/g, '')] || '');
+    // مشكوك = نفس الرحلة مكررة، أو رحلتين بنفس الاتجاه على خطين مختلفين وفي واجبين مختلفين
+    // (نفس الواجب = طبيعي · نفس الخط بأكثر من واجب مثل NW28 = طبيعي · وصول على خط ثم مغادرة على خط ثاني = طبيعي)
+    const odd = T.some((a, i) => T.some((b, j) => j > i && (a === b || (dir(a) && dir(a) === dir(b) && rk(a) !== rk(b) && !(du[i] && du[i] === du[j])))));
+    if (odd) dup.push({ iq, trips: T.map((t, i) => du[i] ? `${t} (${du[i]})` : t) }); });
   Object.keys(seen).forEach(iq => { const r = D.find(x => String(x[C.IQ]) === iq);
     if (!r) { if (!depot) unknown.push({ iq, trip:seen[iq] }); return; }
     if (r[C.ST] !== 'operation' && inDep(r[C.DEP], depot)) notOp.push({ r, trip:seen[iq] }); });
@@ -595,7 +603,7 @@ function showGaps(depot) {
     <div class="sub">«على الرحلات» = الكباتن المسجّلين في روستر اليوم وحالتهم «على رأس العمل». هؤلاء موجودين في الروستر وما انحسبوا:</div>
     ${sec('🌴 مجدول وحالته مو «على رأس العمل»', 'إما الحالة في إدارة السائقين لازم تتحدّث، أو الروستر لازم يتعدّل ويتبدّل الكابتن', g.notOp.map(x => `<tr><td><b>${esc(x.r[C.NAME])}</b><br><span class="sub">${esc(x.r[C.IQ])} · ${esc(depName(x.r[C.DEP]))}</span></td><td dir="ltr">${esc(x.trip)}</td><td><b>${esc(stName(x.r[C.ST]))}</b>${x.r[C.TO] ? '<br><span class="sub">يرجع ' + esc(x.r[C.TO]) + '</span>' : ''}</td><td><button class="btn light" data-ed="${esc(x.r[C.IQ])}">فتح</button></td></tr>`).join(''))}
     ${sec('❓ رقم إقامة مو موجود في قائمة السائقين', 'غالباً رقم الإقامة مكتوب غلط في ملف الروستر، أو الكابتن جديد ما انضاف', g.unknown.map(x => `<tr><td dir="ltr"><b>${esc(x.iq)}</b></td><td dir="ltr">${esc(x.trip)}</td></tr>`).join(''))}
-    ${sec('🔁 كابتن على رحلتين ما يمديه يجمعهم', 'رحلتين مغادرة (أو عودة) على خطين مختلفين بنفس اليوم — غالباً خطأ في الروستر. (الذهاب والعودة على نفس الخط طبيعي وما يطلع هنا)', g.dup.map(x => { const r = D.find(y => String(y[C.IQ]) === x.iq); return `<tr><td><b>${esc(r ? r[C.NAME] : x.iq)}</b><br><span class="sub">${esc(x.iq)}</span></td><td dir="ltr">${x.trips.map(esc).join(' · ')}</td></tr>`; }).join(''))}
+    ${sec('🔁 كابتن على رحلتين ما يمديه يجمعهم', 'رحلتين مغادرة (أو عودة) على خطين مختلفين ومن واجبين مختلفين حسب جدول الرحلات — غالباً خطأ في الروستر. رحلات نفس الواجب، أو نفس الخط (مثل NW28)، أو وصول ثم مغادرة على خط ثاني = طبيعي وما تطلع هنا. الواجب (Nº Bus Duty) بين القوسين', g.dup.map(x => { const r = D.find(y => String(y[C.IQ]) === x.iq); return `<tr><td><b>${esc(r ? r[C.NAME] : x.iq)}</b><br><span class="sub">${esc(x.iq)}</span></td><td dir="ltr">${x.trips.map(esc).join(' · ')}</td></tr>`; }).join(''))}
     <div class="mbtns"><button class="btn light" data-x>إغلاق</button></div></div>`;
   document.body.appendChild(m);
   m.addEventListener('click', e => { if (e.target === m || e.target.closest('[data-x]')) m.remove(); const b = e.target.closest('[data-ed]'); if (b) { m.remove(); openEdit(b.dataset.ed); } });
