@@ -1109,6 +1109,32 @@ if (window.NWAuth) load();
     return { days, subs, marks };
   }
   // تصنيف يوم كل سائق
+  /* سجل الحالات: السائق اللي رجع من إجازة حالته الحين «على رأس العمل» — نرجع لسجل التغييرات عشان أيام الإجازة ما تطلع استعداد */
+  let HIST = {};
+  const stKey = v => { v = String(v || '').trim(); if (ST[v]) return v; return STATUSES.find(k => ST[k].ar === v || ST[k].en === v) || ''; };
+  const hDate = v => { v = String(v || ''); let m = v.match(/(\d{4})-(\d{2})-(\d{2})/); if (m) return m[1] + '-' + m[2] + '-' + m[3]; m = v.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m ? m[3] + '-' + m[2].padStart(2, '0') + '-' + m[1].padStart(2, '0') : ''; };
+  function histIntervals(h, r) {      // [{s,e,st}] فترات الحالات غير «على رأس العمل»
+    const ev = (h || []).map(x => ({ d: hDate(x[0]), f: String(x[3] || ''), o: x[4], n: x[5] })).filter(x => x.d).sort((a, z) => a.d < z.d ? -1 : 1);
+    const stEv = ev.filter(x => (/status|الحالة|حالة/i.test(x.f) && (stKey(x.n) || stKey(x.o))) || (stKey(x.n) && stKey(x.o)));
+    const fromAt = d => { const e = ev.filter(x => /from|بداية|من تاريخ|^من$/i.test(x.f) && Math.abs(new Date(x.d) - new Date(d)) <= 2 * 864e5 && hDate(x.n)).pop(); return e ? hDate(e.n) : ''; };
+    const out = []; let cur = null;
+    if (stEv.length) { const o = stKey(stEv[0].o); if (o && o !== 'operation') cur = { s: '0000-00-00', st: o }; }
+    stEv.forEach(x => { const n = stKey(x.n);
+      if (cur) { cur.e = addD(x.d, -1); out.push(cur); cur = null; }
+      if (n && n !== 'operation') { const f = fromAt(x.d); cur = { s: f && f <= x.d ? f : x.d, st: n }; } });
+    if (cur) { cur.e = '9999-12-31'; out.push(cur); }
+    // أول فترة بدون بداية معروفة: نستخدم تاريخ بداية الإجازة المحفوظ لو موجود
+    if (out[0] && out[0].s === '0000-00-00') { const f = hDate(r[C.FROM]); out[0].s = f && f <= out[0].e ? f : '0000-00-00'; }
+    return out;
+  }
+  async function loadHist(list, from, to, data, prog) {
+    const pre = build(from, to, data, list), need = [];
+    pre.forEach(x => { let run = 0, mx = 0; x.rows.forEach(d => { if (d.kind === 'sb' || d.kind === 'rest' || d.kind === 'none') { run++; mx = Math.max(mx, run); } else run = 0; }); if (mx >= 3 && !(String(x.iq) in HIST)) need.push(x); });
+    for (let i = 0; i < need.length; i += 8) {
+      if (prog) prog(i, need.length);
+      await Promise.all(need.slice(i, i + 8).map(x => NWAuth.call('driverHistory', { iqama: x.iq }).then(j => { HIST[String(x.iq)] = histIntervals((j && j.history) || [], x.r); }).catch(() => {})));
+    }
+  }
   function build(from, to, data, list) {
     const SET = {}, SWO = {}, SWI = {}, MK = {};
     Object.keys(data.days).forEach(k => { const rows = data.days[k] || []; if (!rows.length) return; const set = {}; rows.forEach(r => [r[1], r[2]].forEach(x => { if (!x) return; const q = String(x).trim(); set[q] = set[q] ? set[q] + ' + ' + String(r[0]) : String(r[0]); })); SET[k] = set; });
@@ -1118,6 +1144,7 @@ if (window.NWAuth) load();
     const sched = (iq, k) => { if (!SET[k]) return null; const o = SWO[k] && SWO[k][iq], i = SWI[k] && SWI[k][iq]; if (i) return true; if (o) return false; return !!SET[k][iq]; };
     return list.map(r => {
       const iq = String(r[C.IQ]), st = ST[r[C.ST]] || {}, rows = [];
+      const HI = HIST[iq] || [], hOn = k => HI.find(v => k >= v.s && k <= v.e);
       const leaveOn = k => st.grp === 'leave' && r[C.FROM] && k >= String(r[C.FROM]).slice(0, 10) && (!r[C.TO] || k <= String(r[C.TO]).slice(0, 10));
       allDays.forEach(k => {
         const x = { date: k, kind: 'none', trip: '', note: '' };
@@ -1127,7 +1154,8 @@ if (window.NWAuth) load();
           else if (o) { x.kind = 'swap'; x.trip = String(o.trip || SET[k][iq] || ''); x.note = (o.reason || '') + (o.note ? ' — ' + o.note : ''); }
           else if (SET[k][iq]) { x.kind = 'trip'; x.trip = SET[k][iq]; }
           else if (MK[k] && MK[k][iq] === 'rest') { x.kind = 'rest'; x.note = 'راحة يدوية'; }
-          else if (leaveOn(k)) { x.kind = 'leave'; x.note = stName(r[C.ST]); }
+          else if (leaveOn(k)) { x.kind = 'leave'; x.note = stName(r[C.ST]); x.st = r[C.ST]; }
+          else if (hOn(k)) { const v = hOn(k), g = (ST[v.st] || {}).grp; x.kind = g === 'leave' ? 'leave' : 'out'; x.note = stName(v.st) + ' (من سجل التغييرات)'; x.st = v.st; }
           else if (st.grp === 'out') { x.kind = 'out'; x.note = stName(r[C.ST]); }
           else if (r[C.SB] === 'نعم') { x.kind = 'sb'; x.note = 'استعداد يدوي'; }
           else {                                // يومين متتاليين أو أقل بدون جدولة = راحة، أكثر = استعداد
@@ -1136,7 +1164,8 @@ if (window.NWAuth) load();
             for (let d = 1; d <= 30; d++) { const s2 = sched(iq, addD(k, d)); if (s2 !== false) break; n++; }
             x.kind = n <= 2 ? 'rest' : 'sb';
           }
-        } else if (leaveOn(k)) { x.kind = 'leave'; x.note = stName(r[C.ST]); }
+        } else if (leaveOn(k)) { x.kind = 'leave'; x.note = stName(r[C.ST]); x.st = r[C.ST]; }
+        else if (hOn(k) && (ST[hOn(k).st] || {}).grp === 'leave') { x.kind = 'leave'; x.note = stName(hOn(k).st) + ' (من سجل التغييرات)'; x.st = hOn(k).st; }
         rows.push(x);
       });
       rows.forEach(x => { if (x.kind === 'trip') { const v = incOf(x.trip); x.inc = v.sum; x.miss = v.miss; } else x.inc = 0; });
@@ -1194,7 +1223,7 @@ if (window.NWAuth) load();
   }
   /* ===== ملف الموارد الشهري (Daily driver) — من 21 الشهر السابق إلى 20، بنفس تنسيق ملف الموارد (hr_template.xlsx) ===== */
   const hrPeriod = () => { const t = new Date(), y = t.getFullYear(), m = t.getMonth(), end = t.getDate() > 20 ? new Date(y, m, 20) : new Date(y, m - 1, 20), st = new Date(end.getFullYear(), end.getMonth() - 1, 21); return [ymd(st), ymd(end)]; };
-  const hrCode = (d, r) => { switch (d.kind) { case 'trip': return 1; case 'rest': return 'R'; case 'sb': return 'SB'; case 'leave': return r[C.ST] === 'Sick Leave' ? 'SL' : 'V'; case 'swap': return 'A'; case 'out': return r[C.ST] === 'Suspended' ? 'SUS' : r[C.ST] === 'Termination of services' ? '' : 'A'; default: return ''; } };
+  const hrCode = (d, r) => { switch (d.kind) { case 'trip': return 1; case 'rest': return 'R'; case 'sb': return 'SB'; case 'leave': return (d.st || r[C.ST]) === 'Sick Leave' ? 'SL' : 'V'; case 'swap': return 'A'; case 'out': { const q = d.st || r[C.ST]; return q === 'Suspended' ? 'SUS' : q === 'Termination of services' ? '' : 'A'; } default: return ''; } };
   const HR_CODES = ['NW01','NW02','NW03','NW04','NW05','NW06','NW07','NW08','NW10','NW11','NW12','NW13','NW14','NW15','NW15B','NW16B','NW16','NW17','NW18','NW18B','NW19','NW20','NW21','NW22','NW23','NW26','NW27','NW28','NW29','NW30','NW31','NW32','NW33','NW35'];
   const colL = n => { let s2 = ''; n++; while (n) { const m = (n - 1) % 26; s2 = String.fromCharCode(65 + m) + s2; n = Math.floor((n - 1) / 26); } return s2; };   // 0 → A
   const colN = l => l.split('').reduce((a, ch) => a * 26 + ch.charCodeAt(0) - 64, 0) - 1;
@@ -1239,6 +1268,7 @@ if (window.NWAuth) load();
     try {
       const [data, , , tplBuf] = await Promise.all([fetchRange(addD(from, -31), addD(to, 7)), loadRates(), loadZip(), fetch('hr_template.xlsx?v=1').then(r => { if (!r.ok) throw new Error('ما لقيت قالب ملف الموارد'); return r.arrayBuffer(); })]);
       if (!Object.keys(data.days).some(k => k >= from && k <= to && (data.days[k] || []).length)) { $('rpOut').innerHTML = '<div class="msg err">لا يوجد روستر مرفوع في هذي الفترة</div>'; return; }
+      await loadHist(list, from, to, data, (i, n) => { $('rpOut').innerHTML = `<div class="msg">⏳ مراجعة سجل الإجازات (${i}/${n})...</div>`; });
       const res = build(from, to, data, list).sort((a, z) => String(a.r[C.NAME]).localeCompare(z.r[C.NAME]));
       const days = []; for (let k = from; k <= to; k = addD(k, 1)) days.push(k);
       const stTxt = r => r[C.ST] === 'operation' ? '' : stName(r[C.ST]);
@@ -1306,6 +1336,7 @@ if (window.NWAuth) load();
     const b = $('rpGo'); b.disabled = true; $('rpOut').innerHTML = '<div class="msg">⏳ جاري تجهيز التقرير...</div>';
     try {
       const [data] = await Promise.all([fetchRange(addD(from, -31), addD(to, 7)), loadRates()]);
+      await loadHist(list, from, to, data, (i, n) => { $('rpOut').innerHTML = `<div class="msg">⏳ مراجعة سجل الإجازات (${i}/${n})...</div>`; });
       const res = build(from, to, data, list).sort((a, z) => z.c.trip - a.c.trip || String(a.r[C.NAME]).localeCompare(z.r[C.NAME]));
       const dv = $('fDepot').value; LAST_RES = { from, to, res, scope: dv ? (dv === '*mine' ? (MINE || []).map(depName).join('، ') : depName(dv)) : 'كل الكراجات' };
       if (!Object.keys(data.days).some(k => k >= from && k <= to && (data.days[k] || []).length)) $('rpOut').innerHTML = '<div class="msg err">لا يوجد روستر مرفوع في هذي الفترة</div>';
