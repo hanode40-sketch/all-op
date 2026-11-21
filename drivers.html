@@ -172,7 +172,7 @@
     <div><label>من تاريخ</label><input id="rpFrom" type="date"></div>
     <div><label>إلى تاريخ</label><input id="rpTo" type="date"></div>
     <div style="flex:2;position:relative"><label>السائق (اتركه فاضي لكل السائقين)</label><input id="rpDrv" type="search" autocomplete="off" list="rpDl" placeholder="اسم السائق أو رقم الإقامة"><datalist id="rpDl"></datalist></div>
-    <div style="flex:0 0 auto;display:flex;gap:6px"><button class="btn green" id="rpGo">عرض التقرير</button><button class="btn light" id="rpHr" title="نفس ملف Daily driver اللي ينرسل للموارد كل شهر — الفترة من 21 إلى 20">📤 ملف الموارد الشهري</button></div>
+    <div style="flex:0 0 auto;display:flex;gap:6px"><button class="btn green" id="rpGo">عرض التقرير</button><button class="btn light" id="rpHr" title="ملف التحضير الشهري (Daily driver) اللي ينرسل للموارد كل شهر — الفترة من 21 إلى 20">📤 ملف التحضير الشهري</button></div>
   </div>
   <div id="rpOut" style="margin-top:12px"></div>
 </div></div>
@@ -1271,9 +1271,9 @@ if (window.NWAuth) load();
     else { const f = new Date(from + 'T12:00:00'); to = ymd(new Date(f.getFullYear(), f.getMonth() + 1, 20)); }
     $('rpFrom').value = from; $('rpTo').value = to;
     const list = D.filter(r => inDep(r[C.DEP], $('fDepot').value));
-    const b = $('rpHr'); b.disabled = true; $('rpOut').innerHTML = `<div class="msg">⏳ جاري تجهيز ملف الموارد من ${dmy(from)} إلى ${dmy(to)}...</div>`;
+    const b = $('rpHr'); b.disabled = true; $('rpOut').innerHTML = `<div class="msg">⏳ جاري تجهيز ملف التحضير الشهري من ${dmy(from)} إلى ${dmy(to)}...</div>`;
     try {
-      const [data, , , tplBuf] = await Promise.all([fetchRange(addD(from, -31), addD(to, 7)), loadRates(), loadZip(), fetch('hr_template.xlsx?v=1').then(r => { if (!r.ok) throw new Error('ما لقيت قالب ملف الموارد'); return r.arrayBuffer(); })]);
+      const [data, , , tplBuf] = await Promise.all([fetchRange(addD(from, -31), addD(to, 7)), loadRates(), loadZip(), fetch('hr_template.xlsx?v=1').then(r => { if (!r.ok) throw new Error('ما لقيت قالب ملف التحضير'); return r.arrayBuffer(); })]);
       if (!Object.keys(data.days).some(k => k >= from && k <= to && (data.days[k] || []).length)) { $('rpOut').innerHTML = '<div class="msg err">لا يوجد روستر مرفوع في هذي الفترة</div>'; return; }
       await loadHist(list, from, to, data, (i, n) => { $('rpOut').innerHTML = `<div class="msg">⏳ مراجعة سجل الإجازات (${i}/${n})...</div>`; });
       const res = build(from, to, data, list).sort((a, z) => String(a.r[C.NAME]).localeCompare(z.r[C.NAME]));
@@ -1330,7 +1330,7 @@ if (window.NWAuth) load();
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Daily_driver_20-${mon}${ed.getFullYear()}.xlsx`; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
       window.__hrLast = a.download;
       const miss = Object.keys(extra);
-      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ملف الموارد بنفس التنسيق (إصدار 21/11-ج): ${res.length} سائق · ${det.length} رحلة · من ${dmy(from)} إلى ${dmy(to)}</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها عمود في ملف الموارد (ما انحسبت): ${miss.map(esc).join('، ')}</div>` : '');
+      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ملف التحضير الشهري (إصدار 21/11-د): ${res.length} سائق · ${det.length} رحلة · من ${dmy(from)} إلى ${dmy(to)}</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها عمود في ملف الموارد (ما انحسبت): ${miss.map(esc).join('، ')}</div>` : '');
     } catch (e) { $('rpOut').innerHTML = `<div class="msg err">${esc(e.message || t_('eNet'))}</div>`; }
     finally { b.disabled = false; }
   };
