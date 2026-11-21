@@ -573,9 +573,16 @@ function fillFilters() {
 
 /* ---------- فرق الروستر: كباتن مجدولين ما انحسبوا «على الرحلات» ---------- */
 function rosterGaps(depot) {
-  const seen = {}, unknown = [], notOp = [], dup = [];
+  const seen = {}, unknown = [], notOp = [], all = {};
   (ROSTER_ROWS || []).forEach(row => [row[1], row[2]].forEach(x => { const iq = String(x || '').trim(); if (!iq) return;
-    if (seen[iq]) { dup.push({ iq, trips:[seen[iq], String(row[0])] }); return; } seen[iq] = String(row[0]); }));
+    (all[iq] = all[iq] || []).push(String(row[0])); if (!seen[iq]) seen[iq] = String(row[0]); }));
+  // أكثر من رحلة لنفس الكابتن: الطبيعي ذهاب وعودة على نفس الخط (مثل NW28 أو NW22-O-1 + NW22-I-2) — نطلع بس المشكوك فيه:
+  // رحلتين بنفس الاتجاه (مغادرة + مغادرة أو عودة + عودة) على خطين مختلفين، أو نفس الرحلة مكررة
+  const rk = t => (String(t).toUpperCase().match(/^NW\d+/) || [''])[0], dir = t => (String(t).toUpperCase().match(/-([OI])-/) || [, ''])[1];
+  const dup = [];
+  Object.keys(all).forEach(iq => { const T = all[iq]; if (T.length < 2) return;
+    const odd = T.some((a, i) => T.some((b, j) => j > i && (a === b || (dir(a) && dir(a) === dir(b) && rk(a) !== rk(b)))));
+    if (odd) dup.push({ iq, trips: T }); });
   Object.keys(seen).forEach(iq => { const r = D.find(x => String(x[C.IQ]) === iq);
     if (!r) { if (!depot) unknown.push({ iq, trip:seen[iq] }); return; }
     if (r[C.ST] !== 'operation' && inDep(r[C.DEP], depot)) notOp.push({ r, trip:seen[iq] }); });
@@ -588,7 +595,7 @@ function showGaps(depot) {
     <div class="sub">«على الرحلات» = الكباتن المسجّلين في روستر اليوم وحالتهم «على رأس العمل». هؤلاء موجودين في الروستر وما انحسبوا:</div>
     ${sec('🌴 مجدول وحالته مو «على رأس العمل»', 'إما الحالة في إدارة السائقين لازم تتحدّث، أو الروستر لازم يتعدّل ويتبدّل الكابتن', g.notOp.map(x => `<tr><td><b>${esc(x.r[C.NAME])}</b><br><span class="sub">${esc(x.r[C.IQ])} · ${esc(depName(x.r[C.DEP]))}</span></td><td dir="ltr">${esc(x.trip)}</td><td><b>${esc(stName(x.r[C.ST]))}</b>${x.r[C.TO] ? '<br><span class="sub">يرجع ' + esc(x.r[C.TO]) + '</span>' : ''}</td><td><button class="btn light" data-ed="${esc(x.r[C.IQ])}">فتح</button></td></tr>`).join(''))}
     ${sec('❓ رقم إقامة مو موجود في قائمة السائقين', 'غالباً رقم الإقامة مكتوب غلط في ملف الروستر، أو الكابتن جديد ما انضاف', g.unknown.map(x => `<tr><td dir="ltr"><b>${esc(x.iq)}</b></td><td dir="ltr">${esc(x.trip)}</td></tr>`).join(''))}
-    ${sec('🔁 نفس الكابتن في أكثر من رحلة', 'الكابتن ينحسب مرة وحدة — تأكد إن الروستر صحيح', g.dup.map(x => { const r = D.find(y => String(y[C.IQ]) === x.iq); return `<tr><td><b>${esc(r ? r[C.NAME] : x.iq)}</b><br><span class="sub">${esc(x.iq)}</span></td><td dir="ltr">${x.trips.map(esc).join(' · ')}</td></tr>`; }).join(''))}
+    ${sec('🔁 كابتن على رحلتين ما يمديه يجمعهم', 'رحلتين مغادرة (أو عودة) على خطين مختلفين بنفس اليوم — غالباً خطأ في الروستر. (الذهاب والعودة على نفس الخط طبيعي وما يطلع هنا)', g.dup.map(x => { const r = D.find(y => String(y[C.IQ]) === x.iq); return `<tr><td><b>${esc(r ? r[C.NAME] : x.iq)}</b><br><span class="sub">${esc(x.iq)}</span></td><td dir="ltr">${x.trips.map(esc).join(' · ')}</td></tr>`; }).join(''))}
     <div class="mbtns"><button class="btn light" data-x>إغلاق</button></div></div>`;
   document.body.appendChild(m);
   m.addEventListener('click', e => { if (e.target === m || e.target.closest('[data-x]')) m.remove(); const b = e.target.closest('[data-ed]'); if (b) { m.remove(); openEdit(b.dataset.ed); } });
