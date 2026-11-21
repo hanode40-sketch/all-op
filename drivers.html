@@ -721,6 +721,7 @@ $('mSave').onclick = async () => {
     if (j.error === 'AUTH') { NWAuth.relogin(); throw new Error(t_('eAuth')); }
     if (j.error === 'FORBIDDEN') throw new Error(t_('eForb'));
     if (!j.ok) throw new Error(t_('eErr') + j.error);
+    if (window.__clearHist) window.__clearHist(j.driver[0]);
     const i = D.findIndex(r => r[C.IQ] === j.driver[0]); if (i > -1) D[i] = j.driver; else D.push(j.driver);
     $('ov').classList.remove('on'); fillFilters(); render();
   } catch (e) { alert(e.message); }
@@ -1145,13 +1146,18 @@ if (window.NWAuth) load();
     if (cur) close('9999-12-31');
     return out;
   }
+  // تشغيل طلبات كثيرة بالتوازي (حد أقصى n في نفس الوقت) مع مهلة لكل طلب عشان طلب معلّق ما يوقف الكل
+  async function pool(items, n, fn, prog) { let i = 0, done = 0; const tmo = p2 => Promise.race([p2, new Promise(r => setTimeout(r, 20000))]);
+    await Promise.all(Array.from({ length: Math.min(n, items.length) }, async () => { while (i < items.length) { const it = items[i++]; try { await tmo(fn(it)); } catch (e) {} done++; if (prog) prog(done, items.length); } })); }
+  const SS = (k, v) => { try { if (v === undefined) return JSON.parse(sessionStorage.getItem(k) || 'null'); sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } };
+  HIST = SS('nwHist1') || {}; const BUSC = SS('nwBus1') || {};
+  window.__clearHist = iq => { if (iq) delete HIST[String(iq)]; else HIST = {}; SS('nwHist1', HIST); };   // بعد تعديل سائق نعيد قراءة سجله
   async function loadHist(list, from, to, data, prog) {
     const pre = build(from, to, data, list), need = [];
     pre.forEach(x => { let run = 0, mx = 0; x.rows.forEach(d => { if (d.kind === 'sb' || d.kind === 'rest' || d.kind === 'none') { run++; mx = Math.max(mx, run); } else run = 0; }); if (mx >= 3 && !(String(x.iq) in HIST)) need.push(x); });
-    for (let i = 0; i < need.length; i += 8) {
-      if (prog) prog(i, need.length);
-      await Promise.all(need.slice(i, i + 8).map(x => NWAuth.call('driverHistory', { iqama: x.iq }).then(j => { HIST[String(x.iq)] = histIntervals((j && j.history) || [], x.r); }).catch(() => {})));
-    }
+    if (prog) prog(0, need.length);
+    await pool(need, 12, x => NWAuth.call('driverHistory', { iqama: x.iq }).then(j => { HIST[String(x.iq)] = histIntervals((j && j.history) || [], x.r); }), prog);
+    SS('nwHist1', HIST);
   }
   function build(from, to, data, list) {
     const SET = {}, SWO = {}, SWI = {}, MK = {};
@@ -1290,7 +1296,14 @@ if (window.NWAuth) load();
     try {
       const [data, , , tplBuf] = await Promise.all([fetchRange(addD(from, -31), addD(to, 7)), loadRates(), loadZip(), fetch('hr_template.xlsx?v=1').then(r => { if (!r.ok) throw new Error('ما لقيت قالب ملف التحضير'); return r.arrayBuffer(); })]);
       if (!Object.keys(data.days).some(k => k >= from && k <= to && (data.days[k] || []).length)) { $('rpOut').innerHTML = '<div class="msg err">لا يوجد روستر مرفوع في هذي الفترة</div>'; return; }
-      await loadHist(list, from, to, data, (i, n) => { $('rpOut').innerHTML = `<div class="msg">⏳ مراجعة سجل الإجازات (${i}/${n})...</div>`; });
+      const dts = Object.keys(data.days).filter(k => k >= from && k <= to && (data.days[k] || []).length).sort();
+      const PG = { h: [0, 0], b: [0, 0] }, show = () => { $('rpOut').innerHTML = `<div class="msg">⏳ جاري التجهيز... سجل الإجازات ${PG.h[0]}/${PG.h[1]} · أرقام الحافلات ${PG.b[0]}/${PG.b[1]}</div>`; };
+      const BUS = {}, needB = dts.filter(k => { if (BUSC[k] && k < ymd(new Date())) { BUS[k] = BUSC[k]; return false; } return true; });
+      const [sch] = await Promise.all([
+        NWAuth.call('scheduleGet', {}).catch(() => null),
+        loadHist(list, from, to, data, (i, n) => { PG.h = [i, n]; show(); }),
+        pool(needB, 10, k => NWAuth.call('routeDay', { date: k }).then(j => { BUS[k] = BUSC[k] = (j && j.ok && j.buses) || {}; }), (i, n) => { PG.b = [i, n]; show(); })]);
+      SS('nwBus1', BUSC);
       const res = build(from, to, data, list).sort((a, z) => String(a.r[C.NAME]).localeCompare(z.r[C.NAME]));
       const days = []; for (let k = from; k <= to; k = addD(k, 1)) days.push(k);
       const stTxt = r => r[C.ST] === 'operation' ? '' : stName(r[C.ST]);
@@ -1302,10 +1315,6 @@ if (window.NWAuth) load();
       // 2) trip details
       let x2 = await zip.file(P + 'sheet2.xml').async('string');
       // جدول الرحلات (المحطات والأوقات وواجب الحافلة) + أرقام الحافلات من صفحة جدول الرحلة
-      const dts = Object.keys(data.days).filter(k => k >= from && k <= to && (data.days[k] || []).length).sort();
-      $('rpOut').innerHTML = `<div class="msg">⏳ جاري جلب جدول الرحلات وأرقام الحافلات...</div>`;
-      const sch = await NWAuth.call('scheduleGet', {}).catch(() => null);
-      const BUS = {}; for (let i = 0; i < dts.length; i += 6) await Promise.all(dts.slice(i, i + 6).map(k => NWAuth.call('routeDay', { date: k }).then(j => { BUS[k] = (j && j.ok && j.buses) || {}; }).catch(() => { BUS[k] = {}; })));
       const nk = v => String(v || '').toUpperCase().replace(/\s+/g, ''), mins = v => { const m = String(v || '').match(/(\d{1,2}):(\d{2})/); return m ? +m[1] * 60 + +m[2] : null; };
       const sStart = v => { const m = String(v || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m ? m[3] + '-' + m[2].padStart(2, '0') + '-' + m[1].padStart(2, '0') : ''; };
       const idx = L => { const M = {}, by = {}; (L || []).forEach(t => (by[t.duty] = by[t.duty] || []).push(t));
@@ -1354,7 +1363,7 @@ if (window.NWAuth) load();
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Daily_driver_20-${mon}${ed.getFullYear()}.xlsx`; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
       window.__hrLast = a.download;
       const miss = Object.keys(extra);
-      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ملف التحضير الشهري (إصدار 21/11-هـ): ${res.length} سائق · ${det.length} رحلة · من ${dmy(from)} إلى ${dmy(to)}</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها عمود في ملف الموارد (ما انحسبت): ${miss.map(esc).join('، ')}</div>` : '') + (notIn.length ? `<div class="msg err" style="margin-top:6px">⚠️ ${notIn.length} رقم إقامة في الروستر مو موجود في قائمة السائقين (${notIn.reduce((a2, q) => a2 + SEATS[q].length, 0)} رحلة) — تطلع في ورقة التفاصيل وما تنحسب في ورقة Trips: <span dir="ltr">${notIn.slice(0, 15).map(esc).join(', ')}</span></div>` : '');
+      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ملف التحضير الشهري (إصدار 21/11-و): ${res.length} سائق · ${det.length} رحلة · من ${dmy(from)} إلى ${dmy(to)}</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها عمود في ملف الموارد (ما انحسبت): ${miss.map(esc).join('، ')}</div>` : '') + (notIn.length ? `<div class="msg err" style="margin-top:6px">⚠️ ${notIn.length} رقم إقامة في الروستر مو موجود في قائمة السائقين (${notIn.reduce((a2, q) => a2 + SEATS[q].length, 0)} رحلة) — تطلع في ورقة التفاصيل وما تنحسب في ورقة Trips: <span dir="ltr">${notIn.slice(0, 15).map(esc).join(', ')}</span></div>` : '');
     } catch (e) { $('rpOut').innerHTML = `<div class="msg err">${esc(e.message || t_('eNet'))}</div>`; }
     finally { b.disabled = false; }
   };
