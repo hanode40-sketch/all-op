@@ -1139,32 +1139,32 @@ if (window.NWAuth) load();
   const hDate = v => hDates(v)[0] || '';
   /* فترات الإجازة = تقاطع (فترة الحالة «إجازة» في السجل) مع (تواريخ الإجازة المسجلة من/إلى) — بدون تواريخ ما نحسب شي */
   function histIntervals(h, r) {
-    const ev = (h || []).map(x => ({ d: hDate(x[0]), f: String(x[3] || ''), o: x[4], n: x[5] })).filter(x => x.d).sort((a, z) => a.d < z.d ? -1 : 1);
+    const ev = (h || []).map(x => ({ ts: String(x[0] || ''), d: hDate(x[0]), f: String(x[3] || ''), o: x[4], n: x[5] })).filter(x => x.d).sort((a, z) => a.ts < z.ts ? -1 : a.ts > z.ts ? 1 : 0);
     const isSt = x => (/status|الحالة|حالة/i.test(x.f) && (stKey(x.n) || stKey(x.o))) || (stKey(x.n) && stKey(x.o));
     const stEv = ev.filter(isSt);
-    // نطاقات التواريخ المسجلة: من حقول التاريخ في السجل (القيمة الجديدة والقديمة) + المحفوظ حالياً في بطاقة السائق
-    const R = [];
-    ev.filter(x => !isSt(x) && /تاريخ|date|from|to|من|إلى|عودة|بداية/i.test(x.f)).forEach(x => [x.n, x.o].forEach(v => { const d = hDates(v); if (d.length >= 2) R.push([d[0] < d[1] ? d[0] : d[1], d[0] < d[1] ? d[1] : d[0]]); }));
-    const f0 = hDate(r[C.FROM]), t0 = hDate(r[C.TO]); if (f0 && t0) R.push([f0 < t0 ? f0 : t0, f0 < t0 ? t0 : f0]);
+    // تاريخ الإجازة المعتمد = آخر قيمة انحفظت قبل ما يرجع (القيم القديمة اللي تعدّلت ما تنحسب)
+    const dEv = ev.filter(x => !isSt(x) && /تاريخ|date|from|to|من|إلى|عودة|بداية/i.test(x.f)).map(x => { const d = hDates(x.n); return d.length >= 2 ? { ts: x.ts, rg: [d[0] < d[1] ? d[0] : d[1], d[0] < d[1] ? d[1] : d[0]] } : null; }).filter(Boolean);
+    const f0 = hDate(r[C.FROM]), t0 = hDate(r[C.TO]), cur0 = f0 && t0 ? [f0 < t0 ? f0 : t0, f0 < t0 ? t0 : f0] : null;
+    const rangeAt = ts => { const L = dEv.filter(x => !ts || x.ts <= ts).pop(); return L ? L.rg : cur0; };
     const out = []; let cur = null;
-    if (stEv.length) { const o = stKey(stEv[0].o); if (o && o !== 'operation') cur = { s: '0000-00-00', st: o }; }
-    const close = e => { cur.e = e; R.forEach(([a, b]) => { const s2 = a > cur.s ? a : cur.s, e2 = b < cur.e ? b : cur.e; if (s2 <= e2) out.push({ s: s2, e: e2, st: cur.st }); }); cur = null; };
-    stEv.forEach(x => { const n = stKey(x.n); if (cur) close(addD(x.d, -1)); if (n && n !== 'operation' && (ST[n] || {}).grp === 'leave') cur = { s: '0000-00-00', st: n }; });
-    if (cur) close('9999-12-31');
+    if (stEv.length) { const o = stKey(stEv[0].o); if (o && o !== 'operation' && (ST[o] || {}).grp === 'leave') cur = { s: '0000-00-00', st: o }; }
+    const close = (e, ts) => { const rg = rangeAt(ts); if (rg) { const s2 = rg[0] > cur.s ? rg[0] : cur.s, e2 = rg[1] < e ? rg[1] : e; if (s2 <= e2) out.push({ s: s2, e: e2, st: cur.st }); } cur = null; };
+    stEv.forEach(x => { const n = stKey(x.n); if (cur) close(addD(x.d, -1), x.ts); if (n && n !== 'operation' && (ST[n] || {}).grp === 'leave') cur = { s: '0000-00-00', st: n }; });
+    if (cur) close('9999-12-31', '');
     return out;
   }
   // تشغيل طلبات كثيرة بالتوازي (حد أقصى n في نفس الوقت) مع مهلة لكل طلب عشان طلب معلّق ما يوقف الكل
   async function pool(items, n, fn, prog) { let i = 0, done = 0; const tmo = p2 => Promise.race([p2, new Promise(r => setTimeout(r, 20000))]);
     await Promise.all(Array.from({ length: Math.min(n, items.length) }, async () => { while (i < items.length) { const it = items[i++]; try { await tmo(fn(it)); } catch (e) {} done++; if (prog) prog(done, items.length); } })); }
   const SS = (k, v) => { try { if (v === undefined) return JSON.parse(sessionStorage.getItem(k) || 'null'); sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } };
-  HIST = SS('nwHist1') || {}; const BUSC = SS('nwBus1') || {};
-  window.__clearHist = iq => { if (iq) delete HIST[String(iq)]; else HIST = {}; SS('nwHist1', HIST); };   // بعد تعديل سائق نعيد قراءة سجله
+  HIST = SS('nwHist2') || {}; const BUSC = SS('nwBus1') || {};
+  window.__clearHist = iq => { if (iq) delete HIST[String(iq)]; else HIST = {}; SS('nwHist2', HIST); };   // بعد تعديل سائق نعيد قراءة سجله
   async function loadHist(list, from, to, data, prog) {
     const pre = build(from, to, data, list), need = [];
     pre.forEach(x => { let run = 0, mx = 0; x.rows.forEach(d => { if (d.kind === 'sb' || d.kind === 'rest' || d.kind === 'none') { run++; mx = Math.max(mx, run); } else run = 0; }); if (mx >= 3 && !(String(x.iq) in HIST)) need.push(x); });
     if (prog) prog(0, need.length);
     await pool(need, 12, x => NWAuth.call('driverHistory', { iqama: x.iq }).then(j => { HIST[String(x.iq)] = histIntervals((j && j.history) || [], x.r); }), prog);
-    SS('nwHist1', HIST);
+    SS('nwHist2', HIST);
   }
   function build(from, to, data, list) {
     const SET = {}, SWO = {}, SWI = {}, MK = {};
@@ -1376,7 +1376,7 @@ if (window.NWAuth) load();
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Daily_driver_20-${mon}${ed.getFullYear()}.xlsx`; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
       window.__hrLast = a.download;
       const miss = Object.keys(extra);
-      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ملف التحضير الشهري (إصدار 23/11-د): ${res.length} سائق · ${det.length} رحلة · من ${dmy(from)} إلى ${dmy(to)}</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها عمود في ملف الموارد (ما انحسبت): ${miss.map(esc).join('، ')}</div>` : '') + (noRate.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها سعر في جدول الحوافز (Trip Value = 0): ${noRate.map(esc).join('، ')}</div>` : '') + (DUPX.length ? `<div class="msg err" style="margin-top:6px">⚠️ رحلات مكررة في الروستر (${DUPX.length}): ${DUPX.slice(0, 20).map(esc).join('، ')}${DUPX.length > 20 ? '…' : ''}</div>` : '') + (notIn.length ? `<div class="msg err" style="margin-top:6px">⚠️ ${notIn.length} رقم إقامة في الروستر مو موجود في قائمة السائقين (${notIn.reduce((a2, q) => a2 + SEATS[q].length, 0)} رحلة) — تطلع في ورقة التفاصيل وما تنحسب في ورقة Trips: <span dir="ltr">${notIn.slice(0, 15).map(esc).join(', ')}</span></div>` : '');
+      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ملف التحضير الشهري (إصدار 23/11-هـ): ${res.length} سائق · ${det.length} رحلة · من ${dmy(from)} إلى ${dmy(to)}</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها عمود في ملف الموارد (ما انحسبت): ${miss.map(esc).join('، ')}</div>` : '') + (noRate.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها سعر في جدول الحوافز (Trip Value = 0): ${noRate.map(esc).join('، ')}</div>` : '') + (DUPX.length ? `<div class="msg err" style="margin-top:6px">⚠️ رحلات مكررة في الروستر (${DUPX.length}): ${DUPX.slice(0, 20).map(esc).join('، ')}${DUPX.length > 20 ? '…' : ''}</div>` : '') + (notIn.length ? `<div class="msg err" style="margin-top:6px">⚠️ ${notIn.length} رقم إقامة في الروستر مو موجود في قائمة السائقين (${notIn.reduce((a2, q) => a2 + SEATS[q].length, 0)} رحلة) — تطلع في ورقة التفاصيل وما تنحسب في ورقة Trips: <span dir="ltr">${notIn.slice(0, 15).map(esc).join(', ')}</span></div>` : '');
     } catch (e) { $('rpOut').innerHTML = `<div class="msg err">${esc(e.message || t_('eNet'))}</div>`; }
     finally { b.disabled = false; }
   };
