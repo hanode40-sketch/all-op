@@ -1329,7 +1329,7 @@ if (window.NWAuth) load();
       const CURI = idx(sch && sch.ok && sch.trips), PREVI = idx(sch && sch.ok && sch.prev && sch.prev.trips), cs = sStart(sch && sch.meta && sch.meta.valid);
       const tday = v => { const m = mins(v); return m == null ? (v || '') : m / 1440; };
       // ورقة التفاصيل = مصدر واحد للرحلات: كل رحلة (leg) في سطر، بعد تطبيق التبديلات (البديل يحل محل الأصلي في نفس الواجب)
-      const det = [], SEATS = {}, DUPX = [];   // SEATS[iq] = [كود الرحلة...] — منها تنحسب ورقة Trips عشان الإجماليات تتطابق
+      const det = [], SEATS = {}, DUPX = [], MERGEX = {};   // MERGEX: الرحلة المدموجة تنحسب رحلة وحدة في Total Trips (والحافز للخطين)   // SEATS[iq] = [كود الرحلة...] — منها تنحسب ورقة Trips عشان الإجماليات تتطابق
       const subsBy = {}; (data.subs || []).forEach((x, n) => { (subsBy[x.date] = subsBy[x.date] || []).push(Object.assign({ __n: n }, x)); });
       dts.forEach(k => { const SI = cs && k < cs && Object.keys(PREVI).length ? PREVI : CURI, look = c => SI[nk(c)] || CURI[nk(c)] || null;
         // الرحلة المدموجة (NW13-O-1+NW19-O-1) = سطر واحد في التفاصيل مثل الملف اليدوي، لكنها رحلتين في ورقة Trips (كل خط له حافز)
@@ -1343,7 +1343,7 @@ if (window.NWAuth) load();
           if (seenL['c|' + ck]) DUPX.push(dmy(k) + ' ' + L.code + ' (مكرر بكباتن مختلفين — راجع الروستر)');
           seenL[key] = seenL['c|' + ck] = 1; return true; }));
         legs.forEach(L => { const [a, z] = L.seat, t = look(L.parts[0]), tl = look(L.parts[L.parts.length - 1]) || t;
-          [a, z].forEach(q => { if (q) L.parts.forEach(c => (SEATS[q] = SEATS[q] || []).push(c)); });
+          [a, z].forEach(q => { if (q) { L.parts.forEach(c => (SEATS[q] = SEATS[q] || []).push(c)); if (L.parts.length > 1) MERGEX[q] = (MERGEX[q] || 0) + L.parts.length - 1; } });
           const route = L.parts.map(c => ((look(c) || {}).route) || routeKey(c)).filter((v, i, A) => v && A.indexOf(v) === i).join('+');
           const o = { B: serial(k), C: route, D: L.code, N: a ? numOr(a) : '', P: z ? numOr(z) : '', ...(z ? {} : { Q: '' }), ...(a ? {} : { O: '' }) };
           if (t) Object.assign(o, { E: t.duty || '', F: t.dd || '', G: t.disp || '', H: /no dispatch/i.test(t.disp || '') ? '<--Check info' : tday(t.dt), I: t.fr || '', J: tday(t.t0), K: (tl && tl.to) || '', L: tday(tl && tl.t1), M: numOr((BUS[k] || {})[t.duty] || '') });
@@ -1364,7 +1364,7 @@ if (window.NWAuth) load();
       const colOf = t => { const k = routeKey(t); if (!k) return null; if (HR_CODES.includes(k)) return k; const k2 = k.replace(/[A-Z]$/, ''); if (HR_CODES.includes(k2)) return k2; extra[k] = 1; return null; };
       x4 = fillSheet(x4, 5, res.map((x, i) => { const m = {}; (SEATS[String(x.iq)] || []).forEach(t => { const k = colOf(t); if (k) m[k] = (m[k] || 0) + 1; });
         const o = { A: i + 1, B: numOr(x.r[C.EMP]), C: numOr(x.iq), D: x.r[C.NAME], E: x.r[C.NAT] || '', AP: { f: `IFERROR(""&VLOOKUP(C{R},'DRIVERS SUMMARY  Attendance2'!$C$7:$AS${7 + res.length - 1},43,FALSE()),"")` } };
-        HR_CODES.forEach((k, j) => o[colL(5 + j)] = m[k] || 0); return o; }));
+        HR_CODES.forEach((k, j) => o[colL(5 + j)] = m[k] || 0); const mx = MERGEX[String(x.iq)] || 0; if (mx) o.AN = { f: `SUM(F{R}:AM{R})-${mx}` }; return o; }));
       zip.file(P + 'sheet4.xml', x4);
       // اسم ورقة التفاصيل حسب الفترة
       const d2 = k => (+k.slice(8)) + '-' + (+k.slice(5, 7));
@@ -1375,7 +1375,7 @@ if (window.NWAuth) load();
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Daily_driver_20-${mon}${ed.getFullYear()}.xlsx`; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
       window.__hrLast = a.download;
       const miss = Object.keys(extra);
-      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ملف التحضير الشهري (إصدار 22/11-ب): ${res.length} سائق · ${det.length} رحلة · من ${dmy(from)} إلى ${dmy(to)}</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها عمود في ملف الموارد (ما انحسبت): ${miss.map(esc).join('، ')}</div>` : '') + (DUPX.length ? `<div class="msg err" style="margin-top:6px">⚠️ رحلات مكررة في الروستر (${DUPX.length}): ${DUPX.slice(0, 20).map(esc).join('، ')}${DUPX.length > 20 ? '…' : ''}</div>` : '') + (notIn.length ? `<div class="msg err" style="margin-top:6px">⚠️ ${notIn.length} رقم إقامة في الروستر مو موجود في قائمة السائقين (${notIn.reduce((a2, q) => a2 + SEATS[q].length, 0)} رحلة) — تطلع في ورقة التفاصيل وما تنحسب في ورقة Trips: <span dir="ltr">${notIn.slice(0, 15).map(esc).join(', ')}</span></div>` : '');
+      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ملف التحضير الشهري (إصدار 23/11): ${res.length} سائق · ${det.length} رحلة · من ${dmy(from)} إلى ${dmy(to)}</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها عمود في ملف الموارد (ما انحسبت): ${miss.map(esc).join('، ')}</div>` : '') + (DUPX.length ? `<div class="msg err" style="margin-top:6px">⚠️ رحلات مكررة في الروستر (${DUPX.length}): ${DUPX.slice(0, 20).map(esc).join('، ')}${DUPX.length > 20 ? '…' : ''}</div>` : '') + (notIn.length ? `<div class="msg err" style="margin-top:6px">⚠️ ${notIn.length} رقم إقامة في الروستر مو موجود في قائمة السائقين (${notIn.reduce((a2, q) => a2 + SEATS[q].length, 0)} رحلة) — تطلع في ورقة التفاصيل وما تنحسب في ورقة Trips: <span dir="ltr">${notIn.slice(0, 15).map(esc).join(', ')}</span></div>` : '');
     } catch (e) { $('rpOut').innerHTML = `<div class="msg err">${esc(e.message || t_('eNet'))}</div>`; }
     finally { b.disabled = false; }
   };
