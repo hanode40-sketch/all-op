@@ -1106,7 +1106,7 @@ if (window.NWAuth) load();
   /* حافز المسار: لكل رحلة باتجاه واحد، وكل كابتن ياخذه كامل — الأسعار من allowance.json */
   async function loadRates() { if (RATES) return RATES; try { RATES = await (await fetch('allowance.json?v=' + Date.now())).json(); } catch (e) { RATES = { rates:{} }; } return RATES; }
   const routeKey = c => { const m = String(c || '').toUpperCase().replace(/\s+/g, '').match(/^NW\d+[A-Z]?/); return m ? m[0] : ''; };
-  const incOf = code => { let sum = 0; const miss = []; String(code || '').split('+').map(x => x.trim()).filter(Boolean).forEach(c => { const k = routeKey(c), r = RATES && RATES.rates && (RATES.rates[k] || RATES.rates[k.replace(/[A-Z]$/, '')]); if (r) sum += Number(r.amt) || 0; else miss.push(c); }); return { sum: Math.round(sum * 100) / 100, miss }; };
+  const incOf = code => { let sum = 0; const miss = []; String(code || '').split('+').map(x => x.trim()).filter(Boolean).forEach(c => { const k = routeKey(c), r = RATES && RATES.rates && RATES.rates[k];   // السعر من جدول الحوافز فقط (NW17B غير NW17) if (r) sum += Number(r.amt) || 0; else miss.push(c); }); return { sum: Math.round(sum * 100) / 100, miss }; };
   const sar = v => (Math.round((v || 0) * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const rpDrivers = () => D.filter(r => inDep(r[C.DEP], $('fDepot').value));
   $('bRpt').onclick = () => {
@@ -1360,7 +1360,7 @@ if (window.NWAuth) load();
       // 4) Trips
       let x4 = await zip.file(P + 'sheet4.xml').async('string');
       const RT = (RATES && RATES.rates) || {}, extra = {};
-      HR_CODES.forEach((k, j) => { const r = RT[k]; if (r && r.amt != null) x4 = setCell(x4, colL(5 + j) + '1', Number(r.amt)); });
+      const noRate = []; HR_CODES.forEach((k, j) => { const r = RT[k]; if (r && r.amt != null) x4 = setCell(x4, colL(5 + j) + '1', Number(r.amt)); else { x4 = setCell(x4, colL(5 + j) + '1', 0); noRate.push(k); } });   // الأسعار من جدول الحوافز المرفوع فقط
       const colOf = t => { const k = routeKey(t); if (!k) return null; if (HR_CODES.includes(k)) return k; const k2 = k.replace(/[A-Z]$/, ''); if (HR_CODES.includes(k2)) return k2; extra[k] = 1; return null; };
       x4 = fillSheet(x4, 5, res.map((x, i) => { const m = {}; (SEATS[String(x.iq)] || []).forEach(t => { const k = colOf(t); if (k) m[k] = (m[k] || 0) + 1; });
         const o = { A: i + 1, B: numOr(x.r[C.EMP]), C: numOr(x.iq), D: x.r[C.NAME], E: x.r[C.NAT] || '', AP: { f: `IFERROR(""&VLOOKUP(C{R},'DRIVERS SUMMARY  Attendance2'!$C$7:$AS${7 + res.length - 1},43,FALSE()),"")` } };
@@ -1375,7 +1375,7 @@ if (window.NWAuth) load();
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Daily_driver_20-${mon}${ed.getFullYear()}.xlsx`; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
       window.__hrLast = a.download;
       const miss = Object.keys(extra);
-      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ملف التحضير الشهري (إصدار 23/11-ب): ${res.length} سائق · ${det.length} رحلة · من ${dmy(from)} إلى ${dmy(to)}</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها عمود في ملف الموارد (ما انحسبت): ${miss.map(esc).join('، ')}</div>` : '') + (DUPX.length ? `<div class="msg err" style="margin-top:6px">⚠️ رحلات مكررة في الروستر (${DUPX.length}): ${DUPX.slice(0, 20).map(esc).join('، ')}${DUPX.length > 20 ? '…' : ''}</div>` : '') + (notIn.length ? `<div class="msg err" style="margin-top:6px">⚠️ ${notIn.length} رقم إقامة في الروستر مو موجود في قائمة السائقين (${notIn.reduce((a2, q) => a2 + SEATS[q].length, 0)} رحلة) — تطلع في ورقة التفاصيل وما تنحسب في ورقة Trips: <span dir="ltr">${notIn.slice(0, 15).map(esc).join(', ')}</span></div>` : '');
+      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ملف التحضير الشهري (إصدار 23/11-ج): ${res.length} سائق · ${det.length} رحلة · من ${dmy(from)} إلى ${dmy(to)}</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها عمود في ملف الموارد (ما انحسبت): ${miss.map(esc).join('، ')}</div>` : '') + (noRate.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها سعر في جدول الحوافز (Trip Value = 0): ${noRate.map(esc).join('، ')}</div>` : '') + (DUPX.length ? `<div class="msg err" style="margin-top:6px">⚠️ رحلات مكررة في الروستر (${DUPX.length}): ${DUPX.slice(0, 20).map(esc).join('، ')}${DUPX.length > 20 ? '…' : ''}</div>` : '') + (notIn.length ? `<div class="msg err" style="margin-top:6px">⚠️ ${notIn.length} رقم إقامة في الروستر مو موجود في قائمة السائقين (${notIn.reduce((a2, q) => a2 + SEATS[q].length, 0)} رحلة) — تطلع في ورقة التفاصيل وما تنحسب في ورقة Trips: <span dir="ltr">${notIn.slice(0, 15).map(esc).join(', ')}</span></div>` : '');
     } catch (e) { $('rpOut').innerHTML = `<div class="msg err">${esc(e.message || t_('eNet'))}</div>`; }
     finally { b.disabled = false; }
   };
