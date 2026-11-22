@@ -1106,7 +1106,7 @@ if (window.NWAuth) load();
   /* حافز المسار: لكل رحلة باتجاه واحد، وكل كابتن ياخذه كامل — الأسعار من allowance.json */
   async function loadRates() { if (RATES) return RATES; try { RATES = await (await fetch('allowance.json?v=' + Date.now())).json(); } catch (e) { RATES = { rates:{} }; } return RATES; }
   const routeKey = c => { const m = String(c || '').toUpperCase().replace(/\s+/g, '').match(/^NW\d+[A-Z]?/); return m ? m[0] : ''; };
-  const incOf = code => { let sum = 0; const miss = []; String(code || '').split('+').map(x => x.trim()).filter(Boolean).forEach(c => { const k = routeKey(c), r = RATES && RATES.rates && RATES.rates[k];   // السعر من جدول الحوافز فقط (NW17B غير NW17) if (r) sum += Number(r.amt) || 0; else miss.push(c); }); return { sum: Math.round(sum * 100) / 100, miss }; };
+  const incOf = code => { let sum = 0; const miss = []; String(code || '').split('+').map(x => x.trim()).filter(Boolean).forEach(c => { const k = routeKey(c), r = RATES && RATES.rates && RATES.rates[k]; if (r) sum += Number(r.amt) || 0; else miss.push(c); }); return { sum: Math.round(sum * 100) / 100, miss }; };
   const sar = v => (Math.round((v || 0) * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const rpDrivers = () => D.filter(r => inDep(r[C.DEP], $('fDepot').value));
   $('bRpt').onclick = () => {
