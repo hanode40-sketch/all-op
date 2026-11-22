@@ -167,6 +167,11 @@
    "route": "Riyadh-Al Bashayer",
    "km": 1004,
    "amt": 64.26
+  },
+  "NW17B": {
+   "route": "Tabuk-Halat Ammar",
+   "km": 351,
+   "amt": 28.1
   }
  }
 }
