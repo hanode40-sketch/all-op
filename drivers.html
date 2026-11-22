@@ -1300,7 +1300,7 @@ if (window.NWAuth) load();
     const list = D.filter(r => inDep(r[C.DEP], $('fDepot').value));
     const b = $('rpHr'); b.disabled = true; $('rpOut').innerHTML = `<div class="msg">⏳ جاري تجهيز ملف التحضير الشهري من ${dmy(from)} إلى ${dmy(to)}...</div>`;
     try {
-      const [data, , , tplBuf] = await Promise.all([fetchRange(addD(from, -31), addD(to, 7)), loadRates(), loadZip(), fetch('hr_template.xlsx?v=2').then(r => { if (!r.ok) throw new Error('ما لقيت قالب ملف التحضير'); return r.arrayBuffer(); })]);
+      const [data, , , tplBuf] = await Promise.all([fetchRange(addD(from, -31), addD(to, 7)), loadRates(), loadZip(), fetch('hr_template.xlsx?v=3').then(r => { if (!r.ok) throw new Error('ما لقيت قالب ملف التحضير'); return r.arrayBuffer(); })]);
       if (!Object.keys(data.days).some(k => k >= from && k <= to && (data.days[k] || []).length)) { $('rpOut').innerHTML = '<div class="msg err">لا يوجد روستر مرفوع في هذي الفترة</div>'; return; }
       const dts = Object.keys(data.days).filter(k => k >= from && k <= to && (data.days[k] || []).length).sort();
       const PG = { h: [0, 0], b: [0, 0] }, show = () => { $('rpOut').innerHTML = `<div class="msg">⏳ جاري التجهيز... سجل الإجازات ${PG.h[0]}/${PG.h[1]} · أرقام الحافلات ${PG.b[0]}/${PG.b[1]}</div>`; };
