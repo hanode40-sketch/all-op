@@ -520,7 +520,13 @@ async function load_() {
     const a = await NWAuth.call('driversList', {});
     if (a.error === 'AUTH') { NWAuth.relogin(); throw new Error(t_('eAuth')); }
     if (!a.ok) throw new Error(t_('eErr') + (a.error || ''));
+    if (a.canView === false) {   // صلاحيات إدارة السائقين من صفحة الإعدادات
+      try { localStorage.removeItem(CK); } catch (e) {}
+      D = []; $('list').innerHTML = '<div class="msg err">🔒 ما عندك صلاحية عرض بيانات السائقين — راجع المدير</div>';
+      ['bAdd', 'bImport', 'bCards', 'bRpt'].forEach(id => { const b = $(id); if (b) b.style.display = 'none'; }); return;
+    }
     D = a.drivers || []; canEdit = !!a.canEdit; canCardsE = !!(a.canCards || a.canEdit); canImport = !!a.canImport;
+    $('bRpt').style.display = a.canReports === false ? 'none' : '';
     initMine();
     await Promise.all([loadRoster(), loadTrips(), loadCards()]);
     $('bAdd').style.display = canEdit ? '' : 'none'; $('bImport').style.display = canImport ? '' : 'none'; $('bCards').style.display = canCardsE ? '' : 'none';

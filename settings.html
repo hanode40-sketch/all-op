@@ -83,7 +83,8 @@ async function finesApi(action, data) {
 
 /* ============ قائمة الإعدادات — أضف هنا أي إعدادات جديدة ============ */
 const SECTIONS = [
-  { id: 'fines-users', grp: 'نظام المخالفات المرورية', ic: '🚦', ar: 'المستخدمون والصلاحيات', desc: 'منح وتعديل صلاحيات المستخدمين في نظام المخالفات المرورية', view: vFinesUsers }
+  { id: 'fines-users', grp: 'نظام المخالفات المرورية', ic: '🚦', ar: 'المستخدمون والصلاحيات', desc: 'منح وتعديل صلاحيات المستخدمين في نظام المخالفات المرورية', view: vFinesUsers },
+  { id: 'drivers-perms', grp: 'إدارة السائقين', ic: '🧑‍✈️', ar: 'المستخدمون والصلاحيات', desc: 'من يشوف ويعدّل بيانات السائقين وكروت التشغيل والاستيراد والتقارير', view: vDrvPerms },
 ];
 const isAdmin = () => window.NWAuth && NWAuth.role === 'مدير';
 
@@ -147,6 +148,39 @@ function userDlg(u, keys, done) {
     await finesApi('userSave', { username: u.username, name: u.name, role: m.querySelector('#ur').value, active: m.querySelector('#ua').checked, perms: [...m.querySelectorAll('[data-p]:checked')].map(c => c.dataset.p) });
     toast('تم حفظ الصلاحيات'); m.remove(); done();
   });
+}
+
+/* ============ إدارة السائقين: المستخدمون والصلاحيات (من نظام الدخول) ============ */
+const DP = [['view', '👁 عرض السائقين وتحميل الكروت'], ['edit', '✏️ تعديل البيانات والحالات والتبديل'], ['cards', '🪪 تحديث ورفع كروت التشغيل'], ['import', '📥 استيراد Excel'], ['reports', '📄 التقارير وملف التحضير الشهري']];
+async function dpApi(action, data) { const j = await NWAuth.call(action, data || {}); if (!j || !j.ok) throw new Error(j && j.error === 'FORBIDDEN' ? 'للمدير فقط' : j && j.error === 'UNKNOWN_ACTION' ? 'لازم تنشر النسخة الجديدة من Apps Script حق الدخول أولاً' : (j && j.error) || 'خطأ'); return j; }
+async function vDrvPerms(m) {
+  m.innerHTML = '<div class="loader">جاري التحميل…</div>';
+  let j; try { j = await dpApi('drvPermsGet'); } catch (e) { m.innerHTML = `<div class="card"><b style="color:#dc2626">${esc(e.message)}</b></div>`; return; }
+  m.innerHTML = `<div class="card"><h2>المستخدمون والصلاحيات — إدارة السائقين</h2>
+   <p class="small muted">المستخدم اللي ما له صلاحيات مخصصة يمشي على <b>الافتراضي حسب دوره</b> (المشرف: تعديل · العلاقات الحكومية: كروت · الجودة والمرحّل: عرض). المدير له كل الصلاحيات دائماً. أي تعديل يطبّق خلال دقيقتين، وفتح البرنامج لأول مرة لمستخدم جديد يحتاج يسجل دخول من جديد.</p>
+   <input id="dq" type="search" placeholder="بحث بالاسم أو اسم المستخدم" style="margin-bottom:10px">
+   <div class="scroll"><table><thead><tr><th>المستخدم</th><th>الدور</th><th>الصلاحيات الحالية</th><th></th></tr></thead><tbody id="db"></tbody></table></div></div>`;
+  const lbl = p => DP.filter(([k]) => p[k]).map(([, l]) => l).join('، ') || '<span class="muted">بدون صلاحية</span>';
+  const draw = () => { const q = $('dq').value.trim().toLowerCase();
+    $('db').innerHTML = j.users.filter(u => !q || (u.name + ' ' + u.username).toLowerCase().indexOf(q) > -1).map(u => `<tr>
+      <td><b>${esc(u.name)}</b><br><span class="small muted">${esc(u.username)}</span>${u.active ? '' : ' <span class="pill off">موقوف</span>'}</td>
+      <td>${esc(u.role || '—')}</td>
+      <td class="small">${u.mgr ? 'كل الصلاحيات (مدير)' : lbl(u.eff)} ${u.mgr ? '' : u.custom ? '<span class="pill">مخصصة</span>' : '<span class="pill">افتراضي الدور</span>'}</td>
+      <td>${u.mgr ? '' : `<button class="btn sm" data-u="${esc(u.username)}">تعديل</button>`}</td></tr>`).join('');
+    $('db').querySelectorAll('[data-u]').forEach(b => b.onclick = () => dpDlg(j.users.find(x => x.username === b.dataset.u), r => { j = r; draw(); }));
+  };
+  $('dq').oninput = draw; draw();
+}
+function dpDlg(u, done) {
+  const cur = u.custom || u.def;
+  const m = modal('صلاحيات إدارة السائقين — ' + esc(u.name), `<p class="small muted">الدور: <b>${esc(u.role || '—')}</b> · ${u.custom ? 'صلاحيات مخصصة' : 'يمشي حالياً على الافتراضي حسب الدور'}</p>
+   <div class="chips">${DP.map(([k, l]) => `<label class="chk"><input type="checkbox" data-k="${k}" ${cur[k] ? 'checked' : ''}> ${l}</label>`).join('')}</div>
+   <p class="small muted">أي صلاحية تتطلب «العرض» وتفعّله تلقائياً. إذا شلت كل الصلاحيات ما يقدر يفتح بيانات السائقين.</p>
+   <div class="row"><button class="btn" id="ds">حفظ</button>${u.custom ? '<button class="btn sec" id="dr">رجوع للافتراضي حسب الدور</button>' : ''}</div>`);
+  const ks = () => { const o = {}; m.querySelectorAll('[data-k]').forEach(c => o[c.dataset.k] = c.checked); return o; };
+  m.querySelectorAll('[data-k]').forEach(c => c.onchange = () => { const o = ks(); if (c.dataset.k !== 'view' && c.checked) m.querySelector('[data-k=view]').checked = true; if (c.dataset.k === 'view' && !c.checked) m.querySelectorAll('[data-k]').forEach(x => x.checked = false); });
+  m.querySelector('#ds').onclick = e => busy(e.target, async () => { const r = await dpApi('drvPermsSave', { username: u.username, perms: ks() }); toast('تم حفظ الصلاحيات'); m.remove(); done(r); });
+  const rb = m.querySelector('#dr'); if (rb) rb.onclick = e => busy(e.target, async () => { const r = await dpApi('drvPermsSave', { username: u.username, reset: true }); toast('رجع للافتراضي'); m.remove(); done(r); });
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', render); else render();
