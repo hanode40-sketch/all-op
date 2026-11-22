@@ -1,7 +1,7 @@
 {
  "title": "November schedule",
- "updated": "2026-11-21",
- "note": "حافز لكل رحلة باتجاه واحد · كل كابتن ياخذ الحافز كامل",
+ "updated": "2026-11-23",
+ "note": "حافز لكل رحلة باتجاه واحد · كل كابتن ياخذ الحافز كامل — الأسعار مطابقة لملف الموارد (Trip Value) 23/11/2026",
  "rates": {
   "NW01": {
    "route": "Jeddah-Hail",
@@ -76,12 +76,12 @@
   "NW15B": {
    "route": "Riyadh SAB - Buraydah Airport",
    "km": 374,
-   "amt": 29.92
+   "amt": 28.9
   },
   "NW16B": {
    "route": "Madinah-Riyadh (Semi-Direct)",
    "km": 927,
-   "amt": 59.33
+   "amt": 56.32
   },
   "NW16": {
    "route": "Madinah-Riyadh (Direct)",
@@ -91,7 +91,7 @@
   "NW17": {
    "route": "Madinah-Riyadh (Dawadmi)",
    "km": 907,
-   "amt": 58.05
+   "amt": 57.92
   },
   "NW18": {
    "route": "Jeddah-Riyadh",
@@ -126,12 +126,12 @@
   "NW23": {
    "route": "Makkah-Yanbu",
    "km": 424,
-   "amt": 27.14
+   "amt": 24.128
   },
   "NW26": {
    "route": "Tabuk - Haql",
    "km": 226,
-   "amt": 18.08
+   "amt": 15
   },
   "NW27": {
    "route": "Tabuk-Hail (Al Ula)",
@@ -151,7 +151,7 @@
   "NW30": {
    "route": "Jeddah-Khamis Mushait (Bisha)",
    "km": 902,
-   "amt": 57.73
+   "amt": 57.92
   },
   "NW31": {
    "route": "makkah-tabuk",
@@ -167,6 +167,11 @@
    "route": "Riyadh-Al Bashayer",
    "km": 1004,
    "amt": 64.26
+  },
+  "NW17B": {
+   "route": "Tabuk-Halat Ammar",
+   "km": "",
+   "amt": 15
   }
  }
 }

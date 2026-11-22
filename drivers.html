@@ -1258,7 +1258,7 @@ if (window.NWAuth) load();
   /* ===== ملف الموارد الشهري (Daily driver) — من 21 الشهر السابق إلى 20، بنفس تنسيق ملف الموارد (hr_template.xlsx) ===== */
   const hrPeriod = () => { const t = new Date(), y = t.getFullYear(), m = t.getMonth(), end = t.getDate() > 20 ? new Date(y, m, 20) : new Date(y, m - 1, 20), st = new Date(end.getFullYear(), end.getMonth() - 1, 21); return [ymd(st), ymd(end)]; };
   const hrCode = (d, r) => { switch (d.kind) { case 'trip': return 1; case 'rest': return 'R'; case 'sb': return 'SB'; case 'leave': return (d.st || r[C.ST]) === 'Sick Leave' ? 'SL' : 'V'; case 'swap': return /غياب|رفض/.test(d.reason || '') ? 'A' : /مريض|مرض/.test(d.reason || '') ? 'SL' : (d.alt || 'R'); case 'out': { const q = d.st || r[C.ST]; return q === 'Suspended' ? 'SUS' : q === 'Termination of services' ? '' : 'A'; } default: return ''; } };
-  const HR_CODES = ['NW01','NW02','NW03','NW04','NW05','NW06','NW07','NW08','NW10','NW11','NW12','NW13','NW14','NW15','NW15B','NW16B','NW16','NW17','NW18','NW18B','NW19','NW20','NW21','NW22','NW23','NW26','NW27','NW28','NW29','NW30','NW31','NW32','NW33','NW35'];
+  const HR_CODES = ['NW01','NW02','NW03','NW04','NW05','NW06','NW07','NW08','NW10','NW11','NW12','NW13','NW14','NW15','NW15B','NW16B','NW16','NW17','NW18','NW18B','NW19','NW20','NW21','NW22','NW23','NW26','NW27','NW28','NW29','NW30','NW31','NW32','NW33','NW17B'];
   const colL = n => { let s2 = ''; n++; while (n) { const m = (n - 1) % 26; s2 = String.fromCharCode(65 + m) + s2; n = Math.floor((n - 1) / 26); } return s2; };   // 0 → A
   const colN = l => l.split('').reduce((a, ch) => a * 26 + ch.charCodeAt(0) - 64, 0) - 1;
   const serial = k => { const [y, m, d] = k.split('-').map(Number); return (Date.UTC(y, m - 1, d) - Date.UTC(1899, 11, 30)) / 864e5; };
@@ -1300,7 +1300,7 @@ if (window.NWAuth) load();
     const list = D.filter(r => inDep(r[C.DEP], $('fDepot').value));
     const b = $('rpHr'); b.disabled = true; $('rpOut').innerHTML = `<div class="msg">⏳ جاري تجهيز ملف التحضير الشهري من ${dmy(from)} إلى ${dmy(to)}...</div>`;
     try {
-      const [data, , , tplBuf] = await Promise.all([fetchRange(addD(from, -31), addD(to, 7)), loadRates(), loadZip(), fetch('hr_template.xlsx?v=1').then(r => { if (!r.ok) throw new Error('ما لقيت قالب ملف التحضير'); return r.arrayBuffer(); })]);
+      const [data, , , tplBuf] = await Promise.all([fetchRange(addD(from, -31), addD(to, 7)), loadRates(), loadZip(), fetch('hr_template.xlsx?v=2').then(r => { if (!r.ok) throw new Error('ما لقيت قالب ملف التحضير'); return r.arrayBuffer(); })]);
       if (!Object.keys(data.days).some(k => k >= from && k <= to && (data.days[k] || []).length)) { $('rpOut').innerHTML = '<div class="msg err">لا يوجد روستر مرفوع في هذي الفترة</div>'; return; }
       const dts = Object.keys(data.days).filter(k => k >= from && k <= to && (data.days[k] || []).length).sort();
       const PG = { h: [0, 0], b: [0, 0] }, show = () => { $('rpOut').innerHTML = `<div class="msg">⏳ جاري التجهيز... سجل الإجازات ${PG.h[0]}/${PG.h[1]} · أرقام الحافلات ${PG.b[0]}/${PG.b[1]}</div>`; };
@@ -1375,7 +1375,7 @@ if (window.NWAuth) load();
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Daily_driver_20-${mon}${ed.getFullYear()}.xlsx`; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
       window.__hrLast = a.download;
       const miss = Object.keys(extra);
-      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ملف التحضير الشهري (إصدار 23/11): ${res.length} سائق · ${det.length} رحلة · من ${dmy(from)} إلى ${dmy(to)}</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها عمود في ملف الموارد (ما انحسبت): ${miss.map(esc).join('، ')}</div>` : '') + (DUPX.length ? `<div class="msg err" style="margin-top:6px">⚠️ رحلات مكررة في الروستر (${DUPX.length}): ${DUPX.slice(0, 20).map(esc).join('، ')}${DUPX.length > 20 ? '…' : ''}</div>` : '') + (notIn.length ? `<div class="msg err" style="margin-top:6px">⚠️ ${notIn.length} رقم إقامة في الروستر مو موجود في قائمة السائقين (${notIn.reduce((a2, q) => a2 + SEATS[q].length, 0)} رحلة) — تطلع في ورقة التفاصيل وما تنحسب في ورقة Trips: <span dir="ltr">${notIn.slice(0, 15).map(esc).join(', ')}</span></div>` : '');
+      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ملف التحضير الشهري (إصدار 23/11-ب): ${res.length} سائق · ${det.length} رحلة · من ${dmy(from)} إلى ${dmy(to)}</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها عمود في ملف الموارد (ما انحسبت): ${miss.map(esc).join('، ')}</div>` : '') + (DUPX.length ? `<div class="msg err" style="margin-top:6px">⚠️ رحلات مكررة في الروستر (${DUPX.length}): ${DUPX.slice(0, 20).map(esc).join('، ')}${DUPX.length > 20 ? '…' : ''}</div>` : '') + (notIn.length ? `<div class="msg err" style="margin-top:6px">⚠️ ${notIn.length} رقم إقامة في الروستر مو موجود في قائمة السائقين (${notIn.reduce((a2, q) => a2 + SEATS[q].length, 0)} رحلة) — تطلع في ورقة التفاصيل وما تنحسب في ورقة Trips: <span dir="ltr">${notIn.slice(0, 15).map(esc).join(', ')}</span></div>` : '');
     } catch (e) { $('rpOut').innerHTML = `<div class="msg err">${esc(e.message || t_('eNet'))}</div>`; }
     finally { b.disabled = false; }
   };
