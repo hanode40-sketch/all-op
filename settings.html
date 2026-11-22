@@ -157,7 +157,7 @@ async function vDrvPerms(m) {
   m.innerHTML = '<div class="loader">جاري التحميل…</div>';
   let j; try { j = await dpApi('drvPermsGet'); } catch (e) { m.innerHTML = `<div class="card"><b style="color:#dc2626">${esc(e.message)}</b></div>`; return; }
   m.innerHTML = `<div class="card"><h2>المستخدمون والصلاحيات — إدارة السائقين</h2>
-   <p class="small muted">المستخدم اللي ما له صلاحيات مخصصة يمشي على <b>الافتراضي حسب دوره</b> (المشرف: تعديل · العلاقات الحكومية: كروت · الجودة والمرحّل: عرض). المدير له كل الصلاحيات دائماً. أي تعديل يطبّق خلال دقيقتين، وفتح البرنامج لأول مرة لمستخدم جديد يحتاج يسجل دخول من جديد.</p>
+   <p class="small muted">المستخدم اللي ما له صلاحيات مخصصة يمشي على <b>الافتراضي حسب دوره</b> (المشرف: تعديل + التقارير · العلاقات الحكومية: عرض + كروت · الجودة والمرحّل: عرض فقط). المدير له كل الصلاحيات دائماً. أي تعديل يطبّق خلال دقيقتين، وفتح البرنامج لأول مرة لمستخدم جديد يحتاج يسجل دخول من جديد.</p>
    <input id="dq" type="search" placeholder="بحث بالاسم أو اسم المستخدم" style="margin-bottom:10px">
    <div class="scroll"><table><thead><tr><th>المستخدم</th><th>الدور</th><th>الصلاحيات الحالية</th><th></th></tr></thead><tbody id="db"></tbody></table></div></div>`;
   const lbl = p => DP.filter(([k]) => p[k]).map(([, l]) => l).join('، ') || '<span class="muted">بدون صلاحية</span>';
