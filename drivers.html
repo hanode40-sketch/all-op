@@ -1332,19 +1332,21 @@ if (window.NWAuth) load();
       const det = [], SEATS = {}, DUPX = [];   // SEATS[iq] = [كود الرحلة...] — منها تنحسب ورقة Trips عشان الإجماليات تتطابق
       const subsBy = {}; (data.subs || []).forEach((x, n) => { (subsBy[x.date] = subsBy[x.date] || []).push(Object.assign({ __n: n }, x)); });
       dts.forEach(k => { const SI = cs && k < cs && Object.keys(PREVI).length ? PREVI : CURI, look = c => SI[nk(c)] || CURI[nk(c)] || null;
+        // الرحلة المدموجة (NW13-O-1+NW19-O-1) = سطر واحد في التفاصيل مثل الملف اليدوي، لكنها رحلتين في ورقة Trips (كل خط له حافز)
         const legs = [];
-        (data.days[k] || []).forEach(r => String(r[0]).split('+').map(c => c.trim()).filter(Boolean).forEach(code => legs.push({ code, seat: [String(r[1] || '').trim(), String(r[2] || '').trim()] })));
+        (data.days[k] || []).forEach(r => { const parts = String(r[0]).split('+').map(c => c.trim()).filter(Boolean); if (parts.length) legs.push({ code: parts.join('+'), parts, seat: [String(r[1] || '').trim(), String(r[2] || '').trim()] }); });
         (subsBy[k] || []).sort((x, y) => (x.at && y.at && x.at !== y.at) ? (String(x.at) < String(y.at) ? -1 : 1) : x.__n - y.__n).forEach(sb => {
           const st = look(sb.trip), du = st && st.duty, orig = String(sb.orig || '').trim(), rep = String(sb.rep || '').trim();
-          legs.forEach(L => { if (nk(L.code) !== nk(sb.trip) && !(du && (look(L.code) || {}).duty === du)) return; L.seat = L.seat.map(q => q === orig ? rep : q); }); });
+          legs.forEach(L => { if (!L.parts.some(c => nk(c) === nk(sb.trip) || (du && (look(c) || {}).duty === du))) return; L.seat = L.seat.map(q => q === orig ? rep : q); }); });
         const seenL = {}; legs.splice(0, legs.length, ...legs.filter(L => { const key = nk(L.code) + '|' + L.seat.join('|'), ck = nk(L.code);
           if (seenL[key]) { DUPX.push(dmy(k) + ' ' + L.code + ' (مكرر بنفس الكباتن — انحسب مرة)'); return false; }
           if (seenL['c|' + ck]) DUPX.push(dmy(k) + ' ' + L.code + ' (مكرر بكباتن مختلفين — راجع الروستر)');
           seenL[key] = seenL['c|' + ck] = 1; return true; }));
-        legs.forEach(L => { const [a, z] = L.seat, t = look(L.code);
-          [a, z].forEach(q => { if (q) (SEATS[q] = SEATS[q] || []).push(L.code); });
-          const o = { B: serial(k), C: (t && t.route) || routeKey(L.code), D: L.code, N: a ? numOr(a) : '', P: z ? numOr(z) : '', ...(z ? {} : { Q: '' }), ...(a ? {} : { O: '' }) };
-          if (t) Object.assign(o, { E: t.duty || '', F: t.dd || '', G: t.disp || '', H: /no dispatch/i.test(t.disp || '') ? '<--Check info' : tday(t.dt), I: t.fr || '', J: tday(t.t0), K: t.to || '', L: tday(t.t1), M: numOr((BUS[k] || {})[t.duty] || '') });
+        legs.forEach(L => { const [a, z] = L.seat, t = look(L.parts[0]), tl = look(L.parts[L.parts.length - 1]) || t;
+          [a, z].forEach(q => { if (q) L.parts.forEach(c => (SEATS[q] = SEATS[q] || []).push(c)); });
+          const route = L.parts.map(c => ((look(c) || {}).route) || routeKey(c)).filter((v, i, A) => v && A.indexOf(v) === i).join('+');
+          const o = { B: serial(k), C: route, D: L.code, N: a ? numOr(a) : '', P: z ? numOr(z) : '', ...(z ? {} : { Q: '' }), ...(a ? {} : { O: '' }) };
+          if (t) Object.assign(o, { E: t.duty || '', F: t.dd || '', G: t.disp || '', H: /no dispatch/i.test(t.disp || '') ? '<--Check info' : tday(t.dt), I: t.fr || '', J: tday(t.t0), K: (tl && tl.to) || '', L: tday(tl && tl.t1), M: numOr((BUS[k] || {})[t.duty] || '') });
           det.push(o); }); });
       const inList = new Set(D.map(r => String(r[C.IQ]).trim())), notIn = Object.keys(SEATS).filter(q => !inList.has(q));
       x2 = setCell(x2, 'F1', `Schedule valid for period: ${dmy(from)} (00.01h) to ${dmy(to)} (23.59h)`);
@@ -1373,7 +1375,7 @@ if (window.NWAuth) load();
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Daily_driver_20-${mon}${ed.getFullYear()}.xlsx`; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
       window.__hrLast = a.download;
       const miss = Object.keys(extra);
-      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ملف التحضير الشهري (إصدار 22/11): ${res.length} سائق · ${det.length} رحلة · من ${dmy(from)} إلى ${dmy(to)}</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها عمود في ملف الموارد (ما انحسبت): ${miss.map(esc).join('، ')}</div>` : '') + (DUPX.length ? `<div class="msg err" style="margin-top:6px">⚠️ رحلات مكررة في الروستر (${DUPX.length}): ${DUPX.slice(0, 20).map(esc).join('، ')}${DUPX.length > 20 ? '…' : ''}</div>` : '') + (notIn.length ? `<div class="msg err" style="margin-top:6px">⚠️ ${notIn.length} رقم إقامة في الروستر مو موجود في قائمة السائقين (${notIn.reduce((a2, q) => a2 + SEATS[q].length, 0)} رحلة) — تطلع في ورقة التفاصيل وما تنحسب في ورقة Trips: <span dir="ltr">${notIn.slice(0, 15).map(esc).join(', ')}</span></div>` : '');
+      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ملف التحضير الشهري (إصدار 22/11-ب): ${res.length} سائق · ${det.length} رحلة · من ${dmy(from)} إلى ${dmy(to)}</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها عمود في ملف الموارد (ما انحسبت): ${miss.map(esc).join('، ')}</div>` : '') + (DUPX.length ? `<div class="msg err" style="margin-top:6px">⚠️ رحلات مكررة في الروستر (${DUPX.length}): ${DUPX.slice(0, 20).map(esc).join('، ')}${DUPX.length > 20 ? '…' : ''}</div>` : '') + (notIn.length ? `<div class="msg err" style="margin-top:6px">⚠️ ${notIn.length} رقم إقامة في الروستر مو موجود في قائمة السائقين (${notIn.reduce((a2, q) => a2 + SEATS[q].length, 0)} رحلة) — تطلع في ورقة التفاصيل وما تنحسب في ورقة Trips: <span dir="ltr">${notIn.slice(0, 15).map(esc).join(', ')}</span></div>` : '');
     } catch (e) { $('rpOut').innerHTML = `<div class="msg err">${esc(e.message || t_('eNet'))}</div>`; }
     finally { b.disabled = false; }
   };
