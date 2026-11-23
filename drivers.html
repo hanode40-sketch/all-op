@@ -169,10 +169,11 @@
   <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h3 style="margin:0">📄 تقرير عمل السائقين</h3><button class="btn light" id="rpX">✕</button></div>
   <div class="sub" id="rpSub">يوضح عمل كل سائق يوم بيوم حسب الروستر المرفوع: الرحلات، الراحة، الاستعداد، الإجازات، والتبديلات.</div>
   <div class="bar" style="margin-top:10px;align-items:flex-end">
+    <div><label>الشهر (من 21 إلى 20)</label><select id="rpMon"></select></div>
     <div><label>من تاريخ</label><input id="rpFrom" type="date"></div>
     <div><label>إلى تاريخ</label><input id="rpTo" type="date"></div>
     <div style="flex:2;position:relative"><label>السائق (اتركه فاضي لكل السائقين)</label><input id="rpDrv" type="search" autocomplete="off" list="rpDl" placeholder="اسم السائق أو رقم الإقامة"><datalist id="rpDl"></datalist></div>
-    <div style="flex:0 0 auto;display:flex;gap:6px"><button class="btn green" id="rpGo">عرض التقرير</button><button class="btn light" id="rpHr" title="ملف التحضير الشهري (Daily driver) اللي ينرسل للموارد كل شهر — الفترة من 21 إلى 20">📤 ملف التحضير الشهري</button></div>
+    <div style="flex:0 0 auto;display:flex;gap:6px"><button class="btn green" id="rpGo">عرض التقرير</button><button class="btn light" id="rpHr" title="ملف التحضير الشهري (Daily driver) اللي ينرسل للموارد كل شهر — الفترة من 21 إلى 20">📤 ملف التحضير الشهري</button><button class="btn light" id="rpKm" title="نفس ملف التحضير الشهري لكن بالكيلومترات بدل المبلغ">🛣️ ملف الكيلومترات</button></div>
   </div>
   <div id="rpOut" style="margin-top:12px"></div>
 </div></div>
@@ -1292,14 +1293,30 @@ if (window.NWAuth) load();
     return (headPart + xml.slice(at)).replace(/<!--PROTO[\s\S]*?PROTO-->/, rows).replace(/\{L\}/g, last);
   }
   const loadZip = () => window.JSZip ? Promise.resolve() : new Promise((ok, bad) => { const s2 = document.createElement('script'); s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'; s2.onload = ok; s2.onerror = () => bad(new Error('تعذر تحميل مكتبة Excel — تأكد من الإنترنت')); document.head.appendChild(s2); });
-  $('rpHr').onclick = async () => {
+  /* اختيار الشهر: كل شهر = من 21 الشهر السابق إلى 20 */
+  (function () { const sel = $('rpMon'); if (!sel) return; const MN = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+    const [, e0] = hrPeriod(), E = new Date(e0 + 'T12:00:00'); let h = '<option value="">فترة مخصصة</option>';
+    for (let i = -1; i < 12; i++) { const e = new Date(E.getFullYear(), E.getMonth() - i, 20), st = new Date(e.getFullYear(), e.getMonth() - 1, 21);
+      h += `<option value="${ymd(st)}|${ymd(e)}">${MN[e.getMonth()]} ${e.getFullYear()} (${dmy(ymd(st)).slice(0, 5)} – ${dmy(ymd(e)).slice(0, 5)})</option>`; }
+    sel.innerHTML = h;
+    const setM = () => { const v = sel.value; if (!v) return; const [f, t] = v.split('|'); $('rpFrom').value = f; $('rpTo').value = t; };
+    sel.onchange = setM;
+    const sync = () => { const v = $('rpFrom').value + '|' + $('rpTo').value; sel.value = [...sel.options].some(o => o.value === v) ? v : ''; };
+    $('rpFrom').addEventListener('change', sync); $('rpTo').addEventListener('change', sync);
+    const def = [...sel.options].find(o => o.value === hrPeriod().join('|')); if (def) { sel.value = def.value; setM(); }
+    window.__rpMonSync = sync;
+  })();
+  $('rpHr').onclick = () => hrExport('amt');
+  $('rpKm').onclick = () => hrExport('km');
+  const hrExport = async (mode) => {
+    const KM = mode === 'km', TITLE = KM ? 'ملف الكيلومترات' : 'ملف التحضير الشهري';
     let from = $('rpFrom').value, to = $('rpTo').value;
     // الفترة دايماً من 21 إلى 20 الشهر اللي بعده — نصححها تلقائياً بدل رسالة خطأ
     if (!from || from.slice(8) !== '21') [from, to] = hrPeriod();
     else { const f = new Date(from + 'T12:00:00'); to = ymd(new Date(f.getFullYear(), f.getMonth() + 1, 20)); }
-    $('rpFrom').value = from; $('rpTo').value = to;
+    $('rpFrom').value = from; $('rpTo').value = to; if (window.__rpMonSync) window.__rpMonSync();
     const list = D.filter(r => inDep(r[C.DEP], $('fDepot').value));
-    const b = $('rpHr'); b.disabled = true; $('rpOut').innerHTML = `<div class="msg">⏳ جاري تجهيز ملف التحضير الشهري من ${dmy(from)} إلى ${dmy(to)}...</div>`;
+    const b = $(KM ? 'rpKm' : 'rpHr'); b.disabled = true; $('rpOut').innerHTML = `<div class="msg">⏳ جاري تجهيز ${TITLE} من ${dmy(from)} إلى ${dmy(to)}...</div>`;
     try {
       const [data, , , tplBuf] = await Promise.all([fetchRange(addD(from, -31), addD(to, 7)), loadRates(), loadZip(), fetch('hr_template.xlsx?v=3').then(r => { if (!r.ok) throw new Error('ما لقيت قالب ملف التحضير'); return r.arrayBuffer(); })]);
       if (!Object.keys(data.days).some(k => k >= from && k <= to && (data.days[k] || []).length)) { $('rpOut').innerHTML = '<div class="msg err">لا يوجد روستر مرفوع في هذي الفترة</div>'; return; }
@@ -1361,7 +1378,8 @@ if (window.NWAuth) load();
       // 4) Trips
       let x4 = await zip.file(P + 'sheet4.xml').async('string');
       const RT = (RATES && RATES.rates) || {}, extra = {};
-      const noRate = []; HR_CODES.forEach((k, j) => { const r = RT[k]; if (r && r.amt != null) x4 = setCell(x4, colL(5 + j) + '1', Number(r.amt)); else { x4 = setCell(x4, colL(5 + j) + '1', 0); noRate.push(k); } });   // الأسعار من جدول الحوافز المرفوع فقط
+      const noRate = []; HR_CODES.forEach((k, j) => { const r = RT[k], v = r ? (KM ? r.km : r.amt) : null; if (v != null && v !== '' && isFinite(Number(v))) x4 = setCell(x4, colL(5 + j) + '1', Number(v)); else { x4 = setCell(x4, colL(5 + j) + '1', 0); noRate.push(k); } });
+      if (KM) { x4 = setCell(x4, 'D1', 'Trip KM'); x4 = setCell(x4, 'AO1', 'Total KM'); }   // نفس الملف: بدل المبلغ = عدد الرحلات × كيلومترات المسار   // الأسعار من جدول الحوافز المرفوع فقط
       const colOf = t => { const k = routeKey(t); if (!k) return null; if (HR_CODES.includes(k)) return k; const k2 = k.replace(/[A-Z]$/, ''); if (HR_CODES.includes(k2)) return k2; extra[k] = 1; return null; };
       x4 = fillSheet(x4, 5, res.map((x, i) => { const m = {}; (SEATS[String(x.iq)] || []).forEach(t => { const k = colOf(t); if (k) m[k] = (m[k] || 0) + 1; });
         const o = { A: i + 1, B: numOr(x.r[C.EMP]), C: numOr(x.iq), D: x.r[C.NAME], E: x.r[C.NAT] || '', AP: { f: `IFERROR(""&VLOOKUP(C{R},'DRIVERS SUMMARY  Attendance2'!$C$7:$AS${7 + res.length - 1},43,FALSE()),"")` } };
@@ -1373,10 +1391,10 @@ if (window.NWAuth) load();
       wbx = wbx.replace(/name="[^"]*trip details"/, `name="${d2(from)} to ${d2(to)} trip details"`); zip.file('xl/workbook.xml', wbx);
       const blob = await zip.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', compression: 'DEFLATE' });
       const ed = new Date(to + 'T12:00:00'), mon = ed.toLocaleString('en-US', { month: 'short' }).toUpperCase();
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Daily_driver_20-${mon}${ed.getFullYear()}.xlsx`; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Daily_driver${KM ? '_KM' : ''}_20-${mon}${ed.getFullYear()}.xlsx`; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
       window.__hrLast = a.download;
       const miss = Object.keys(extra);
-      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ملف التحضير الشهري (إصدار 23/11-و): ${res.length} سائق · ${det.length} رحلة · من ${dmy(from)} إلى ${dmy(to)}</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها عمود في ملف الموارد (ما انحسبت): ${miss.map(esc).join('، ')}</div>` : '') + (noRate.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها سعر في جدول الحوافز (Trip Value = 0): ${noRate.map(esc).join('، ')}</div>` : '') + (DUPX.length ? `<div class="msg err" style="margin-top:6px">⚠️ رحلات مكررة في الروستر (${DUPX.length}): ${DUPX.slice(0, 20).map(esc).join('، ')}${DUPX.length > 20 ? '…' : ''}</div>` : '') + (notIn.length ? `<div class="msg err" style="margin-top:6px">⚠️ ${notIn.length} رقم إقامة في الروستر مو موجود في قائمة السائقين (${notIn.reduce((a2, q) => a2 + SEATS[q].length, 0)} رحلة) — تطلع في ورقة التفاصيل وما تنحسب في ورقة Trips: <span dir="ltr">${notIn.slice(0, 15).map(esc).join(', ')}</span></div>` : '');
+      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ${TITLE} (إصدار 23/11-ز): ${res.length} سائق · ${det.length} رحلة · من ${dmy(from)} إلى ${dmy(to)}</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها عمود في ملف الموارد (ما انحسبت): ${miss.map(esc).join('، ')}</div>` : '') + (noRate.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها ${KM ? 'كيلومترات' : 'سعر'} في جدول الحوافز (= 0): ${noRate.map(esc).join('، ')}</div>` : '') + (DUPX.length ? `<div class="msg err" style="margin-top:6px">⚠️ رحلات مكررة في الروستر (${DUPX.length}): ${DUPX.slice(0, 20).map(esc).join('، ')}${DUPX.length > 20 ? '…' : ''}</div>` : '') + (notIn.length ? `<div class="msg err" style="margin-top:6px">⚠️ ${notIn.length} رقم إقامة في الروستر مو موجود في قائمة السائقين (${notIn.reduce((a2, q) => a2 + SEATS[q].length, 0)} رحلة) — تطلع في ورقة التفاصيل وما تنحسب في ورقة Trips: <span dir="ltr">${notIn.slice(0, 15).map(esc).join(', ')}</span></div>` : '');
     } catch (e) { $('rpOut').innerHTML = `<div class="msg err">${esc(e.message || t_('eNet'))}</div>`; }
     finally { b.disabled = false; }
   };
