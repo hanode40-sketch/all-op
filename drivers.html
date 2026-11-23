@@ -1297,7 +1297,7 @@ if (window.NWAuth) load();
   (function () { const sel = $('rpMon'); if (!sel) return; const MN = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
     const [, e0] = hrPeriod(), E = new Date(e0 + 'T12:00:00'); let h = '<option value="">فترة مخصصة</option>';
     for (let i = -1; i < 12; i++) { const e = new Date(E.getFullYear(), E.getMonth() - i, 20), st = new Date(e.getFullYear(), e.getMonth() - 1, 21);
-      h += `<option value="${ymd(st)}|${ymd(e)}">${MN[e.getMonth()]} ${e.getFullYear()} (${dmy(ymd(st)).slice(0, 5)} – ${dmy(ymd(e)).slice(0, 5)})</option>`; }
+      h += `<option value="${ymd(st)}|${ymd(e)}">${MN[e.getMonth()]} ${e.getFullYear()}</option>`; }
     sel.innerHTML = h;
     const setM = () => { const v = sel.value; if (!v) return; const [f, t] = v.split('|'); $('rpFrom').value = f; $('rpTo').value = t; };
     sel.onchange = setM;
