@@ -274,7 +274,7 @@ function render() {
     tile('#15803d', 'مشغول', s.used, 'نسبة الإشغال ' + pct + '%', 'res', pct) +
     tile('#0d9488', 'فاضي', s.free, 'جاهز للتسكين', 'rooms:free') +
     tile('#7c3aed', 'ترانزيت الليلة', ts.used + (ts.beds ? ' / ' + ts.beds : ''), nt.length ? 'يحتاجون ترانزيت: ' + nt.length + ' (استعداد ' + nt.filter(x => RS.state[x[0]] === 'sb').length + ')' : (ts.beds ? 'أسرّة الترانزيت' : 'ما في غرف ترانزيت'), 'tr') +
-    tile('#d97706', 'بدون سكن', un.length, 'على رأس العمل أو في إجازة', 'un') +
+    tile('#d97706', 'بدون سكن', un.length, RS.ok ? 'استعداد ' + un.filter(x => dayKey(x) === 'sb').length + ' · راحة ' + un.filter(x => dayKey(x) === 'rest').length + ' · رحلة ' + un.filter(x => dayKey(x) === 'trip').length + ' · إجازة ' + un.filter(x => dayKey(x) === 'leave').length : 'على رأس العمل أو في إجازة', 'un') +
     tile('#dc2626', 'يحتاج إخلاء', out.length, 'هروب أو إنهاء خدمات', 'res:out');
   let al = '';
   if (out.length) al += '<div class="alert red" data-go="res:out">⚠️ ' + out.length + ' ساكن حالتهم هروب أو إنهاء خدمات — أسرّتهم محجوزة ويحتاجون إخلاء</div>';
