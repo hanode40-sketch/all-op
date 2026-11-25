@@ -163,21 +163,37 @@ async function loadTrips() {
   } catch (e) {}
 }
 const addD = (d, n) => { const x = new Date(d + 'T12:00:00'); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
+/* نفس حساب «إدارة السائقين»: بدون رحلة يومين متتاليين أو أقل = راحة، أكثر = استعداد — والمعتذر/المستبدل اليوم = استعداد — والراحة اليدوية تبقى راحة.
+   مكانه الليلة (راحة أو استعداد) = كراج وصول آخر رحلة قبل اليوم، وإذا ما له رحلات = كراجه في إدارة السائقين */
 async function loadRest(today) {
   await loadTrips();
-  const r = await NWAuth.call('rosterRange', { from: addD(today, -30), to: addD(today, 3) });
+  const r = await NWAuth.call('rosterRange', { from: addD(today, -30), to: addD(today, 6) });
   if (!r || !r.ok) return;
-  const trips = {}, last = {}, cnt = {};
-  Object.keys(r.days).sort().forEach(dt => r.days[dt].forEach(x => [x[1], x[2]].forEach(iq => { if (!iq) return; (trips[iq] = trips[iq] || []).push([dt, x[0]]); })));
-  Object.keys(trips).forEach(iq => trips[iq].forEach(([dt, code]) => {
-    if (dt > today) return;
-    const g = endDepot(tripEnd(code));
-    if (!last[iq] || dt >= last[iq].date) last[iq] = { date: dt, code, g };
+  const days = r.days || {}, SETS = {}, trips = {}, last = {}, cnt = {};
+  Object.keys(days).filter(k => (days[k] || []).length).forEach(k => {
+    const set = {}; days[k].forEach(x => [x[1], x[2]].forEach(iq => { iq = String(iq || '').trim(); if (!iq) return; set[iq] = String(x[0]); (trips[iq] = trips[iq] || []).push([k, String(x[0])]); }));
+    SETS[k] = set;
+  });
+  Object.values(trips).forEach(t => t.sort((a, b) => a[0] < b[0] ? -1 : 1));
+  Object.keys(SETS).filter(k => k < today).sort().forEach(k => Object.keys(SETS[k]).forEach(iq => {
+    const g = endDepot(tripEnd(SETS[k][iq])); last[iq] = { date: k, code: SETS[k][iq], g };
     if (g) { cnt[iq] = cnt[iq] || {}; cnt[iq][g] = (cnt[iq][g] || 0) + 1; }
   }));
   const usual = {}; Object.keys(cnt).forEach(iq => { const e = Object.entries(cnt[iq]).sort((a, b) => b[1] - a[1])[0]; usual[iq] = { g: e[0], n: e[1] }; });
-  const onToday = {}; Object.keys(trips).forEach(iq => { const t = trips[iq].find(x => x[0] === today); if (t) onToday[iq] = t[1]; });
-  RS = { ok: true, last, today: onToday, usual, trips };
+  const onToday = SETS[today] || {}, rosterN = (days[today] || []).length;
+  const out = {}; (r.subs || []).filter(x => x.date === today).forEach(x => { out[x.orig] = x; });
+  const restm = {}; (r.marks || []).filter(x => x.date === today && x.mark === 'rest').forEach(x => { restm[x.iqama] = 1; });
+  const state = {};   // iq → 'rest' | 'sb'
+  D.drivers.forEach(x => {
+    const iq = x[0]; if (x[RC.st] !== 'operation' || onToday[iq]) return;
+    if (restm[iq]) { state[iq] = 'rest'; return; }
+    if (out[iq] || x[RC.sb] === 'نعم') { state[iq] = 'sb'; return; }
+    if (!rosterN) return;
+    let n = 1; for (let k = 1; k <= 30; k++) { const s = SETS[addD(today, -k)]; if (!s || s[iq]) break; n++; }
+    for (let k = 1; k <= 6; k++) { const s = SETS[addD(today, k)]; if (!s || s[iq]) break; n++; }
+    state[iq] = n <= 2 ? 'rest' : 'sb';
+  });
+  RS = { ok: true, last, today: onToday, usual, trips, state, out };
 }
 const usualG = iq => (RS.usual[iq] || {}).g || '';
 const homeG = iq => usualG(iq) || (DRV[iq] || [])[3] || '';
@@ -185,14 +201,11 @@ const nextTrip = (iq, after) => (RS.trips[iq] || []).find(x => x[0] > after) || 
 /** مكانه الليلة (للترانزيت) — ما عنده رحلة اليوم:
     استعداد (من إدارة السائقين): كراج وصول آخر رحلة له مهما كان تاريخها، وإذا ما له رحلات = كراجه
     راحة: آخر رحلة له خلال آخر 3 أيام — كراج الراحة = مدينة وصولها */
-const isSB = iq => (DRV[iq] || [])[RC.sb] === 'نعم';
 function restToday(iq) {
-  if (!RS.ok || RS.today[iq]) return '';
-  const l = RS.last[iq];
-  if (isSB(iq)) return (l && l.g) || (DRV[iq] || [])[RC.dep] || '';
-  return l && l.date >= addD(D.today, -3) ? l.g : '';
+  if (!RS.ok || !RS.state[iq]) return '';
+  const l = RS.last[iq]; return (l && l.g) || (DRV[iq] || [])[RC.dep] || '';
 }
-const whyRest = iq => isSB(iq) ? '<span class="chip s-leave">استعداد</span>' : '<span class="chip s-active">راحة</span>';
+const whyRest = iq => RS.state[iq] === 'sb' ? '<span class="chip s-leave">استعداد' + (RS.out[iq] ? ' · ' + esc(RS.out[iq].reason || 'اعتذار') : '') + '</span>' : '<span class="chip s-active">راحة</span>';
 
 function toast(t, ms) { const e = $('toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), ms || 2600); }
 function call(action, data) {
@@ -260,7 +273,7 @@ function render() {
     tile('#0369a1', 'الأسرّة', s.beds, '', 'rooms:all') +
     tile('#15803d', 'مشغول', s.used, 'نسبة الإشغال ' + pct + '%', 'res', pct) +
     tile('#0d9488', 'فاضي', s.free, 'جاهز للتسكين', 'rooms:free') +
-    tile('#7c3aed', 'ترانزيت الليلة', ts.used + (ts.beds ? ' / ' + ts.beds : ''), nt.length ? 'يحتاجون ترانزيت: ' + nt.length : (ts.beds ? 'أسرّة الترانزيت' : 'ما في غرف ترانزيت'), 'tr') +
+    tile('#7c3aed', 'ترانزيت الليلة', ts.used + (ts.beds ? ' / ' + ts.beds : ''), nt.length ? 'يحتاجون ترانزيت: ' + nt.length + ' (استعداد ' + nt.filter(x => RS.state[x[0]] === 'sb').length + ')' : (ts.beds ? 'أسرّة الترانزيت' : 'ما في غرف ترانزيت'), 'tr') +
     tile('#d97706', 'بدون سكن', un.length, 'على رأس العمل أو في إجازة', 'un') +
     tile('#dc2626', 'يحتاج إخلاء', out.length, 'هروب أو إنهاء خدمات', 'res:out');
   let al = '';
@@ -370,7 +383,10 @@ function vTr() {
   const hasTr = roomsIn().some(r => r.type === 'ترانزيت');
   let h = toolsBar('ابحث بالاسم أو الإقامة', null, canEdit() ? '<button class="btn light" data-act="tin">＋ دخول ترانزيت</button>' : '');
   if (!hasTr) h += '<div class="tools" style="padding-top:0"><div class="warnbox" style="flex:1">ما في غرف ترانزيت ' + (G === 'all' ? '' : 'في ' + esc(DEP[G] || G)) + ' — أضف غرفة واختر نوعها «ترانزيت»' + (canRooms() ? ' من تبويب الغرف' : ' (المدير أو المشرف)') + '</div></div>';
+  const allOff = RS.ok ? D.drivers.filter(x => RS.state[x[0]] && inG(restToday(x[0]))) : [];
   h += '<h4 class="sub">🛏️ راحة أو استعداد اليوم ويحتاجون ترانزيت <span class="mut">(' + nt.length + ')</span></h4>';
+  if (RS.ok) h += '<div class="tools" style="padding-top:0"><span class="chip s-active">راحة الليلة ' + (G === 'all' ? '' : 'في ' + esc(DEP[G] || G) + ' ') + ': ' + allOff.filter(x => RS.state[x[0]] === 'rest').length + '</span><span class="chip s-leave">استعداد: ' + allOff.filter(x => RS.state[x[0]] === 'sb').length + '</span>' +
+    '<span class="mut">— الباقين (' + (allOff.length - nt.length) + ') ساكنين بنفس الكراج أو في الترانزيت أو بدون سكن</span></div>';
   h += '<div class="tools" style="padding-top:0"><span class="mut">على رأس العمل وما عندهم رحلة اليوم (راحة أو استعداد)، ومكانهم الليلة حسب آخر رحلة كراج غير كراج سكنهم الدائم</span><span class="sp"></span>' +
     (canEdit() && nt.length && hasTr ? '<button class="btn green" data-act="trall">🪄 دخّل الكل الترانزيت</button>' : '') + '</div>';
   if (!RS.ok) h += '<div class="msg">جاري تحميل الروستر…</div>';
