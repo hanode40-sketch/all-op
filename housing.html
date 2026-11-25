@@ -366,13 +366,25 @@ function vRes() {
         '<td><button class="btn light sm" data-occ="' + esc(o.iq) + '">فتح</button></td></tr>'; }).join('') + '</tbody></table></div>';
 }
 
+/** وضع السائق اليوم: على رحلة / راحة / استعداد / إجازة */
+function dayKey(x) { if (LEAVE.includes(x[RC.st])) return 'leave'; if (!RS.ok) return ''; if (RS.today[x[0]]) return 'trip'; return RS.state[x[0]] || ''; }
+function dayChip(x) {
+  const k = dayKey(x);
+  if (k === 'trip') return '<span class="chip s-leave" style="background:#ccfbf1;color:#0f766e">على رحلة · ' + esc(RS.today[x[0]]) + '</span>';
+  if (k === 'sb' || k === 'rest') return whyRest(x[0]);
+  if (k === 'leave') return stChip(x[RC.st]);
+  return '<span class="mut">—</span>';
+}
+let UNLIST = [];
 function vUn() {
-  const list = unhoused().filter(x => qm(x[RC.name], x[0], x[RC.mob], x[RC.emp])).sort((a, b) => natSort(homeG(a[0]) + a[RC.name], homeG(b[0]) + b[RC.name]));
-  let h = toolsBar('ابحث بالاسم أو الإقامة', null, canEdit() && list.length ? '<button class="btn green" data-act="auto">🪄 تسكين تلقائي حسب الراحة</button>' : '');
+  const all = unhoused(), cnt = k => all.filter(x => dayKey(x) === k).length;
+  const list = UNLIST = all.filter(x => (F === 'all' || dayKey(x) === F) && qm(x[RC.name], x[0], x[RC.mob], x[RC.emp])).sort((a, b) => natSort(homeG(a[0]) + a[RC.name], homeG(b[0]) + b[RC.name]));
+  let h = toolsBar('ابحث بالاسم أو الإقامة', [['all', 'الكل (' + all.length + ')'], ['sb', 'استعداد (' + cnt('sb') + ')'], ['rest', 'راحة (' + cnt('rest') + ')'], ['trip', 'على رحلة اليوم (' + cnt('trip') + ')'], ['leave', 'إجازة (' + cnt('leave') + ')']],
+    canEdit() && list.length ? '<button class="btn green" data-act="auto">🪄 تسكين تلقائي' + (F === 'all' ? ' حسب الراحة' : ' للقائمة المعروضة (' + list.length + ')') + '</button>' : '');
   h += '<div class="tools" style="padding-top:0"><span class="mut">السائقين اللي حالتهم «على رأس العمل» أو «إجازة» وما لهم سرير دائم — كل سائق يطلع في كراج راحته المعتاد (أكثر كراج وصل له خلال آخر 30 يوم حسب الروستر)، واللي ما له رحلات يطلع في كراجه بإدارة السائقين' + (RS.ok ? '' : ' — <b>جاري تحميل الروستر…</b>') + '</span></div>';
   if (!list.length) return h + '<div class="msg">✅ كل السائقين مسكّنين</div>';
-  return h + '<div class="tw"><table><thead><tr><th>السائق</th><th>الإقامة</th><th>الرقم الوظيفي</th><th>الجوال</th><th>الحالة</th><th>كراج الراحة المعتاد</th><th>كراجه بالإدارة</th><th></th></tr></thead><tbody>' +
-    list.map(x => '<tr><td><b>' + esc(x[RC.name]) + '</b></td><td class="mono">' + esc(x[0]) + '</td><td class="mono">' + esc(x[RC.emp]) + '</td><td class="mono">' + esc(x[RC.mob]) + '</td><td>' + stChip(x[RC.st]) + '</td>' +
+  return h + '<div class="tw"><table><thead><tr><th>السائق</th><th>الإقامة</th><th>الرقم الوظيفي</th><th>الجوال</th><th>اليوم</th><th>مكانه الليلة</th><th>كراج الراحة المعتاد</th><th>كراجه بالإدارة</th><th></th></tr></thead><tbody>' +
+    list.map(x => '<tr><td><b>' + esc(x[RC.name]) + '</b></td><td class="mono">' + esc(x[0]) + '</td><td class="mono">' + esc(x[RC.emp]) + '</td><td class="mono">' + esc(x[RC.mob]) + '</td><td>' + dayChip(x) + '</td><td>' + (restToday(x[0]) ? esc(DEP[restToday(x[0])] || restToday(x[0])) : '<span class="mut">—</span>') + '</td>' +
       '<td>' + (RS.usual[x[0]] ? '<b>' + esc(DEP[RS.usual[x[0]].g] || RS.usual[x[0]].g) + '</b> <span class="mut">(' + RS.usual[x[0]].n + ' رحلة)</span>' : '<span class="mut">ما له رحلات</span>') + '</td><td>' + esc(DEP[x[RC.dep]] || x[RC.dep]) + '</td>' +
       '<td>' + (canEdit() ? '<button class="btn green sm" data-assign="' + esc(x[0]) + '">＋ تسكين</button>' : '') + '</td></tr>').join('') + '</tbody></table></div>';
 }
@@ -634,7 +646,7 @@ document.addEventListener('click', e => {
   if (ds.tin) return transitDlg(ds.tin);
   if (ds.tout) return tOut(t, ds.tout);
   if (ds.act === 'tin') return transitDlg('');
-  if (ds.act === 'auto') return planDlg('perm', unhoused());
+  if (ds.act === 'auto') return planDlg('perm', UNLIST);
   if (ds.act === 'trall') return planDlg('tr', needTransit());
   if (ds.occ) return occDlg(ds.occ);
   if (ds.assign) return assignDlg(ds.assign);
