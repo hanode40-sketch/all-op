@@ -385,7 +385,7 @@ function vTr() {
   if (!hasTr) h += '<div class="tools" style="padding-top:0"><div class="warnbox" style="flex:1">ما في غرف ترانزيت ' + (G === 'all' ? '' : 'في ' + esc(DEP[G] || G)) + ' — أضف غرفة واختر نوعها «ترانزيت»' + (canRooms() ? ' من تبويب الغرف' : ' (المدير أو المشرف)') + '</div></div>';
   const allOff = RS.ok ? D.drivers.filter(x => RS.state[x[0]] && inG(restToday(x[0]))) : [];
   h += '<h4 class="sub">🛏️ راحة أو استعداد اليوم ويحتاجون ترانزيت <span class="mut">(' + nt.length + ')</span></h4>';
-  if (RS.ok) h += '<div class="tools" style="padding-top:0"><span class="chip s-active">راحة الليلة ' + (G === 'all' ? '' : 'في ' + esc(DEP[G] || G) + ' ') + ': ' + allOff.filter(x => RS.state[x[0]] === 'rest').length + '</span><span class="chip s-leave">استعداد: ' + allOff.filter(x => RS.state[x[0]] === 'sb').length + '</span>' +
+  if (RS.ok) h += '<div class="tools" style="padding-top:0"><span class="chip s-active">راحة الليلة' + (G === 'all' ? '' : ' في ' + esc(DEP[G] || G)) + ': ' + allOff.filter(x => RS.state[x[0]] === 'rest').length + '</span><span class="chip s-leave">استعداد: ' + allOff.filter(x => RS.state[x[0]] === 'sb').length + '</span>' +
     '<span class="mut">— الباقين (' + (allOff.length - nt.length) + ') ساكنين بنفس الكراج أو في الترانزيت أو بدون سكن</span></div>';
   h += '<div class="tools" style="padding-top:0"><span class="mut">على رأس العمل وما عندهم رحلة اليوم (راحة أو استعداد)، ومكانهم الليلة حسب آخر رحلة كراج غير كراج سكنهم الدائم</span><span class="sp"></span>' +
     (canEdit() && nt.length && hasTr ? '<button class="btn green" data-act="trall">🪄 دخّل الكل الترانزيت</button>' : '') + '</div>';
