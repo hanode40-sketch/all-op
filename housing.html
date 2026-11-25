@@ -133,7 +133,7 @@ const ERR = { FORBIDDEN:'ما عندك صلاحية لهذي العملية', RO
   BEDS_IN_USE:'فيه سائق على سرير رقمه أكبر من العدد الجديد', BAD_ROOM:'اكتب الكراج ورقم الغرفة وعدد الأسرّة', ROOM_MAINT:'الغرفة تحت صيانة', BAD_BED:'اختر السرير',
   BED_TAKEN:'السرير مشغول', NO_DRIVER:'السائق مو موجود في إدارة السائقين', SAME_BED:'السائق ساكن في نفس السرير', NOT_HOUSED:'السائق مو ساكن', BAD_IQAMA:'اختر السائق',
   NOT_FOUND:'ما لقيت الغرفة', ROOM_TRANSIT:'هذي غرفة ترانزيت — للتسكين الدائم اختر غرفة سكن دائم', ROOM_NOT_TRANSIT:'هذي غرفة سكن دائم مو ترانزيت', AUTH:'انتهت الجلسة — سجّل دخول من جديد', NO_URL:'تعذر الاتصال' };
-const RC = { iq:0, name:1, st:2, dep:3, mob:4, nat:5, emp:6 };
+const RC = { iq:0, name:1, st:2, dep:3, mob:4, nat:5, emp:6, sb:7 };
 
 let D = null, G = 'all', TAB = 'rooms', Q = '', F = 'all', HL = '';
 let ROOM = {}, OCC = {}, BYROOM = {}, DRV = {}, TRN = {}, TBY = {};
@@ -182,8 +182,17 @@ async function loadRest(today) {
 const usualG = iq => (RS.usual[iq] || {}).g || '';
 const homeG = iq => usualG(iq) || (DRV[iq] || [])[3] || '';
 const nextTrip = (iq, after) => (RS.trips[iq] || []).find(x => x[0] > after) || null;
-/** يرتاح اليوم: ما عنده رحلة اليوم وآخر رحلة له خلال آخر 3 أيام — كراج الراحة = مدينة وصولها */
-function restToday(iq) { if (!RS.ok || RS.today[iq]) return ''; const l = RS.last[iq]; return l && l.date >= addD(D.today, -3) ? l.g : ''; }
+/** مكانه الليلة (للترانزيت) — ما عنده رحلة اليوم:
+    استعداد (من إدارة السائقين): كراج وصول آخر رحلة له مهما كان تاريخها، وإذا ما له رحلات = كراجه
+    راحة: آخر رحلة له خلال آخر 3 أيام — كراج الراحة = مدينة وصولها */
+const isSB = iq => (DRV[iq] || [])[RC.sb] === 'نعم';
+function restToday(iq) {
+  if (!RS.ok || RS.today[iq]) return '';
+  const l = RS.last[iq];
+  if (isSB(iq)) return (l && l.g) || (DRV[iq] || [])[RC.dep] || '';
+  return l && l.date >= addD(D.today, -3) ? l.g : '';
+}
+const whyRest = iq => isSB(iq) ? '<span class="chip s-leave">استعداد</span>' : '<span class="chip s-active">راحة</span>';
 
 function toast(t, ms) { const e = $('toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), ms || 2600); }
 function call(action, data) {
@@ -258,7 +267,7 @@ function render() {
   if (out.length) al += '<div class="alert red" data-go="res:out">⚠️ ' + out.length + ' ساكن حالتهم هروب أو إنهاء خدمات — أسرّتهم محجوزة ويحتاجون إخلاء</div>';
   if (warn.length) al += '<div class="alert" data-go="res:warn">⏳ ' + warn.length + ' ساكن موقوفين أو لم يعودوا من الإجازة — راجع حالتهم</div>';
   if (lv.length) al += '<div class="alert blue" data-go="res:leave">🧳 ' + lv.length + ' ساكن في إجازة الحين (السرير محجوز لهم وفاضي فعلياً)</div>';
-  if (nt.length && canEdit()) al += '<div class="alert" style="border-color:#c4b5fd" data-go="tr">🛏️ ' + nt.length + ' سائق يرتاحون اليوم في كراج غير كراج سكنهم — يحتاجون ترانزيت</div>';
+  if (nt.length && canEdit()) al += '<div class="alert" style="border-color:#c4b5fd" data-go="tr">🛏️ ' + nt.length + ' سائق (راحة أو استعداد) الليلة في كراج غير كراج سكنهم — يحتاجون ترانزيت</div>';
   if (!all.length && canRooms()) al += '<div class="alert blue" data-go="bulk">🏗️ ابدأ بإضافة غرف الكراج — اضغط هنا لإضافة مجموعة غرف مرة وحدة</div>';
   $('alerts').innerHTML = al;
   const T = [['rooms', 'الغرف', roomsIn().length], ['res', 'الساكنين', res.length], ['tr', 'الترانزيت', ts.used], ['un', 'بدون سكن', un.length], ['log', 'السجل', '']];
@@ -361,14 +370,14 @@ function vTr() {
   const hasTr = roomsIn().some(r => r.type === 'ترانزيت');
   let h = toolsBar('ابحث بالاسم أو الإقامة', null, canEdit() ? '<button class="btn light" data-act="tin">＋ دخول ترانزيت</button>' : '');
   if (!hasTr) h += '<div class="tools" style="padding-top:0"><div class="warnbox" style="flex:1">ما في غرف ترانزيت ' + (G === 'all' ? '' : 'في ' + esc(DEP[G] || G)) + ' — أضف غرفة واختر نوعها «ترانزيت»' + (canRooms() ? ' من تبويب الغرف' : ' (المدير أو المشرف)') + '</div></div>';
-  h += '<h4 class="sub">🛏️ يرتاحون اليوم ويحتاجون ترانزيت <span class="mut">(' + nt.length + ')</span></h4>';
-  h += '<div class="tools" style="padding-top:0"><span class="mut">على رأس العمل، ما عندهم رحلة اليوم، وآخر رحلة لهم وصلت كراج غير كراج سكنهم الدائم (حسب الروستر)</span><span class="sp"></span>' +
+  h += '<h4 class="sub">🛏️ راحة أو استعداد اليوم ويحتاجون ترانزيت <span class="mut">(' + nt.length + ')</span></h4>';
+  h += '<div class="tools" style="padding-top:0"><span class="mut">على رأس العمل وما عندهم رحلة اليوم (راحة أو استعداد)، ومكانهم الليلة حسب آخر رحلة كراج غير كراج سكنهم الدائم</span><span class="sp"></span>' +
     (canEdit() && nt.length && hasTr ? '<button class="btn green" data-act="trall">🪄 دخّل الكل الترانزيت</button>' : '') + '</div>';
   if (!RS.ok) h += '<div class="msg">جاري تحميل الروستر…</div>';
   else if (!nt.length) h += '<div class="msg">✅ ما في أحد يحتاج ترانزيت اليوم</div>';
-  else h += '<div class="tw" style="max-height:40vh"><table><thead><tr><th>السائق</th><th>الإقامة</th><th>يرتاح في</th><th>آخر رحلة</th><th>رحلته الجاية</th><th>سكنه الدائم</th><th></th></tr></thead><tbody>' +
+  else h += '<div class="tw" style="max-height:40vh"><table><thead><tr><th>السائق</th><th>الإقامة</th><th>الحالة</th><th>مكانه الليلة</th><th>آخر رحلة</th><th>رحلته الجاية</th><th>سكنه الدائم</th><th></th></tr></thead><tbody>' +
     nt.map(x => { const l = RS.last[x[0]], nx = nextTrip(x[0], D.today), o = OCC[x[0]];
-      return '<tr><td><b>' + esc(x[RC.name]) + '</b></td><td class="mono">' + esc(x[0]) + '</td><td><b>' + esc(DEP[restToday(x[0])] || '') + '</b></td><td class="mono">' + esc(l.code) + ' <span class="mut">' + esc(l.date.slice(5)) + '</span></td>' +
+      return '<tr><td><b>' + esc(x[RC.name]) + '</b></td><td class="mono">' + esc(x[0]) + '</td><td>' + whyRest(x[0]) + '</td><td><b>' + esc(DEP[restToday(x[0])] || '') + '</b></td><td class="mono">' + (l ? esc(l.code) + ' <span class="mut">' + esc(l.date.slice(5)) + '</span>' : '<span class="mut">—</span>') + '</td>' +
         '<td class="mono">' + (nx ? esc(nx[1]) + ' <span class="mut">' + esc(nx[0].slice(5)) + '</span>' : '<span class="mut">—</span>') + '</td><td>' + (o ? esc(DEP[ROOM[o.room].garage] || '') + ' · ' + esc(rLabel(ROOM[o.room])) : '<span class="mut">ما عنده</span>') + '</td>' +
         '<td>' + (canEdit() ? '<button class="btn green sm" data-tin="' + esc(x[0]) + '">دخول</button>' : '') + '</td></tr>'; }).join('') + '</tbody></table></div>';
   h += '<h4 class="sub">🏨 الموجودين في الترانزيت الحين <span class="mut">(' + cur.length + ')</span></h4>';
