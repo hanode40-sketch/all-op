@@ -249,9 +249,8 @@ function needTransit() {
     if (x[RC.st] !== 'operation' || TRN[x[0]]) return false;
     const g = restToday(x[0]); if (!g || !inG(g)) return false;
     const h = OCC[x[0]] && ROOM[OCC[x[0]].room] ? ROOM[OCC[x[0]].room].garage : '';
-    if (h === g) return false;
-    if (!h && homeG(x[0]) === g) return false;      // ما عنده سكن وهذا كراجه المعتاد: مكانه «بدون سكن» مو ترانزيت
-    return true;
+    if (!h) return false;                          // ما عنده سكن دائم: يظل في «بدون سكن» لين يتسكّن
+    return h !== g;
   });
 }
 function unhoused() {
@@ -399,7 +398,7 @@ function vTr() {
   h += '<h4 class="sub">🛏️ راحة أو استعداد اليوم ويحتاجون ترانزيت <span class="mut">(' + nt.length + ')</span></h4>';
   if (RS.ok) h += '<div class="tools" style="padding-top:0"><span class="chip s-active">راحة الليلة' + (G === 'all' ? '' : ' في ' + esc(DEP[G] || G)) + ': ' + allOff.filter(x => RS.state[x[0]] === 'rest').length + '</span><span class="chip s-leave">استعداد: ' + allOff.filter(x => RS.state[x[0]] === 'sb').length + '</span>' +
     '<span class="mut">— الباقين (' + (allOff.length - nt.length) + ') ساكنين بنفس الكراج أو في الترانزيت أو بدون سكن</span></div>';
-  h += '<div class="tools" style="padding-top:0"><span class="mut">على رأس العمل وما عندهم رحلة اليوم (راحة أو استعداد)، ومكانهم الليلة حسب آخر رحلة كراج غير كراج سكنهم الدائم</span><span class="sp"></span>' +
+  h += '<div class="tools" style="padding-top:0"><span class="mut">ساكنين سكن دائم، وما عندهم رحلة اليوم (راحة أو استعداد)، ومكانهم الليلة حسب آخر رحلة كراج غير كراج سكنهم — اللي ما لهم سكن دائم تلقاهم في «بدون سكن»</span><span class="sp"></span>' +
     (canEdit() && nt.length && hasTr ? '<button class="btn green" data-act="trall">🪄 دخّل الكل الترانزيت</button>' : '') + '</div>';
   if (!RS.ok) h += '<div class="msg">جاري تحميل الروستر…</div>';
   else if (!nt.length) h += '<div class="msg">✅ ما في أحد يحتاج ترانزيت اليوم</div>';
