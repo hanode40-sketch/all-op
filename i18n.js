@@ -37,7 +37,9 @@
     var out = WRXL ? s.replace(WRXL, function (m, pre, w) { return pre + DICT[w]; }) : s;
     for (var j = 0; j < RX.length; j++) if (RX[j][2]) out = out.replace(RX[j][0], RX[j][1]);   // أنماط داخل النص (قبل الكلمات)
     if (WRX) out = out.replace(WRX, function (m, pre, w) { return pre + DICT[w]; });
-    return out.replace(/،/g, ',').replace(/؟/g, '?').replace(/؛/g, ';');
+    out = out.replace(/،/g, ',').replace(/؟/g, '?').replace(/؛/g, ';');
+    // كل شي أو لا شي: لو بقي عربي (بيانات مثل وصف المخالفة أو اسم مدينة) نخلي النص الأصلي كما هو بدل خلط اللغتين
+    return /[\u0621-\u064A]/.test(out) ? s : out;
   }
 
   function skip(el) {
