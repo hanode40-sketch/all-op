@@ -4,7 +4,7 @@
  *
  *  <script src="https://hanode40-sketch.github.io/all-op/auth.js" data-tool="shift"></script>
  *
- *  data-tool = رمز البرنامج (accident, violation, shift, evaluation, trip, uniform, dashboard, stats, kpi)
+ *  data-tool = رمز البرنامج (accident, violation, shift, evaluation, trip, uniform, dashboard, stats, kpi, housing)
  *  في صفحة الهب الرئيسية اتركه بدون data-tool.
  ******************************************************************/
 (function () {
@@ -14,7 +14,7 @@
   var HOME_URL  = 'https://hanode40-sketch.github.io/all-op/';
   var KEY = 'nw_auth_v1';
   var IDLE_KEY = 'nw_last_active';
-  var AUTH_VERSION = '2026-11-19.2';   // غيّره عند كل تعديل على هذا الملف (يجبر الأجهزة على التحديث)
+  var AUTH_VERSION = '2026-11-25.1';   // غيّره عند كل تعديل على هذا الملف (يجبر الأجهزة على التحديث)
   var IDLE_MS = 2 * 60 * 60 * 1000;   // يقفل بعد ساعتين بدون أي نشاط (غيّر الرقم 2 لتغيير المدة)
 
   /* ===== ألوان موحدة لكل البرامج (نهاري / ليلي) — أي برنامج يستخدم var(--nw-...) ياخذ نفس الشكل ===== */
@@ -59,6 +59,7 @@
     card: '<rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/><path d="M6 15h4"/>',
     fines: '<rect x="7" y="2" width="10" height="20" rx="3"/><circle cx="12" cy="7" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="17" r="1.6"/>',
     settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+    housing: '<path d="M3 21h18"/><path d="M5 21V8l7-5 7 5v13"/><path d="M9 21v-5h6v5"/><path d="M9 11h.01M15 11h.01"/>',
     arrow: '<path d="M15 6l-6 6 6 6"/>'
   };
   function icon(k, size) { var p = NW_IC[k]; if (!p) return ''; return '<svg class="nwi" width="' + (size || 20) + '" height="' + (size || 20) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; }
@@ -129,7 +130,7 @@
     return p;
   }
   // صفحات الإدارة (الأداء والإحصائيات والمؤشرات): مفتوحة للمدير والمشرف تلقائياً
-  var MGMT_TOOLS = { performance: 1, stats: 1, kpi: 1, drivers: 1, review: 1 };
+  var MGMT_TOOLS = { performance: 1, stats: 1, kpi: 1, drivers: 1, review: 1, housing: 1 };
   function can(user, tool) {
     if (!tool) return true;
     if (MGMT_TOOLS[String(tool).toLowerCase()] && user && (user.r === 'مدير' || user.r === 'مدير تنفيذي' || user.r === 'مشرف')) return true;
@@ -301,6 +302,7 @@
     { ik: 'tasks', g: 1, t: 'tasks',       ic: '✅', ar: 'المهام',              en: 'Tasks',             url: 'https://hanode40-sketch.github.io/tasks/' },
     { ik: 'trip', g: 1, t: 'trip',        ic: '🚌', ar: 'مسار الرحلة',         en: 'Trip Route',        url: 'https://hanode40-sketch.github.io/trip/' },
     { ik: 'drivers', g: 1, t: 'drivers',     ic: '👨‍✈️', ar: 'إدارة السائقين',     en: 'Drivers Management', url: HOME_URL + 'drivers.html' },
+    { ik: 'housing', g: 1, t: 'housing',     ic: '🏠', ar: 'سكن السائقين',       en: 'Drivers Housing',   url: HOME_URL + 'housing.html' },
     { ik: 'violation', g: 2, t: 'violation',   ic: '📝', ar: 'محضر مخالفة',         en: 'Violation Report',  url: 'https://hanode40-sketch.github.io/violation/' },
     { ik: 'fines', g: 2, t: '', ext: 1, ic: '🚦', ar: 'نظام المخالفات المرورية', en: 'Traffic Violations', url: 'https://hanode40-sketch.github.io/fines/' },
     { ik: 'accident', g: 2, t: 'accident',    ic: '🚨', ar: 'تقرير حادث',          en: 'Accident Report',   url: 'https://hanode40-sketch.github.io/accident_report/' },

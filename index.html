@@ -79,7 +79,7 @@
   .card-title { font-size: 15.5px; font-weight: 800; margin: 0 0 3px; }
   .card-sub { font-size: 12.5px; line-height: 1.5; color: var(--nw-muted); margin: 0; }
   .arrow, .open { display: none; }
-  a.card[data-tool="shift"]{--acc:#d97706} a.card[data-tool="tasks"]{--acc:#16a34a} a.card[data-tool="trip"]{--acc:#0d9488} a.card[data-tool="drivers"]{--acc:#0369a1}
+  a.card[data-tool="shift"]{--acc:#d97706} a.card[data-tool="tasks"]{--acc:#16a34a} a.card[data-tool="trip"]{--acc:#0d9488} a.card[data-tool="drivers"]{--acc:#0369a1} a.card[data-tool="housing"]{--acc:#7c3aed}
   a.card[data-tool="violation"]{--acc:#dc2626} a.card[data-tool="accident"]{--acc:#ea580c} a.card[data-tool="evaluation"]{--acc:#ca8a04}
   a.card[data-tool="performance"]{--acc:#7c3aed} a.card[data-tool="stats"]{--acc:#0284c7} a.card[data-tool="kpi"]{--acc:#db2777} a.card[data-tool="review"]{--acc:#0f766e}
   .icon .nwi { color: var(--acc); }
@@ -192,6 +192,15 @@
       <div class="card-text">
         <p class="card-title" data-ar="إدارة السائقين" data-en="Drivers Management">إدارة السائقين</p>
         <p class="card-sub" data-ar="حالات السائقين والإجازات والاستعداد لكل كراج" data-en="Driver statuses, leaves and standby for each depot">حالات السائقين والإجازات والاستعداد لكل كراج</p>
+      </div>
+      <div class="arrow">‹</div>
+      <div class="open" data-ar="فتح البرنامج" data-en="Open">فتح البرنامج</div>
+    </a>
+    <a class="card" href="housing.html" data-tool="housing">
+      <div class="icon icon-drv">🏠</div>
+      <div class="card-text">
+        <p class="card-title" data-ar="سكن السائقين" data-en="Drivers Housing">سكن السائقين</p>
+        <p class="card-sub" data-ar="غرف كل كراج والتسكين والنقل والإخلاء" data-en="Depot rooms, assigning, moving and vacating drivers">غرف كل كراج والتسكين والنقل والإخلاء</p>
       </div>
       <div class="arrow">‹</div>
       <div class="open" data-ar="فتح البرنامج" data-en="Open">فتح البرنامج</div>
@@ -376,7 +385,7 @@
     $('sc-foot').innerHTML='<span>'+rng+'</span><span>'+lt+'</span>';
   }
   /* أيقونات احترافية بدل الإيموجي */
-  var IK={shift:'shift',tasks:'tasks',trip:'trip',drivers:'drivers',violation:'violation',accident:'accident',evaluation:'evaluation',performance:'performance',stats:'stats',kpi:'kpi',review:'review'};
+  var IK={shift:'shift',tasks:'tasks',trip:'trip',drivers:'drivers',housing:'housing',violation:'violation',accident:'accident',evaluation:'evaluation',performance:'performance',stats:'stats',kpi:'kpi',review:'review'};
   function icons(){
     if(!window.NWIcon) return;
     document.querySelectorAll('a.card[data-tool]').forEach(function(a){ var k=IK[a.dataset.tool], ic=a.querySelector('.icon'); if(k&&ic&&!ic.querySelector('svg')) ic.innerHTML=NWIcon(k,24); });
