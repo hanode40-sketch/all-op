@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <script>try{var t=localStorage.getItem('nwTheme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <script src="https://hanode40-sketch.github.io/all-op/auth.js" data-tool="housing"></script>
+<script src="i18n.js"></script>
+<script src="i18n/common.js"></script>
+<script src="i18n/housing.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#2c4a7a">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -519,8 +522,8 @@ function roomDlg(id) {
   modal(id ? 'تعديل غرفة ' + esc(r.no) : 'إضافة غرفة',
     '<div class="row2"><div><label>الكراج</label><select id="rg"' + (n ? ' disabled' : '') + '>' + gOpts(r.garage) + '</select></div><div><label>المبنى / الجناح (اختياري)</label><input id="rb" list="bl" value="' + esc(r.bld) + '" placeholder="مثال: مبنى A"><datalist id="bl">' + blds().map(b => '<option value="' + esc(b) + '">').join('') + '</datalist></div></div>' +
     '<div class="row3"><div><label>رقم الغرفة</label><input id="rn" value="' + esc(r.no) + '"></div><div><label>عدد الأسرّة</label><input id="rc" type="number" min="1" max="30" value="' + r.beds + '"></div>' +
-    '<div><label>الحالة</label><select id="rs">' + D.states.map(s => '<option' + (s === r.state ? ' selected' : '') + '>' + s + '</option>').join('') + '</select></div></div>' +
-    '<div class="row2"><div><label>نوع الغرفة</label><select id="ry"' + (n ? ' disabled' : '') + '>' + D.types.map(t => '<option' + (t === (r.type || 'دائم') ? ' selected' : '') + '>' + t + '</option>').join('') + '</select></div>' +
+    '<div><label>الحالة</label><select id="rs">' + D.states.map(s => '<option value="' + s + '"' + (s === r.state ? ' selected' : '') + '>' + s + '</option>').join('') + '</select></div></div>' +
+    '<div class="row2"><div><label>نوع الغرفة</label><select id="ry"' + (n ? ' disabled' : '') + '>' + D.types.map(t => '<option value="' + t + '"' + (t === (r.type || 'دائم') ? ' selected' : '') + '>' + t + '</option>').join('') + '</select></div>' +
     '<div><label>ملاحظة</label><input id="rt" value="' + esc(r.note) + '" placeholder="مثال: مكيف يحتاج صيانة"></div></div>' + (n ? '<div class="info">في الغرفة ' + n + ' ساكن — ما تقدر تغيّر الكراج أو تحذفها إلا بعد نقلهم أو إخلائهم.</div>' : ''),
     '<button class="btn" id="rsave">حفظ</button>' + (id && !n ? '<button class="btn red" id="rdel">حذف الغرفة</button>' : ''));
   $('rsave').onclick = e => busy(e.target, call('housingRoomSave', { room: { id: id || '', garage: $('rg').value, building: $('rb').value.trim(), no: $('rn').value.trim(), beds: $('rc').value, state: $('rs').value, note: $('rt').value.trim(), type: $('ry').value } })).then(r => r && toast('تم الحفظ ✅'));
@@ -531,7 +534,7 @@ function bulkDlg() {
     '<div class="info">تضيف غرف متتالية بنفس عدد الأسرّة مرة وحدة — مثلاً من 101 إلى 120. الغرف الموجودة قبل ما تتكرر.</div>' +
     '<div class="row2"><div><label>الكراج</label><select id="bg">' + gOpts(G !== 'all' ? G : '') + '</select></div><div><label>المبنى / الجناح (اختياري)</label><input id="bb" list="bl2" placeholder="مثال: مبنى A"><datalist id="bl2">' + blds().map(b => '<option value="' + esc(b) + '">').join('') + '</datalist></div></div>' +
     '<div class="row3"><div><label>من رقم</label><input id="bf" type="number" value="1"></div><div><label>إلى رقم</label><input id="bt" type="number" value="10"></div><div><label>أسرّة كل غرفة</label><input id="bc" type="number" min="1" max="30" value="4"></div></div>' +
-    '<div><label>نوع الغرف</label><select id="by">' + D.types.map(t => '<option>' + t + '</option>').join('') + '</select></div><div class="info" id="bp"></div>', '<button class="btn" id="bsave">إضافة</button>');
+    '<div><label>نوع الغرف</label><select id="by">' + D.types.map(t => '<option value="' + t + '">' + t + '</option>').join('') + '</select></div><div class="info" id="bp"></div>', '<button class="btn" id="bsave">إضافة</button>');
   const pv = () => { const f = +$('bf').value, t = +$('bt').value, c = +$('bc').value, n = t >= f ? t - f + 1 : 0; $('bp').innerHTML = n ? 'سيتم إضافة <b>' + n + '</b> غرفة (' + (n * c) + ' سرير)' : 'تأكد من الأرقام'; };
   ['bf', 'bt', 'bc'].forEach(k => $(k).oninput = pv); pv();
   $('bsave').onclick = e => {
@@ -617,7 +620,7 @@ function vacateDlg(iq) {
   const sugg = s === 'Termination of services' ? 'إنهاء خدمات' : s === 'Absconding' ? 'هروب' : '';
   modal('إخلاء سكن — ' + esc(o.name),
     '<div class="info">' + esc(DEP[r.garage] || r.garage) + ' · ' + esc(rLabel(r)) + ' · سرير ' + o.bed + '</div>' +
-    '<div class="row2"><div><label>السبب</label><select id="vr">' + ['إنهاء خدمات', 'استقالة', 'هروب', 'نقل لكراج آخر', 'سكن خاص', 'أخرى'].map(x => '<option' + (x === sugg ? ' selected' : '') + '>' + x + '</option>').join('') + '</select></div>' +
+    '<div class="row2"><div><label>السبب</label><select id="vr">' + ['إنهاء خدمات', 'استقالة', 'هروب', 'نقل لكراج آخر', 'سكن خاص', 'أخرى'].map(x => '<option value="' + x + '"' + (x === sugg ? ' selected' : '') + '>' + x + '</option>').join('') + '</select></div>' +
     '<div><label>تاريخ الإخلاء</label><input id="vd" type="date" value="' + D.today + '"></div></div><div><label>ملاحظة (اختياري)</label><input id="vn" placeholder="مثال: سلّم المفتاح"></div>',
     '<button class="btn red" id="vsave">تأكيد الإخلاء</button>');
   $('vsave').onclick = e => busy(e.target, call('housingVacate', { iqama: iq, date: $('vd').value, reason: $('vr').value + ($('vn').value.trim() ? ' — ' + $('vn').value.trim() : '') })).then(r => r && toast('تم الإخلاء ✅'));

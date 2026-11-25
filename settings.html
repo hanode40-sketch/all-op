@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <script>try{var t=localStorage.getItem('nwTheme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <script src="https://hanode40-sketch.github.io/all-op/auth.js"></script>
+<script src="i18n.js"></script>
+<script src="i18n/common.js"></script>
+<script src="i18n/settings.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#13274f">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
@@ -137,7 +140,7 @@ async function vFinesUsers(m) {
 function userDlg(u, keys, done) {
   const p = u.p || {}; const ps = String(p.perms || '').split(',');
   const preset = { 'موظف': ['dashboard', 'view', 'print', 'whatsapp', 'drivers', 'cancelReq', 'transferReq', 'docs'], 'مشرف': ['dashboard', 'view', 'print', 'drivers', 'archive', 'reports', 'cancelApprove', 'transferApprove', 'stampApprove', 'docsApprove'] };
-  const m = modal('صلاحيات — ' + esc(u.name), `<div class="row"><label>الدور <select id="ur"><option>موظف</option><option>مشرف</option><option>مدير</option></select></label>
+  const m = modal('صلاحيات — ' + esc(u.name), `<div class="row"><label>الدور <select id="ur"><option value="موظف">موظف</option><option value="مشرف">مشرف</option><option value="مدير">مدير</option></select></label>
     <label class="chk"><input type="checkbox" id="ua" ${p.active === 'لا' ? '' : 'checked'}> الحساب مفعّل في نظام المخالفات</label><button class="btn sec sm" id="upre">تعبئة الصلاحيات المقترحة للدور</button></div>
    <b>الصلاحيات</b><div class="chips">${keys.filter(k => k !== 'import' && k !== 'vehicles').map(k => `<label class="chk"><input type="checkbox" data-p="${k}" ${ps.indexOf(k) > -1 ? 'checked' : ''}> ${esc(PERM_LABEL[k] || k)}</label>`).join('')}</div>
    <p class="small muted">الدور «مدير» يعطي كل الصلاحيات الإدارية. الصلاحيات لا تُمنح تلقائياً للموظف أو المشرف — حدّدها لكل حساب.</p>

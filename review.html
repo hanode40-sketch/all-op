@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <script>try{var t=localStorage.getItem('nwTheme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <script src="https://hanode40-sketch.github.io/all-op/auth.js" data-tool="review"></script>
+<script src="i18n.js"></script>
+<script src="i18n/common.js"></script>
+<script src="i18n/review.js"></script>
 <script src="stats-widget.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#13274f">
@@ -266,8 +269,8 @@ function fillSelects() {
   const gs = [...new Set(ALL.map(o => gNorm(o.garage)).filter(Boolean))].sort();
   const es = [...new Set(ALL.map(o => String(o.by || '').trim()).filter(Boolean))].sort();
   const g0 = $('garage').value, e0 = $('emp').value;
-  $('garage').innerHTML = '<option value="">كل الكراجات</option>' + gs.map(g => `<option${g === g0 ? ' selected' : ''}>${esc(g)}</option>`).join('');
-  $('emp').innerHTML = '<option value="">كل الموظفين</option>' + es.map(g => `<option${g === e0 ? ' selected' : ''}>${esc(g)}</option>`).join('');
+  $('garage').innerHTML = '<option value="">كل الكراجات</option>' + gs.map(g => `<option value="${esc(g)}"${g === g0 ? ' selected' : ''}>${esc(g)}</option>`).join('');
+  $('emp').innerHTML = '<option value="">كل الموظفين</option>' + es.map(g => `<option value="${esc(g)}"${g === e0 ? ' selected' : ''}>${esc(g)}</option>`).join('');
 }
 
 function filtered(ignoreTool) {
@@ -483,7 +486,7 @@ async function drawTrip() {
       : `<div class="msg">${TRF === 'miss' ? '✓ ما فيه مسارات فات موعدها بدون إرسال' : TRF === 'late' ? '✓ ما فيه إرسال متأخر' : TRF === 'off' ? 'ما فيه رحلات غير مفعلة في هذه الفترة' : 'لا توجد بيانات'}</div>`) +
     (R.extra.length ? `<div class="warn">ℹ️ ${R.extra.length} إرسال لرحلات مو موجودة في روستر نفس اليوم (ممكن تاريخ الرحلة انكتب غلط في برنامج المسار): ${R.extra.slice(0, 8).map(x => esc(x.code) + ' · ' + esc(x.date)).join('، ')}${R.extra.length > 8 ? '…' : ''}</div>` : '');
   const gs = [...new Set(R.items.map(i => i.garage).filter(Boolean))].sort(), g0 = $('garage').value;
-  $('garage').innerHTML = '<option value="">كل الكراجات</option>' + gs.map(x => `<option${x === g0 ? ' selected' : ''}>${esc(x)}</option>`).join('');
+  $('garage').innerHTML = '<option value="">كل الكراجات</option>' + gs.map(x => `<option value="${esc(x)}"${x === g0 ? ' selected' : ''}>${esc(x)}</option>`).join('');
 }
 
 
