@@ -13,6 +13,7 @@
   if (window.NWI18N) return;
   var KEY = 'hubLang', DICT = {}, RX = [], WRX = null, WRXL = null, LANG = 'ar', BUSY = false;
   var TXT = new WeakMap(), ATT = new WeakMap(), ATTRS = ['placeholder', 'title', 'aria-label', 'data-tip'];
+  var SCR = document.currentScript, NOBTN = !!(SCR && SCR.hasAttribute('data-nobtn'));   // البرامج اللي لها زر لغة خاص
   var root = document.documentElement, AR_DIR = root.getAttribute('dir') || 'rtl', AR_LANG = root.getAttribute('lang') || 'ar';
 
   function read() { try { return localStorage.getItem(KEY) === 'en' ? 'en' : 'ar'; } catch (e) { return 'ar'; } }
@@ -117,6 +118,7 @@
   /* زر اللغة للشاشات الصغيرة (على الكمبيوتر الزر في القائمة الجانبية) */
   function btn() {
     if (!document.body) return;
+    if (NOBTN) return;
     var b = document.getElementById('nwi18n-btn');
     if (!b) {
       if (document.getElementById('lang-btn')) return;

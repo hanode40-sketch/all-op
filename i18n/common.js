@@ -12,5 +12,7 @@ NWI18N.add({
   'الرقم الوظيفي': 'Employee No.', 'رحلة': 'trip(s)', 'اليوم': 'Today', 'يوم': 'days', 'أيام': 'days', 'تم الحفظ': 'Saved', 'جاري الحفظ': 'Saving', 'جاري الحفظ…': 'Saving…',
   'خطأ': 'Error', 'غير معروف': 'unknown', 'تعذر الاتصال': 'Connection failed', 'ما عندك صلاحية لهذي العملية': 'You do not have permission for this action',
   'انتهت الجلسة — سجّل دخول من جديد': 'Session expired — please sign in again', 'المدير': 'Manager', 'المشرف': 'Supervisor', 'مدير': 'Manager', 'مشرف': 'Supervisor',
+  'يناير': 'January', 'فبراير': 'February', 'مارس': 'March', 'أبريل': 'April', 'مايو': 'May', 'يونيو': 'June', 'يوليو': 'July', 'أغسطس': 'August',
+  'سبتمبر': 'September', 'أكتوبر': 'October', 'نوفمبر': 'November', 'ديسمبر': 'December', 'من تاريخ': 'From date', 'إلى تاريخ': 'To date',
   'مرحّل': 'Dispatcher', 'مرحل': 'Dispatcher', 'موظف': 'Employee', 'جودة': 'Quality', 'علاقات حكومية': 'Government Relations', 'مدير تنفيذي': 'Executive Manager'
 });
