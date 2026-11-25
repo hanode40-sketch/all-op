@@ -51,6 +51,8 @@
   .tab.on{background:#1f3f7a;color:#fff} .tab b{font-size:12px;background:var(--nbg);color:var(--ink);border-radius:999px;padding:1px 8px;margin-inline-start:4px} .tab.on b{background:rgba(255,255,255,.2);color:#fff}
   .tools{display:flex;gap:8px;padding:12px;flex-wrap:wrap;align-items:center} .tools input,.tools select{width:auto;flex:1;min-width:160px;padding:9px 10px;font-size:14px}
   .tools .sp{flex:1}
+  .fchips{display:flex;gap:6px;flex-wrap:wrap;padding:0 12px 10px} .fch{font:inherit;font-size:13px;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer;background:var(--soft);color:var(--ink)}
+  .fch b{font-size:12px;margin-inline-start:4px;opacity:.75} .fch.on{background:#1f3f7a;border-color:#1f3f7a;color:#fff}
   .bld{margin:6px 12px 4px;font-size:13px;font-weight:800;color:var(--muted);display:flex;align-items:center;gap:8px}
   .bld::after{content:"";flex:1;height:1px;background:var(--line)}
   .rooms{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;padding:6px 12px 14px}
@@ -378,8 +380,10 @@ let UNLIST = [];
 function vUn() {
   const all = unhoused(), cnt = k => all.filter(x => dayKey(x) === k).length;
   const list = UNLIST = all.filter(x => (F === 'all' || dayKey(x) === F) && qm(x[RC.name], x[0], x[RC.mob], x[RC.emp])).sort((a, b) => natSort(homeG(a[0]) + a[RC.name], homeG(b[0]) + b[RC.name]));
-  let h = toolsBar('ابحث بالاسم أو الإقامة', [['all', 'الكل (' + all.length + ')'], ['sb', 'استعداد (' + cnt('sb') + ')'], ['rest', 'راحة (' + cnt('rest') + ')'], ['trip', 'على رحلة اليوم (' + cnt('trip') + ')'], ['leave', 'إجازة (' + cnt('leave') + ')']],
+  let h = toolsBar('ابحث بالاسم أو الإقامة', null,
     canEdit() && list.length ? '<button class="btn green" data-act="auto">🪄 تسكين تلقائي' + (F === 'all' ? ' حسب الراحة' : ' للقائمة المعروضة (' + list.length + ')') + '</button>' : '');
+  h += '<div class="fchips"><span class="mut" style="align-self:center">حالة اليوم:</span>' + [['all', 'الكل', all.length], ['sb', '🟣 استعداد', cnt('sb')], ['rest', '🟢 راحة', cnt('rest')], ['trip', '🚌 على رحلة', cnt('trip')], ['leave', '🧳 إجازة', cnt('leave')]]
+    .map(f => '<button class="fch' + (F === f[0] ? ' on' : '') + '" data-f="' + f[0] + '">' + f[1] + '<b>' + f[2] + '</b></button>').join('') + '</div>';
   h += '<div class="tools" style="padding-top:0"><span class="mut">السائقين اللي حالتهم «على رأس العمل» أو «إجازة» وما لهم سرير دائم — كل سائق يطلع في كراج راحته المعتاد (أكثر كراج وصل له خلال آخر 30 يوم حسب الروستر)، واللي ما له رحلات يطلع في كراجه بإدارة السائقين' + (RS.ok ? '' : ' — <b>جاري تحميل الروستر…</b>') + '</span></div>';
   if (!list.length) return h + '<div class="msg">✅ كل السائقين مسكّنين</div>';
   return h + '<div class="tw"><table><thead><tr><th>السائق</th><th>الإقامة</th><th>الرقم الوظيفي</th><th>الجوال</th><th>اليوم</th><th>مكانه الليلة</th><th>كراج الراحة المعتاد</th><th>كراجه بالإدارة</th><th></th></tr></thead><tbody>' +
@@ -628,10 +632,11 @@ function csv() {
 
 /* ===== الأحداث ===== */
 document.addEventListener('click', e => {
-  const t = e.target.closest('[data-g],[data-tab],[data-go],[data-act],[data-room],[data-bed],[data-occ],[data-assign],[data-trn],[data-tin],[data-tout],[data-x]');
+  const t = e.target.closest('[data-f],[data-g],[data-tab],[data-go],[data-act],[data-room],[data-bed],[data-occ],[data-assign],[data-trn],[data-tin],[data-tout],[data-x]');
   if (!t) { if (e.target === $('ov')) closeM(); return; }
   const ds = t.dataset;
   if (ds.x) return closeM();
+  if (ds.f) { F = ds.f; return view(); }
   if (ds.g) { G = ds.g; HL = ''; return render(); }
   if (ds.tab) { TAB = ds.tab; Q = ''; F = 'all'; return render(); }
   if (ds.go) { const [tb, f] = ds.go.split(':'); if (tb === 'bulk') return bulkDlg(); TAB = tb; F = f || 'all'; Q = ''; render(); $('tabs').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
