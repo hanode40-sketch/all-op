@@ -283,6 +283,11 @@ function render() {
   if (lv.length) al += '<div class="alert blue" data-go="res:leave">🧳 ' + lv.length + ' ساكن في إجازة الحين (السرير محجوز لهم وفاضي فعلياً)</div>';
   if (nt.length && canEdit()) al += '<div class="alert" style="border-color:#c4b5fd" data-go="tr">🛏️ ' + nt.length + ' سائق (راحة أو استعداد) الليلة في كراج غير كراج سكنهم — يحتاجون ترانزيت</div>';
   if (!all.length && canRooms()) al += '<div class="alert blue" data-go="bulk">🏗️ ابدأ بإضافة غرف الكراج — اضغط هنا لإضافة مجموعة غرف مرة وحدة</div>';
+  if (RS.ok) {   // نفس أرقام «إدارة السائقين»: كل سائقين الكراج الليلة حسب آخر رحلة — ساكنين أو لا
+    const off = D.drivers.filter(x => RS.state[x[0]] && inG(restToday(x[0])));
+    al = '<div class="alert blue" style="cursor:default">📍 الليلة في ' + (G === 'all' ? 'كل الكراجات' : esc(DEP[G] || G)) + ' (نفس أرقام إدارة السائقين): 🟣 استعداد <b>' + off.filter(x => RS.state[x[0]] === 'sb').length +
+      '</b> · 🟢 راحة <b>' + off.filter(x => RS.state[x[0]] === 'rest').length + '</b> <span style="font-weight:500;opacity:.8">— أرقام «بدون سكن» أقل لأنها تحسب اللي ما لهم سكن بس، حسب كراج راحتهم المعتاد</span></div>' + al;
+  }
   $('alerts').innerHTML = al;
   const T = [['rooms', 'الغرف', roomsIn().length], ['res', 'الساكنين', res.length], ['tr', 'الترانزيت', ts.used], ['un', 'بدون سكن', un.length], ['log', 'السجل', '']];
   $('tabs').innerHTML = T.map(t => '<button class="tab' + (TAB === t[0] ? ' on' : '') + '" data-tab="' + t[0] + '">' + t[1] + (t[2] !== '' ? '<b>' + t[2] + '</b>' : '') + '</button>').join('');
