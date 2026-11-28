@@ -297,7 +297,7 @@ let D = [], ROSTER = {}, ROSTER_N = 0, ABSENT = {}, SINCE = {}, WEEK_N = 0, canE
 /* ---------- الحسابات ---------- */
 const dep = r => r[C.DEP] || 'Unassigned';
 /* كراج الاستعداد حسب آخر رحلة نفّذها السائق: تنتهي في مكة أو جدة أو ينبع = الشميسي، والباقي حسب كراج مدينة الوصول */
-let TRIP_END = {}, LAST = {}, NEXT = {}, ROSTER_TO = '';
+let TRIP_END = {}, EXTRA_END = {}, LAST = {}, NEXT = {}, ROSTER_TO = '';   // EXTRA_END: نهاية الرحلات الإضافية
 const END_DEPOT = [[/jeddah|makkah|mecca|jarwal|yanbu|جدة|مكة|ينبع/i, 'Shumaysi'], [/madinah|medina|rafha|المدينة|رفحاء/i, 'Madinah'], [/tabuk|haql|تبوك|حقل/i, 'Tabuk'],
   [/riyadh|dawadmi|الرياض|الدوادمي/i, 'Riyadh'], [/jazan|jizan|جازان/i, 'Jazan'], [/khamis|خميس/i, 'Khamis Mushait'], [/bashayer|البشائر/i, 'Al Bashayer'],
   [/buraydah|qassim|بريدة|القصيم/i, 'Buraydah'], [/hail|حائل/i, 'Hail']];
@@ -305,6 +305,7 @@ const endDepot = st => { for (const [re, d] of END_DEPOT) if (re.test(st || ''))
 function tripEnd(code) {
   code = String(code || '').toUpperCase().replace(/\s+/g, ' ').trim(); if (!code) return '';
   if (TRIP_END[code]) return TRIP_END[code];
+  if (EXTRA_END[code]) return EXTRA_END[code];
   const parts = code.split('+').map(x => x.trim()).filter(Boolean);           // رحلة مدمجة: نهاية آخر جزء
   return TRIP_END[parts[parts.length - 1]] || '';
 }
@@ -592,7 +593,7 @@ async function loadRoster_() {
   const date = $('fDate').value, from = addD(date, -30), to = addD(date, 6);
   let days = null;
   let subs = [], marks = [];
-  try { const [j] = await Promise.all([NWAuth.call('rosterRange', { from, to }), loadDuties()]); if (j && j.ok) { days = j.days || {}; subs = j.subs || []; marks = j.marks || []; } } catch (e) {}
+  try { const [j] = await Promise.all([NWAuth.call('rosterRange', { from, to }), loadDuties()]); if (j && j.ok) { days = j.days || {}; subs = j.subs || []; marks = j.marks || []; (j.extras || []).forEach(x => { EXTRA_END[String(x.trip).toUpperCase().replace(/\s+/g, ' ').trim()] = x.to; }); } } catch (e) {}
   if (!days) { try { const j = await NWAuth.call('rosterGet', { date }); days = {}; if (j && j.ok) { if ((j.rows || []).length) days[date] = j.rows; subs = j.subs || []; marks = j.marks || []; } } catch (e) { days = {}; } }
   RESTM = {}; marks.filter(x => x.date === date && x.mark === 'rest').forEach(x => { RESTM[x.iqama] = x; });
   SWOUT = {}; SWIN = {};
@@ -1173,16 +1174,16 @@ if (window.NWAuth) load();
   $('rpOv').addEventListener('click', e => { if (e.target.id === 'rpOv') $('rpOv').classList.remove('on'); });
 
   async function fetchRange(from, to) {
-    const days = {}, subs = [], marks = [];
+    const days = {}, subs = [], marks = [], extras = [];
     let a = from;
     while (a <= to) {                          // على دفعات 31 يوم
       let b = addD(a, 30); if (b > to) b = to;
       const j = await NWAuth.call('rosterRange', { from: a, to: b });
       if (j && j.error === 'AUTH') { NWAuth.relogin && NWAuth.relogin(); throw new Error(t_('eAuth')); }
-      if (j && j.ok) { Object.assign(days, j.days || {}); (j.subs || []).forEach(x => subs.push(x)); (j.marks || []).forEach(x => marks.push(x)); }
+      if (j && j.ok) { Object.assign(days, j.days || {}); (j.subs || []).forEach(x => subs.push(x)); (j.marks || []).forEach(x => marks.push(x)); (j.extras || []).forEach(x => extras.push(x)); }
       a = addD(b, 1);
     }
-    return { days, subs, marks };
+    return { days, subs, marks, extras };
   }
   // تصنيف يوم كل سائق
   /* سجل الحالات: السائق اللي رجع من إجازة حالته الحين «على رأس العمل» — نرجع لسجل التغييرات عشان أيام الإجازة ما تطلع استعداد */
@@ -1401,7 +1402,8 @@ if (window.NWAuth) load();
       // ورقة التفاصيل = مصدر واحد للرحلات: كل رحلة (leg) في سطر، بعد تطبيق التبديلات (البديل يحل محل الأصلي في نفس الواجب)
       const det = [], SEATS = {}, DUPX = [], MERGEX = {};   // MERGEX: الرحلة المدموجة تنحسب رحلة وحدة في Total Trips (والحافز للخطين)   // SEATS[iq] = [كود الرحلة...] — منها تنحسب ورقة Trips عشان الإجماليات تتطابق
       const subsBy = {}; (data.subs || []).forEach((x, n) => { (subsBy[x.date] = subsBy[x.date] || []).push(Object.assign({ __n: n }, x)); });
-      dts.forEach(k => { const SI = cs && k < cs && Object.keys(PREVI).length ? PREVI : CURI, look = c => SI[nk(c)] || CURI[nk(c)] || null;
+      const EXI = {}; (data.extras || []).forEach(x => { EXI[x.date + '|' + nk(x.trip)] = { trip: x.trip, route: x.route, duty: x.duty, dd: x.duty, disp: x.disp, dt: x.dt, fr: x.fr, t0: x.t0, to: x.to, t1: x.t1, bus: x.bus }; });   // الرحلات الإضافية
+      dts.forEach(k => { const SI = cs && k < cs && Object.keys(PREVI).length ? PREVI : CURI, look = c => SI[nk(c)] || CURI[nk(c)] || EXI[k + '|' + nk(c)] || null;
         // الرحلة المدموجة (NW13-O-1+NW19-O-1) = سطر واحد في التفاصيل مثل الملف اليدوي، لكنها رحلتين في ورقة Trips (كل خط له حافز)
         const legs = [];
         (data.days[k] || []).forEach(r => { const parts = String(r[0]).split('+').map(c => c.trim()).filter(Boolean); if (parts.length) legs.push({ code: parts.join('+'), parts, seat: [String(r[1] || '').trim(), String(r[2] || '').trim()] }); });
