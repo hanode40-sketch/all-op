@@ -118,7 +118,7 @@
   /* زر اللغة للشاشات الصغيرة (على الكمبيوتر الزر في القائمة الجانبية) */
   function btn() {
     if (!document.body) return;
-    if (NOBTN) return;
+    return;   // الزر العائم مخفي (طلب الإدارة 11/2026) — تبديل اللغة من القائمة الجانبية أو زر اللغة داخل البرامج، والاختيار يتطبق على كل البرامج
     var b = document.getElementById('nwi18n-btn');
     if (!b) {
       if (document.getElementById('lang-btn')) return;
