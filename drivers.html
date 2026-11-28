@@ -1,0 +1,1474 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<script>try{var t=localStorage.getItem('nwTheme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<script src="https://hanode40-sketch.github.io/all-op/auth.js" data-tool="drivers"></script>
+<script src="i18n.js" data-nobtn></script>
+<script src="i18n/common.js"></script>
+<script src="i18n/drivers.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2c4a7a">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<title>إدارة السائقين · أدوات التشغيل</title>
+<style>
+  :root{ --navy:#1f3f7a; --ink:#0f172a; --muted:#64748b; --line:#e5e7eb; --soft:#f8fafc;
+    --g:#15803d; --gbg:#e7f5ed; --y:#b45309; --ybg:#fef3c7; --r:#b91c1c; --rbg:#fdecea; --b:#1d4ed8; --bbg:#dbeafe; --n:#475569; --nbg:#f1f5f9; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Tahoma,Arial,sans-serif;color:var(--ink);
+    background:#2c4a7a;position:relative;min-height:100vh;padding:20px 14px 90px}
+  .wrap{max-width:none;margin:0 auto}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#fff;position:sticky;top:0;z-index:50;margin:-20px -14px 18px;
+    padding:14px 14px 12px;border-radius:0 0 16px 16px;background:rgba(31,63,122,.88);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 6px 20px rgba(0,0,0,.18)}
+  .top h1{margin:0;font-size:22px}
+  .top .en{font-size:13px;opacity:.8}
+  .back{color:#fff;text-decoration:none;font-size:14px;background:rgba(255,255,255,.15);padding:8px 14px;border-radius:999px;white-space:nowrap}
+  .panel{background:#fff;border-radius:16px;border:1px solid rgba(15,23,42,.06);box-shadow:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(10,25,55,.16)}
+  .bar{padding:14px;display:flex;gap:10px;align-items:end;flex-wrap:wrap}
+  .bar>div{flex:1;min-width:160px}
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600}
+  select,input{width:100%;font:inherit;font-size:15px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink)}
+  .btn{font:inherit;font-size:14px;font-weight:700;border:0;border-radius:10px;padding:11px 14px;cursor:pointer;background:var(--navy);color:#fff;white-space:nowrap}
+  .btn.light{background:#eef2f7;color:var(--navy)} .btn.green{background:#15803d} .btn:disabled{opacity:.6;cursor:wait}
+  .sec{margin:22px 4px 10px;color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;gap:10px;text-shadow:0 2px 6px rgba(0,0,0,.4)}
+  .sec::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.25)}
+  .tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  .tile{all:unset;box-sizing:border-box;cursor:pointer;background:#fff;border-radius:16px;padding:14px 16px;position:relative;overflow:hidden;color:var(--ink);font-family:inherit;
+    border:1px solid rgba(15,23,42,.06);box-shadow:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(10,25,55,.16);transition:transform .15s}
+  .tile:hover{transform:translateY(-3px)} .tile::before{content:"";position:absolute;inset-inline:0;top:0;height:4px;background:var(--acc)}
+  .tile .lb{font-size:13px;color:var(--muted);font-weight:600} .tile b{display:block;font-size:30px;margin-top:6px} .tile small{font-size:12px;color:var(--muted)}
+  .tiles.s{grid-template-columns:repeat(10,1fr)} .tiles.s .tile b{font-size:24px}
+  .grid2{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}
+  .card{padding:16px;min-width:0} .card h2{margin:0 0 12px;font-size:16px;color:var(--navy)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{padding:8px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}
+  th{font-size:12px;color:var(--muted);background:var(--soft)} th:first-child,td:first-child{text-align:start}
+  td.c{cursor:pointer} td.c:hover{background:var(--soft);color:var(--navy);font-weight:700} tr.tot td{font-weight:800}
+  .tw{overflow-x:auto}
+  .chip{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap}
+  .s-operation{background:var(--gbg);color:var(--g)} .s-annual{background:var(--bbg);color:var(--b)} .s-emergency{background:var(--ybg);color:var(--y)} .s-sick{background:#fce7f3;color:#9d174d}
+  .s-out{background:var(--rbg);color:var(--r)} .s-sb{background:#ede9fe;color:#6d28d9} .s-trip{background:#ccfbf1;color:#0f766e} .s-late{background:#dc2626;color:#fff}
+  .list{overflow-x:auto}
+  .list .row{display:grid;grid-template-columns:minmax(210px,1.7fr) minmax(90px,.8fr) minmax(80px,.7fr) minmax(120px,1fr) minmax(170px,1.4fr) minmax(130px,1fr) minmax(110px,.9fr) minmax(110px,.9fr) 150px;gap:12px;align-items:start;padding:12px;border-bottom:1px solid var(--line);min-width:1240px}
+  .list .row>span,.list .row>div{min-width:0;font-size:13.5px}
+  .list .row.hd{background:var(--soft);font-size:12px;color:var(--muted);font-weight:700;align-items:center;position:sticky;top:0}
+  .list .row.hd>span{font-size:12px}
+  .list .sub2{font-size:11.5px;color:var(--muted);margin-top:4px;line-height:1.45}
+  .list .dash{color:var(--muted)} .list .mono{font-variant-numeric:tabular-nums}
+  .pager{display:flex;gap:8px;align-items:center;justify-content:center;padding:14px;flex-wrap:wrap} .pager span{font-weight:700;color:var(--muted);padding:0 8px} .pager .btn{padding:7px 14px}
+  .list .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end} .list .acts .btn{padding:7px 10px;font-size:12.5px}
+  .list .row:hover{background:var(--soft)}
+  .nm b{display:block} .nm small{color:var(--muted);font-size:12px}
+  .msg{text-align:center;padding:24px;color:var(--muted)} .msg.err{color:var(--r);font-weight:700}
+  .sug{display:none;position:absolute;top:100%;inset-inline:0;z-index:60;background:#fff;border:1px solid var(--line);border-top:none;border-radius:0 0 10px 10px;max-height:320px;overflow-y:auto;box-shadow:0 10px 24px rgba(0,0,0,.18)}
+  .sug.on{display:block}
+  .sug div{padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--line);font-size:13px}
+  .sug div:hover,.sug div.act{background:var(--soft)}
+  .sug b{display:block;font-size:14px} .sug small{color:var(--muted)}
+  html[data-theme="dark"] .sug{background:#151c2b}
+  .alerts{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .alert.blue{background:#eff6ff;border-color:#93c5fd;color:#1e3a8a}
+  .alert.red{background:#fdecea;border-color:#f87171;color:#991b1b}
+  .alert{padding:12px 16px;border-radius:14px;background:#fff7ed;border:1px solid #fdba74;color:#7c2d12;font-weight:700;cursor:pointer}
+
+  .rp-k{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:10px 0}
+  .rp-k div{border:1px solid var(--nw-line,#e5e7eb);border-radius:12px;padding:10px;text-align:center}.rp-k b{display:block;font-size:22px}.rp-k span{font-size:12px;opacity:.75}
+  .rp-t{width:100%;border-collapse:collapse;font-size:13px}.rp-t th,.rp-t td{padding:7px 8px;border-bottom:1px solid var(--nw-line,#e5e7eb);text-align:start;white-space:nowrap}
+  .rp-t th{position:sticky;top:0;background:var(--nw-card,#fff);font-size:12px;opacity:.85}.rp-t tr.cl{cursor:pointer}.rp-t tr.cl:hover td{background:rgba(59,130,246,.08)}
+  .rp-w{max-height:60vh;overflow:auto;border:1px solid var(--nw-line,#e5e7eb);border-radius:12px}
+  .rp-b{display:inline-block;border-radius:999px;padding:1px 9px;font-size:12px;font-weight:700;color:#fff}
+  .rp-trip{background:#16a34a}.rp-rest{background:#64748b}.rp-sb{background:#7c3aed}.rp-leave{background:#2563eb}.rp-swap{background:#ea580c}.rp-out{background:#dc2626}.rp-none{background:#cbd5e1;color:#334155}
+  .rp-acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .ov{position:fixed;inset:0;z-index:100000;background:rgba(8,15,30,.55);display:none;align-items:flex-start;justify-content:center;padding:4vh 12px;overflow:auto}
+  .ov.on{display:flex}
+  .md{background:#fff;border-radius:18px;width:100%;max-width:720px;padding:20px;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+  .md h3{margin:0 0 4px} .md .sub{color:var(--muted);font-size:13px;margin-bottom:14px}
+  .fg{display:grid;grid-template-columns:1fr 1fr;gap:12px} .fg .full{grid-column:1/-1}
+  .tog{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--soft);cursor:pointer;font-weight:700}
+  .tog input{width:20px;height:20px}
+  .hist{margin-top:14px;max-height:220px;overflow:auto;font-size:12.5px;border-top:1px dashed var(--line);padding-top:10px}
+  .hist div{padding:4px 0;border-bottom:1px solid var(--soft)}
+  .mbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
+  .note{color:rgba(255,255,255,.85);font-size:12px;margin:10px 4px 0;line-height:1.7}
+
+  html[data-theme="dark"]{--ink:#e5e7eb;--muted:#9aa6b8;--line:#263042;--soft:#0f1624;--gbg:#12301f;--g:#4ade80;--ybg:#3a2e12;--y:#fbbf24;--rbg:#3a1e22;--r:#f87171;--bbg:#172554;--b:#93c5fd;--nbg:#1e2a44}
+  html[data-theme="dark"] body{background:#0b1220} 
+  html[data-theme="dark"] .panel,html[data-theme="dark"] .tile,html[data-theme="dark"] .md{background:#151c2b;border-color:var(--line)}
+  html[data-theme="dark"] .top{background:rgba(11,18,32,.88);border-bottom:1px solid #263042}
+  html[data-theme="dark"] .card h2{color:#9ec1ff} html[data-theme="dark"] .btn.light{background:#1e2a44;color:#c7d7f5}
+  html[data-theme="dark"] .s-sick{background:#4a1d33;color:#f9a8d4} html[data-theme="dark"] .s-sb{background:#2e1f4f;color:#c4b5fd} html[data-theme="dark"] .s-trip{background:#123b38;color:#5eead4}
+  html[data-theme="dark"] .alert{background:#2a1a0e;border-color:#9a3412;color:#fed7aa}
+  html[data-theme="dark"] .alert.blue{background:#172554;border-color:#1d4ed8;color:#bfdbfe}
+  html[data-theme="dark"] .alert.red{background:#3a1e22;border-color:#b91c1c;color:#fecaca}
+  @media (min-width:1500px){ .grid2{grid-template-columns:1.5fr 1fr} }
+  @media (max-width:1000px){ .tiles{grid-template-columns:repeat(3,1fr)} .tiles.s{grid-template-columns:repeat(3,1fr)} }
+  @media (max-width:700px){ .bar .tbtns{flex:1 1 100%!important} .list .chip{white-space:normal;word-break:break-word} .tiles,.tiles.s{grid-template-columns:1fr 1fr} .list .row{grid-template-columns:1.4fr 1fr 1fr;min-width:0} .list .row .hm{display:none} .list .row .acts{grid-column:1/-1;justify-content:flex-start} .fg{grid-template-columns:1fr} .top h1{font-size:18px} }
+  @media print{ body{background:#fff!important;padding:0} body::before,.bar,.back,.nws,.nwh,.btn{display:none!important} .top{position:static;background:none;color:#000;box-shadow:none} .sec{color:#000;text-shadow:none} }
+
+  /* ===== التصميم الموحد (ألوان auth.js --nw-*) ===== */
+  :root,html[data-theme="dark"]{--ink:var(--nw-ink,#0f172a);--muted:var(--nw-muted,#64748b);--line:var(--nw-line,#e5e7eb);--soft:var(--nw-soft,#f8fafc)}
+  body{background:var(--nw-bg,#eef2f8)!important;font-family:var(--nw-font,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif);-webkit-font-smoothing:antialiased}
+  .top{background:var(--nw-hero,#13274f)!important;border-bottom:0!important;box-shadow:0 8px 24px rgba(19,39,79,.18)}
+  .panel,.tile,.md{background:var(--nw-card,#fff)!important;border:1px solid var(--nw-line,#e5e7eb)!important;box-shadow:var(--nw-shadow)!important}
+  .tile::before{height:3px;opacity:.85}
+  .sec{color:var(--nw-muted,#64748b);text-shadow:none;font-size:14px;font-weight:800}
+  .sec::after{background:var(--nw-line,#e2e8f0)}
+  .note{color:var(--nw-muted,#64748b)}
+  .btn{background:var(--nw-navy,#13274f)} .btn.light{background:var(--nw-soft,#eef2f7);color:var(--nw-ink,#13274f);border:1px solid var(--nw-line,#e2e8f0)}
+  html[data-theme="dark"] .btn.light{background:#1b2540;color:#dbe5f7;border-color:#24304a}
+  .card h2{color:var(--nw-ink,#13274f)}
+  .alert{border-radius:12px;font-weight:600;background:var(--nw-card,#fff)!important;color:var(--nw-ink,#0f172a)!important;border:1px solid var(--nw-line,#e2e8f0)!important;border-inline-start:4px solid #d97706!important;box-shadow:var(--nw-shadow)}
+  .alert.blue{border-inline-start-color:#2563eb!important} .alert.red{border-inline-start-color:#dc2626!important}
+  select,input{background:var(--nw-card,#fff)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><h1 style="display:flex;align-items:center;gap:10px"><span id="tIc">👨‍✈️</span> <span data-i="title">إدارة السائقين</span></h1><div class="en" data-i="subtitle">Drivers Management</div></div>
+    <a class="back" href="./" data-i="back">← أدوات التشغيل</a>
+  </div>
+
+  <div class="panel bar">
+    <div><label data-i="lDate">تاريخ الروستر (على الرحلات / الاستعداد)</label><input id="fDate" type="date"></div>
+    <div><label data-i="lDepot">الكراج</label><select id="fDepot"></select></div>
+    <div class="tbtns" style="flex:0 1 auto;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn light" id="bRefresh" data-i="refresh">↻ تحديث</button>
+      <button class="btn light" id="bExport" data-i="export">⬇️ Excel</button>
+      <button class="btn light" id="bDash" data-i="dash">📊 الداش بورد</button>
+      <button class="btn light" id="bRpt" data-i="rpt">📄 تقرير عمل السائقين</button>
+      <button class="btn light" id="bCmp">⚖️ مقارنة يومين</button>
+      <button class="btn" id="bAdd" style="display:none" data-i="add">➕ سائق جديد</button>
+      <button class="btn light" id="bCards" style="display:none" data-i="cards">🪪 تحديث الكروت</button>
+      <button class="btn light" id="bImport" style="display:none" data-i="import">📤 استيراد من Excel</button>
+    </div>
+  </div>
+
+  <div class="alerts" id="alerts"></div>
+
+  <div class="sec" data-i="secSum">الملخص</div>
+  <div class="tiles" id="tMain"></div>
+  <div class="tiles s" id="tStatus" style="margin-top:12px"></div>
+
+  <div class="grid2">
+    <div class="panel card"><h2 data-i="natTitle">السائقون حسب الجنسية والحالة</h2><div class="tw" id="natTable"></div></div>
+    <div class="panel card"><h2 data-i="depTitle">سائقو التشغيل والاستعداد في الكراجات</h2><div class="tw" id="depTable"></div></div>
+  </div>
+
+  <div class="sec"><span data-i="secList">قائمة السائقين</span></div>
+  <div class="panel">
+    <div class="bar">
+      <div style="flex:2;position:relative"><input id="q" type="search" autocomplete="off" data-ph="search" placeholder="ابحث برقم الإقامة أو الاسم أو الرحلة..."><div id="qSug" class="sug"></div></div>
+      <div><select id="fStatus"></select></div>
+      <div><select id="fNat"></select></div>
+    </div>
+    <div class="list" id="list"><div class="msg" data-i="loading">جاري التحميل...</div></div>
+  </div>
+  <div class="note" data-i="note">..</div>
+</div>
+
+<!-- تقرير عمل السائقين -->
+<div class="ov" id="rpOv"><div class="md" style="max-width:1100px">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h3 style="margin:0">📄 تقرير عمل السائقين</h3><button class="btn light" id="rpX">✕</button></div>
+  <div class="sub" id="rpSub">يوضح عمل كل سائق يوم بيوم حسب الروستر المرفوع: الرحلات، الراحة، الاستعداد، الإجازات، والتبديلات.</div>
+  <div class="bar" style="margin-top:10px;align-items:flex-end">
+    <div><label>الشهر (من 21 إلى 20)</label><select id="rpMon"></select></div>
+    <div><label>من تاريخ</label><input id="rpFrom" type="date"></div>
+    <div><label>إلى تاريخ</label><input id="rpTo" type="date"></div>
+    <div style="flex:2;position:relative"><label>السائق (اتركه فاضي لكل السائقين)</label><input id="rpDrv" type="search" autocomplete="off" list="rpDl" placeholder="اسم السائق أو رقم الإقامة"><datalist id="rpDl"></datalist></div>
+    <div style="flex:0 0 auto;display:flex;gap:6px"><button class="btn green" id="rpGo">عرض التقرير</button><button class="btn light" id="rpHr" title="ملف التحضير الشهري (Daily driver) اللي ينرسل للموارد كل شهر — الفترة من 21 إلى 20">📤 ملف التحضير الشهري</button><button class="btn light" id="rpKm" title="نفس ملف التحضير الشهري لكن بالكيلومترات بدل المبلغ">🛣️ ملف الكيلومترات</button></div>
+  </div>
+  <div id="rpOut" style="margin-top:12px"></div>
+</div></div>
+<!-- نافذة التبديل -->
+<div class="ov" id="swOv"><div class="md" style="max-width:560px">
+  <h3 data-i="swTitle">🔄 تبديل سائق</h3><div class="sub" id="swSub"></div>
+  <div class="fg">
+    <div class="full" id="swOrigW"><label data-i="swOrig">السائق المعتذر ورحلته</label><div style="position:relative;margin-bottom:8px"><input id="swOrigQ" type="search" autocomplete="off" data-ph="swQph"><div id="swOrigS" class="sug"></div></div><select id="swOrig"></select></div>
+    <div class="full" id="swRepW"><label data-i="swRep">السائق البديل</label><div style="position:relative;margin-bottom:8px"><input id="swRepQ" type="search" autocomplete="off" data-ph="swQph"><div id="swRepS" class="sug"></div></div><select id="swRep"></select></div>
+    <div><label><span data-i="swReason">السبب</span> <b style="color:#dc2626">*</b></label><select id="swReason"><option value="">— اختر السبب —</option><option>رفض الرحلة</option><option>مريض</option><option>غياب</option><option>ظرف طارئ</option><option>تأخر</option><option>أخرى</option></select></div>
+    <div><label><span data-i="swNote">ملاحظة</span> <b style="color:#dc2626">*</b></label><input id="swNote" maxlength="300" data-ph="swNotePh" placeholder="اكتب تفاصيل السبب..."></div>
+  </div>
+  <div class="mbtns"><button class="btn light" id="swCancel" data-i="cancel">إلغاء</button><button class="btn green" id="swSave" data-i="swDo">تأكيد التبديل</button></div>
+</div></div>
+<!-- نافذة التعديل -->
+<div class="ov" id="ov"><div class="md">
+  <h3 id="mTitle"></h3><div class="sub" id="mSub"></div>
+  <div class="fg">
+    <div class="full" id="newFields" style="display:none">
+      <div class="fg">
+        <div><label data-i="fIq">رقم الإقامة</label><input id="eIq" inputmode="numeric"></div>
+        <div><label data-i="fEmp">الرقم الوظيفي</label><input id="eEmp" inputmode="numeric"></div>
+        <div><label data-i="fName">اسم السائق</label><input id="eName"></div>
+        <div><label data-i="fNat">الجنسية</label><input id="eNat" list="natList"></div>
+      </div>
+    </div>
+    <div><label data-i="fStatus">الحالة</label><select id="eStatus"></select></div>
+    <div><label data-i="fDepot">الكراج</label><select id="eDepot"></select></div>
+    <div class="full"><label class="tog"><input type="checkbox" id="eSb"> <span data-i="fSb">🟣 السائق على الاستعداد (Standby)</span></label></div>
+    <div id="leaveF"><label data-i="fFrom">من تاريخ</label><input id="eFrom" type="date"></div>
+    <div id="leaveT"><label data-i="fTo">تاريخ العودة المتوقع</label><input id="eTo" type="date"></div>
+    <div><label data-i="fHire">📅 تاريخ التعيين</label><input id="eHire" type="date"></div>
+    <div><label data-i="fCard">🪪 انتهاء كرت التشغيل</label><input id="eCard" type="date"></div>
+    <div><label data-i="fMob">الجوال</label><input id="eMob" inputmode="tel"></div>
+    <div><label data-i="fNote">ملاحظة</label><input id="eNote" maxlength="300"></div>
+  </div>
+  <div id="cardBox" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center">
+    <button class="btn light" id="mCardDl">🪪 <span data-i="cardDlFull">تحميل كرت التشغيل</span></button>
+    <button class="btn light" id="mCardUp">📤 <span data-i="cardUp">رفع كرت جديد</span></button>
+    <small id="mCardMsg" style="color:var(--muted)"></small>
+    <input type="file" id="cardUpFile" accept="application/pdf,image/jpeg,image/png" style="display:none">
+  </div>
+  <div class="hist" id="hist"></div>
+  <div class="mbtns"><button class="btn light" id="mCancel" data-i="cancel">إلغاء</button><button class="btn green" id="mSave" data-i="save">حفظ</button></div>
+</div></div>
+<datalist id="natList"><option>Pakistan</option><option>UGANDA</option><option>India</option><option>Indonesia</option></datalist>
+<input type="file" id="cardFile" accept=".xlsx,.xls,.csv" style="display:none">
+<input type="file" id="impFile" accept=".xlsx,.xls,.csv" style="display:none">
+
+<script>
+/* ====================================================================
+   إدارة السائقين — البيانات في شيت «السائقين» (نظام الدخول)
+   ==================================================================== */
+const ST = {
+  'operation':               { ar:'على رأس العمل',  en:'Operation',        cls:'s-operation', grp:'active' },
+  'Annual Leave':            { ar:'إجازة سنوية',      en:'Annual Leave',     cls:'s-annual',    grp:'leave' },
+  'Emergency Leave':         { ar:'إجازة اضطرارية',   en:'Emergency Leave',  cls:'s-emergency', grp:'leave' },
+  'Sick Leave':              { ar:'إجازة مرضية',      en:'Sick Leave',       cls:'s-sick', grp:'leave' },
+  'Not Returned':            { ar:'لم يعد من الإجازة', en:'Not Returned',     cls:'s-out',       grp:'out' },
+  'Suspended':               { ar:'موقوف عن العمل',   en:'Suspended',        cls:'s-out',       grp:'out' },
+  'Absconding':              { ar:'هروب',             en:'Absconding',       cls:'s-out',       grp:'out' },
+  'Termination of services': { ar:'إنهاء خدمات',      en:'Termination',      cls:'s-out',       grp:'out' }
+};
+const STATUSES = Object.keys(ST);
+const DEP = { 'Shumaysi':'الشميسي','Madinah':'المدينة','Tabuk':'تبوك','Riyadh':'الرياض','Jazan':'جازان','Khamis Mushait':'خميس مشيط','Al Bashayer':'البشائر','Buraydah':'بريدة','Hail':'حائل','Unassigned':'غير محدد' };
+const DEPOTS = Object.keys(DEP);
+const C = { IQ:0, EMP:1, NAME:2, NAT:3, ST:4, DEP:5, SB:6, MOB:7, FROM:8, TO:9, NOTE:10, BY:11, AT:12, CARD:13, HIRE:14 };
+
+let LANG = (() => { try { return localStorage.getItem('hubLang') === 'en' ? 'en' : 'ar'; } catch (e) { return 'ar'; } })();
+const I18N = {
+  ar:{ rpt:'📄 تقرير عمل السائقين', title:'إدارة السائقين', subtitle:'Drivers Management', back:'← أدوات التشغيل', lDate:'تاريخ الروستر (على الرحلات / الاستعداد)', lDepot:'الكراج',
+    refresh:'↻ تحديث', cards:'🪪 تحديث الكروت', cardsHow:'اختر ملف Excel فيه عمود «رقم الإقامة» (أو ID Number) وعمود «تاريخ انتهاء كرت التشغيل» (أو oc). يتحدث تاريخ الكرت فقط وما يتغير أي شي ثاني.\n\nتقدر تصدّر القائمة من زر Excel وتعدّل عمود Operating card expiry وترفعها.', cardsBad:'ما لقيت عمود رقم الإقامة وعمود تاريخ انتهاء الكرت في الملف', cardsAsk:(n,f,c,x)=>`في الملف ${n} سائق:\n• موجودين في البرنامج: ${f}\n• تاريخ كرتهم بيتغير: ${c}\n• غير موجودين: ${x}\n\nتحديث؟`, cardsDone:(c,x)=>`✅ تم تحديث ${c} كرت${x ? `\n⚠️ ${x} رقم إقامة غير موجود:` : ''}`, export:'⬇️ Excel', dash:'📊 الداش بورد', add:'➕ سائق جديد', import:'📤 استيراد من Excel', secSum:'الملخص', secList:'قائمة السائقين', loading:'جاري التحميل...',
+    natTitle:'السائقون حسب الجنسية والحالة', depTitle:'سائقو التشغيل والاستعداد في الكراجات', search:'ابحث برقم الإقامة أو الاسم أو الرحلة...',
+    note:'«على الرحلات» = سائقو التشغيل المسجّلون في روستر التاريخ المختار. السائق اللي مو في روستر اليوم: إذا كان غير مجدول يومين متتاليين أو أقل = «راحة»، وإذا أكثر من يومين متتاليين = «استعداد». و«الاستعداد» اليدوي يبقى استعداد. ارفعوا الروستر يوم بيوم عشان يطلع الحساب دقيق.',
+    allDep:'كل الكراجات', myDeps:'كل كراجاتي', allSt:'كل الحالات', allNat:'كل الجنسيات', req:'إجمالي احتياج التشغيل', active:'على رأس العمل', out:'خارج الخدمة / مطلوب تعويضهم',
+    avail:'المتاحين للتشغيل', onLeave:'في إجازات', onTrips:'على الرحلات', standby:'الاستعداد', rest:'راحة', pageOf:(p,n,t)=>`صفحة ${p} من ${n} · ${t} سائق`, upd:'⏳ جاري التحديث...', cardDl:'الكرت', cardDlFull:'تحميل كرت التشغيل', cardUp:'رفع كرت جديد', noCardF:'لا يوجد ملف كرت', cardFile:'كرت_تشغيل', cardUpHow:'اختر ملف الكرت الجديد (PDF أو صورة، حد أقصى 5 ميجا). يستبدل الكرت القديم.\n\nإذا كتبت تاريخ الانتهاء في خانة «انتهاء كرت التشغيل» قبل الرفع، يتحدث معه.', cardBig:'الملف أكبر من 5 ميجا', cardType:'الملف لازم PDF أو صورة JPG/PNG', cardUpDone:'تم رفع الكرت', colDay:'اليوم', colLast:'آخر رحلة', colCard:'انتهاء كرت التشغيل', colRet:'العودة من الإجازة', lateS:'متأخر عن العودة', toRestT:'تحويل السائق إلى راحة لهذا اليوم', toSbT:'إرجاع السائق إلى الاستعداد', toRestAsk:(n,d)=>`تحويل ${n} إلى راحة يوم ${d}؟`, toSbAsk:(n,d)=>`إرجاع ${n} إلى الاستعداد يوم ${d}؟`, outTile:'المعتذرين', outTile1:'معتذر', sbOut:(n,why)=>`منهم ${n} معتذر: ${why}`, outLine:(t,n)=>`رحلته ${t} انتقلت إلى ${n}`, outT:'معتذر/مستبدل', swapA:n=>`🔄 ${n} تبديل سائق في هذا التاريخ`, swapT:'تبديل السائق ببديل من الاستعداد', unswap:'إلغاء التبديل', subFor:'بديل عن', swTitle:'🔄 تبديل سائق', swOrig:'السائق المعتذر ورحلته', swQph:'🔍 ابحث بالاسم أو الإقامة أو رقم الرحلة...', noMatch:'لا توجد نتائج', swNeedR:'اختر سبب التبديل', swNeedN:'اكتب ملاحظة توضح السبب', swNotePh:'اكتب تفاصيل السبب...', swPickO:'اختر السائق المعتذر / الرحلة', swFromB:'تكليف', swFromT:'تكليف هذا السائق بديل عن سائق معتذر', swRep:'السائق البديل', swReason:'السبب', swNote:'ملاحظة', swDo:'تأكيد التبديل', swG1:'الاستعداد', swG2:'الراحة', swG3:'تبادل مع سائق عنده رحلة', swSame2:'السائقين على نفس الرحلة', xWith:(n,t)=>`تبادل مع ${n} (كانت رحلته ${t})`, xAsk:(a,ta,b,tb)=>`تبادل الرحلتين؟\n\n${a}: ${ta} ← ${tb}\n${b}: ${tb} ← ${ta}`, swSame:'نفس الموقع', swBusy:'البديل عنده رحلة في نفس اليوم', swNotIn:'السائق الأصلي مو موجود في روستر هذا اليوم', swPick:'اختر السائق البديل', swDone:'✅ تم التبديل — يظهر البديل في مسار الرحلة', unswAsk:'إلغاء التبديل ورجوع السائق الأصلي للرحلة؟', sbAt:'استعداد في', restAt:'راحة في', baseDep:'الكراج الأساسي', lastT:'آخر رحلة', manual:'يدوي', offN:n=>n === 1 ? 'يوم واحد' : n === 2 ? 'يومين' : n <= 10 ? `${n} أيام` : `${n} يوم`, since:d=>`من ${d}`, wk:n=>`أيام الروستر المرفوعة حول التاريخ: ${n}`, total:'إجمالي السائقين', noRoster:'لا يوجد روستر لهذا التاريخ',
+    nat:'الجنسية', depot:'الكراج', count:'العدد', gt:'الإجمالي', opDrivers:'التشغيل', sbDrivers:'الاستعداد', edit:'تعديل', trip:'رحلة',
+    fIq:'رقم الإقامة', fEmp:'الرقم الوظيفي', fName:'اسم السائق', fNat:'الجنسية', fStatus:'الحالة', fDepot:'الكراج', fSb:'🟣 السائق على الاستعداد (Standby)',
+    fFrom:'من تاريخ', fTo:'تاريخ العودة المتوقع', fMob:'الجوال', fNote:'ملاحظة', cancel:'إلغاء', save:'حفظ', saving:'جاري الحفظ...',
+    newTitle:'➕ سائق جديد', lastBy:'آخر تعديل', hist:'سجل التغييرات', noHist:'لا توجد تغييرات مسجّلة', histLoading:'جاري تحميل السجل...',
+    due:(n,t)=>`↩️ ${n} سائق راجعين من الإجازة خلال 3 أيام${t ? ` (منهم ${t} اليوم)` : ''} — جهّزوا جدولتهم`, retToday:'يرجع اليوم',
+    late:n=>`⚠️ ${n} سائق تجاوز تاريخ العودة من الإجازة وحالته لسا إجازة`, noData:'لا يوجد سائقين بعد — المدير يستورد ملف Excel أول مرة',
+    eNet:'تعذّر الاتصال — تأكد من الإنترنت', eAuth:'انتهت مدة الدخول — سجّل دخول من جديد', eForb:'التعديل للمشرف والمدير فقط', eErr:'خطأ: ',
+    eIq:'رقم الإقامة غير صحيح', eName:'اكتب اسم السائق', exists:'السائق موجود — افتحه من القائمة وعدّله',
+    impAsk:n=>`استيراد ${n} سائق من الملف؟ هذا يستبدل القائمة الحالية (الجوال والملاحظات الموجودة تبقى).`, impDone:n=>`✅ تم استيراد ${n} سائق`, impBad:'ما لقيت أعمدة Employee ID / ID Number / Driver Name / Status في الملف',
+    saved:'✅ تم الحفظ', fCard:'🪪 انتهاء كرت التشغيل', fHire:'📅 تاريخ التعيين', eHire:'اكتب تاريخ التعيين', cardExp:n=>`🪪 ${n} سائق كرت التشغيل حقه منتهي`, cardSoon:n=>`🪪 ${n} سائق كرت التشغيل ينتهي خلال 30 يوم`, cExp:'كرت منتهي', cSoon:'كرت ينتهي', results:n=>`${n} سائق`, more:n=>`يظهر أول 300 من ${n} — استخدم البحث أو الفلتر` },
+  en:{ rpt:'📄 Drivers work report', title:'Drivers Management', subtitle:'إدارة السائقين', back:'← Operations Tools', lDate:'Roster date (on trips / standby)', lDepot:'Depot',
+    refresh:'↻ Refresh', cards:'🪪 Update cards', cardsHow:'Choose an Excel file with an Iqama (ID Number) column and an operating card expiry (oc) column. Only the card date is updated.\n\nTip: export with the Excel button, edit the Operating card expiry column and upload it back.', cardsBad:'Could not find Iqama and card expiry columns', cardsAsk:(n,f,c,x)=>`${n} drivers in file:\n• found: ${f}\n• card date will change: ${c}\n• not found: ${x}\n\nUpdate?`, cardsDone:(c,x)=>`✅ ${c} cards updated${x ? `\n⚠️ ${x} Iqama numbers not found:` : ''}`, export:'⬇️ Excel', dash:'📊 Dashboard', add:'➕ New driver', import:'📤 Import from Excel', secSum:'Summary', secList:'Drivers list', loading:'Loading...',
+    natTitle:'Drivers by nationality & status', depTitle:'Operational & standby drivers by depot', search:'Search by Iqama, name or trip...',
+    note:'"On trips" = operational drivers in the roster of the selected date. A driver missing from today\'s roster is on a "Rest day" if unscheduled for 2 consecutive days or fewer, otherwise "Standby". Manual standby always counts as standby.',
+    allDep:'All depots', myDeps:'All my depots', allSt:'All statuses', allNat:'All nationalities', req:'Total operational requirement', active:'Active drivers', out:'Out of service / replacement required',
+    avail:'Available for operation', onLeave:'On leave', onTrips:'On trips', standby:'Standby', rest:'Rest day', pageOf:(p,n,t)=>`Page ${p} of ${n} · ${t} drivers`, upd:'⏳ Updating...', cardDl:'Card', cardDlFull:'Download operating card', cardUp:'Upload new card', noCardF:'No card file', cardFile:'Operating_card', cardUpHow:'Choose the new card file (PDF or image, max 5 MB). It replaces the old one.\n\nIf you fill the card expiry field before uploading, it is updated too.', cardBig:'File is larger than 5 MB', cardType:'File must be PDF or JPG/PNG', cardUpDone:'Card uploaded', colDay:'Today', colLast:'Last trip', colCard:'Card expiry', colRet:'Return from leave', lateS:'Overdue', toRestT:'Mark as rest day for this date', toSbT:'Return to standby', toRestAsk:(n,d)=>`Mark ${n} as rest day on ${d}?`, toSbAsk:(n,d)=>`Return ${n} to standby on ${d}?`, outTile:'Absent', outTile1:'Absent', sbOut:(n,why)=>`incl. ${n} absent: ${why}`, outLine:(t,n)=>`Trip ${t} moved to ${n}`, outT:'Replaced', swapA:n=>`🔄 ${n} driver replacements on this date`, swapT:'Replace with a standby driver', unswap:'Cancel replacement', subFor:'Replacing', swTitle:'🔄 Replace driver', swOrig:'Absent driver & trip', swQph:'🔍 Search by name, Iqama or trip...', noMatch:'No matches', swNeedR:'Choose the reason', swNeedN:'Write a note explaining the reason', swNotePh:'Describe the reason...', swPickO:'Choose the absent driver / trip', swFromB:'Assign', swFromT:'Assign this driver to replace an absent driver', swRep:'Replacement driver', swReason:'Reason', swNote:'Note', swDo:'Confirm replacement', swG1:'Standby', swG2:'Rest day', swG3:'Exchange with a driver on a trip', swSame2:'Both drivers are on the same trip', xWith:(n,t)=>`Exchanged with ${n} (was on ${t})`, xAsk:(a,ta,b,tb)=>`Exchange the two trips?\n\n${a}: ${ta} → ${tb}\n${b}: ${tb} → ${ta}`, swSame:'same location', swBusy:'The replacement already has a trip that day', swNotIn:'The original driver is not in this day\'s roster', swPick:'Choose the replacement driver', swDone:'✅ Replaced — the replacement shows in Trip Route', unswAsk:'Cancel the replacement and return the original driver to the trip?', sbAt:'standby at', restAt:'resting at', baseDep:'Home depot', lastT:'Last trip', manual:'manual', offN:n=>n === 1 ? '1 day' : `${n} days`, since:d=>`since ${d}`, wk:n=>`Roster days uploaded around date: ${n}`, total:'Total drivers', noRoster:'No roster for this date',
+    nat:'Nationality', depot:'Depot', count:'Count', gt:'Grand total', opDrivers:'Operation', sbDrivers:'Standby', edit:'Edit', trip:'Trip',
+    fIq:'Iqama number', fEmp:'Employee ID', fName:'Driver name', fNat:'Nationality', fStatus:'Status', fDepot:'Depot', fSb:'🟣 Driver is on standby',
+    fFrom:'From', fTo:'Expected return', fMob:'Mobile', fNote:'Note', cancel:'Cancel', save:'Save', saving:'Saving...',
+    newTitle:'➕ New driver', lastBy:'Last update', hist:'Change history', noHist:'No recorded changes', histLoading:'Loading history...',
+    due:(n,t)=>`↩️ ${n} سائق راجعين من الإجازة خلال 3 أيام${t ? ` (منهم ${t} اليوم)` : ''} — جهّزوا جدولتهم`, retToday:'يرجع اليوم',
+    due:(n,t)=>`↩️ ${n} drivers return from leave within 3 days${t ? ` (${t} today)` : ''} — plan their schedule`, retToday:'Returns today',
+    late:n=>`⚠️ ${n} drivers passed their return date and are still on leave`, noData:'No drivers yet — a manager imports the Excel file once',
+    eNet:'Connection failed — check your internet', eAuth:'Session expired — sign in again', eForb:'Only supervisors and managers can edit', eErr:'Error: ',
+    eIq:'Invalid Iqama number', eName:'Enter the driver name', exists:'Driver already exists — open them from the list to edit',
+    impAsk:n=>`Import ${n} drivers from the file? This replaces the current list (existing mobiles and notes are kept).`, impDone:n=>`✅ ${n} drivers imported`, impBad:'Could not find Employee ID / ID Number / Driver Name / Status columns',
+    saved:'✅ Saved', fCard:'🪪 Operating card expiry', fHire:'📅 Hiring date', eHire:'Enter the hiring date', cardExp:n=>`🪪 ${n} drivers have an expired operating card`, cardSoon:n=>`🪪 ${n} drivers' operating cards expire within 30 days`, cExp:'Card expired', cSoon:'Card expires', results:n=>`${n} drivers`, more:n=>`Showing the first 300 of ${n} — use search or filters` }
+};
+const t_ = k => (I18N[LANG][k] ?? I18N.ar[k] ?? k);
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const stName = s => ST[s] ? (LANG==='en' ? ST[s].en : ST[s].ar) : s;
+const depName = d => d ? (LANG==='en' ? d : (DEP[d] || d)) : (LANG==='en' ? 'Unassigned' : 'غير محدد');
+const pad = n => String(n).padStart(2,'0');
+const today = () => { const d = new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); };
+
+let RESTM = {};   // راحة يدوية للتاريخ المختار
+let SWOUT = {}, SWIN = {};   // تبديلات التاريخ المختار: الأصلي ← البديل
+let CARDS = {};   // أرقام الإقامة اللي لها ملف كرت في Drive
+let D = [], ROSTER = {}, ROSTER_N = 0, ABSENT = {}, SINCE = {}, WEEK_N = 0, canEdit = false, canCardsE = false, canImport = false, LISTS = {};
+
+/* ---------- الحسابات ---------- */
+const dep = r => r[C.DEP] || 'Unassigned';
+/* كراج الاستعداد حسب آخر رحلة نفّذها السائق: تنتهي في مكة أو جدة أو ينبع = الشميسي، والباقي حسب كراج مدينة الوصول */
+let TRIP_END = {}, LAST = {}, NEXT = {}, ROSTER_TO = '';
+const END_DEPOT = [[/jeddah|makkah|mecca|jarwal|yanbu|جدة|مكة|ينبع/i, 'Shumaysi'], [/madinah|medina|rafha|المدينة|رفحاء/i, 'Madinah'], [/tabuk|haql|تبوك|حقل/i, 'Tabuk'],
+  [/riyadh|dawadmi|الرياض|الدوادمي/i, 'Riyadh'], [/jazan|jizan|جازان/i, 'Jazan'], [/khamis|خميس/i, 'Khamis Mushait'], [/bashayer|البشائر/i, 'Al Bashayer'],
+  [/buraydah|qassim|بريدة|القصيم/i, 'Buraydah'], [/hail|حائل/i, 'Hail']];
+const endDepot = st => { for (const [re, d] of END_DEPOT) if (re.test(st || '')) return d; return ''; };
+function tripEnd(code) {
+  code = String(code || '').toUpperCase().replace(/\s+/g, ' ').trim(); if (!code) return '';
+  if (TRIP_END[code]) return TRIP_END[code];
+  const parts = code.split('+').map(x => x.trim()).filter(Boolean);           // رحلة مدمجة: نهاية آخر جزء
+  return TRIP_END[parts[parts.length - 1]] || '';
+}
+async function loadTrips() {
+  if (Object.keys(TRIP_END).length) return;
+  try { const c = JSON.parse(localStorage.getItem('nwTripEnd') || 'null'); if (c && Date.now() - c.at < 12 * 3600e3) { TRIP_END = c.m; return; } } catch (e) {}
+  try {
+    const tx = await (await fetch('https://hanode40-sketch.github.io/trip/', { cache: 'no-cache' })).text();
+    const m = tx.match(/const TRIP_DATA=(\[[\s\S]*?\]);\s*\n/);
+    if (m) JSON.parse(m[1]).forEach(t => {
+      const end = t[6] && t[6].end ? t[6].end : t[2];
+      TRIP_END[String(t[0]).toUpperCase().replace(/\s+/g, ' ').trim()] = end;
+      const first = String(t[0]).split('+')[0].trim().toUpperCase(); if (!TRIP_END[first]) TRIP_END[first] = t[2];
+      if (t[6] && t[6].code) TRIP_END[String(t[6].code).toUpperCase()] = t[6].end;
+    });
+    if (Object.keys(TRIP_END).length) try { localStorage.setItem('nwTripEnd', JSON.stringify({ at: Date.now(), m: TRIP_END })); } catch (e) {}
+  } catch (e) {}
+}
+const lastTrip = r => LAST[r[C.IQ]];
+const offLoc = r => isStandby(r) || isRest(r);   // الاستعداد والراحة: الموقع حسب آخر رحلة
+const sbDep = r => { const l = lastTrip(r), d = l && endDepot(tripEnd(l.code)); return d || dep(r); };
+/* الكراج الحالي: الراحة والاستعداد حسب مكان نهاية آخر رحلة، وغيرهم حسب كراجه المسجل */
+const curDep = r => offLoc(r) ? sbDep(r) : dep(r);
+/* ربط الكراج بالمستخدم: المرحّل/المشرف المربوط بكراج يشوف كراجه بس (المدير والي بدون كراج يشوفون الكل) */
+let MINE = null;   // null = كل الكراجات
+function initMine() {
+  const A = window.NWAuth || {}, role = A.role || (A.user && A.user.r) || '', g = A.garages || (A.user && A.user.g) || [];
+  if (role === 'مدير' || role === 'مدير تنفيذي' || !g.length || g.includes('all')) { MINE = null; return; }
+  const rev = {}; DEPOTS.forEach(d => { rev[d.toLowerCase()] = d; rev[DEP[d]] = d; });
+  const m = g.map(x => rev[String(x).replace(/كراج/g, '').trim()] || rev[String(x).trim().toLowerCase()]).filter(Boolean);
+  MINE = m.length ? [...new Set(m)] : null;
+}
+const inDep = (d, sel) => sel ? (sel === '*mine' ? (MINE || []).includes(d) : d === sel) : true;
+function filtered(depot) { return D.filter(r => inDep(dep(r), depot)); }
+function isOnTrip(r) { return r[C.ST] === 'operation' && !!ROSTER[r[C.IQ]]; }   // الرحلة في الروستر لها الأولوية على الاستعداد اليدوي
+const isX = iq => !!(SWIN[iq] && SWOUT[iq] && SWOUT[iq].rep === SWIN[iq].orig);   // تبادل رحلتين
+const isOut = r => !!SWOUT[r[C.IQ]] && !ROSTER[r[C.IQ]];   // اعتذر/استُبدل اليوم
+const offToday = r => !isOut(r) && r[C.ST] === 'operation' && r[C.SB] !== 'نعم' && ROSTER_N > 0 && !ROSTER[r[C.IQ]];
+const restManual = r => !!RESTM[r[C.IQ]] && r[C.ST] === 'operation' && !ROSTER[r[C.IQ]] && !isOut(r);
+function isRest(r) { return restManual(r) || (offToday(r) && (ABSENT[r[C.IQ]] || 0) <= 2); }
+function isStandby(r) { return r[C.ST] === 'operation' && !ROSTER[r[C.IQ]] && !restManual(r) && (isOut(r) || r[C.SB] === 'نعم' || (offToday(r) && (ABSENT[r[C.IQ]] || 0) > 2)); }
+const in30 = () => { const d = new Date(); d.setDate(d.getDate() + 30); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); };
+const cardOk = r => r[C.ST] !== 'Termination of services' && r[C.ST] !== 'Absconding';
+function cardExpired(r) { return cardOk(r) && r[C.CARD] && r[C.CARD] < today(); }
+function cardSoon(r) { return cardOk(r) && r[C.CARD] && r[C.CARD] >= today() && r[C.CARD] <= in30(); }
+const in3 = () => { const d = new Date(); d.setDate(d.getDate() + 3); return ymd(d); };
+function isDue(r) { return ST[r[C.ST]] && ST[r[C.ST]].grp === 'leave' && r[C.TO] && r[C.TO] >= today() && r[C.TO] <= in3(); }
+function isLate(r) { return ST[r[C.ST]] && ST[r[C.ST]].grp === 'leave' && r[C.TO] && r[C.TO] < today(); }
+
+function render() {
+  const depot = $('fDepot').value, rows = filtered(depot);
+  const cnt = s => rows.filter(r => r[C.ST] === s).length;
+  const active = cnt('operation'), leave = cnt('Annual Leave') + cnt('Emergency Leave') + cnt('Sick Leave');
+  const out = cnt('Not Returned') + cnt('Suspended') + cnt('Absconding') + cnt('Termination of services');
+  const outN = rows.filter(isOut).length, onTrips = rows.filter(isOnTrip).length, sb = D.filter(r => isStandby(r) && inDep(sbDep(r), depot)).length, rest = D.filter(r => isRest(r) && inDep(sbDep(r), depot)).length;
+  const tile = (acc, lb, v, key, sub) => `<button class="tile" style="--acc:${acc}" data-f="${key}"><div class="lb">${lb}</div><b>${v}</b>${sub?`<small>${sub}</small>`:''}</button>`;
+  $('tMain').innerHTML =
+    tile('#1f3f7a', t_('req'), rows.length, 'all') +
+    tile('#0369a1', t_('active'), active + leave, 'req') +
+    tile('#15803d', t_('avail'), active, 'st:operation', `${t_('onTrips')}: ${ROSTER_N ? onTrips : '—'} · ${t_('rest')}: ${ROSTER_N ? rest : '—'} · ${t_('standby')}: ${sb}`) +
+    tile('#2563eb', t_('onLeave'), leave, 'leave') +
+    tile('#dc2626', t_('out'), out, 'out');
+  $('tStatus').innerHTML =
+    tile('#0d9488', t_('onTrips'), ROSTER_N ? onTrips : '—', 'trip', ROSTER_N ? t_('wk')(WEEK_N) : t_('noRoster')) +
+    tile('#64748b', t_('rest'), ROSTER_N ? rest : '—', 'rest') +
+    tile('#7c3aed', t_('standby'), sb, 'sb', outN ? t_('sbOut')(outN, Object.entries(rows.filter(isOut).reduce((a, r) => { const k = SWOUT[r[C.IQ]].reason; a[k] = (a[k] || 0) + 1; return a; }, {})).map(([k, v]) => `${k} ${v}`).join(' · ')) : '') +
+    STATUSES.filter(s => s !== 'operation').map(s => tile(ST[s].grp === 'leave' ? '#2563eb' : '#dc2626', stName(s), cnt(s), 'st:' + s)).join('');
+
+  // الجنسية × الحالة
+  const nats = [...new Set(rows.map(r => r[C.NAT] || '—'))].sort();
+  let h = `<table><thead><tr><th>${t_('nat')}</th>${STATUSES.map(s => `<th>${esc(stName(s))}</th>`).join('')}<th>${t_('gt')}</th></tr></thead><tbody>`;
+  nats.forEach(n => {
+    const rr = rows.filter(r => (r[C.NAT] || '—') === n);
+    h += `<tr><td><b>${esc(n)}</b></td>` + STATUSES.map(s => { const v = rr.filter(r => r[C.ST] === s).length; return `<td class="c" data-f="ns:${esc(n)}|${s}">${v || '·'}</td>`; }).join('') + `<td class="c" data-f="n:${esc(n)}"><b>${rr.length}</b></td></tr>`;
+  });
+  h += `<tr class="tot"><td>${t_('gt')}</td>` + STATUSES.map(s => `<td>${cnt(s)}</td>`).join('') + `<td>${rows.length}</td></tr></tbody></table>`;
+  $('natTable').innerHTML = h;
+
+  // الكراجات: التشغيل والاستعداد
+  const deps = DEPOTS.filter(d => inDep(d, depot));
+  let g = `<table><thead><tr><th>${t_('depot')}</th><th>${t_('opDrivers')}</th><th>${t_('onTrips')}</th><th>${t_('rest')}</th><th>${t_('standby')}</th></tr></thead><tbody>`;
+  let s1 = 0, s2 = 0, s3 = 0, s4 = 0, s5 = 0;
+  deps.forEach(d => {
+    const rr = D.filter(r => dep(r) === d), op = rr.filter(r => r[C.ST] === 'operation').length, tr = rr.filter(isOnTrip).length, st = D.filter(r => isStandby(r) && sbDep(r) === d).length, rs = D.filter(r => isRest(r) && sbDep(r) === d).length, ou = rr.filter(isOut).length;
+    if (!rr.length && !st && !rs) return; s1 += op; s2 += tr; s3 += st; s4 += rs; s5 += ou;
+    g += `<tr><td><b>${esc(depName(d))}</b></td><td class="c" data-f="ds:${d}|operation">${op}</td><td class="c" data-f="dt:${d}">${ROSTER_N ? tr : '—'}</td><td class="c" data-f="dr:${d}">${ROSTER_N ? rs : '—'}</td><td class="c" data-f="db:${d}">${st}${ou ? ` <small style="color:#c53030;font-weight:800">(${ou}❌)</small>` : ''}</td></tr>`;
+  });
+  g += `<tr class="tot"><td>${t_('gt')}</td><td>${s1}</td><td>${ROSTER_N ? s2 : '—'}</td><td>${ROSTER_N ? s4 : '—'}</td><td>${s3}</td></tr></tbody></table>`;
+  $('depTable').innerHTML = g;
+
+  // تنبيه المتأخرين عن العودة
+  const late = rows.filter(isLate);
+  const due = rows.filter(isDue), dueT = due.filter(r => r[C.TO] === today()).length;
+  const ce = rows.filter(cardExpired).length, cs = rows.filter(cardSoon).length;
+  const swN = Object.keys(SWIN).filter(k => !isX(k)).length + Object.keys(SWIN).filter(isX).length / 2;
+  const w6 = D.filter(r => inDep(curDep(r), depot)).map(sb6).filter(Boolean), w6o = w6.filter(x => x.over).length;
+  const w6A = w6.length ? `<div class="alert ${w6o ? 'red' : ''}" data-f="sb6">${esc(LANG === 'en' ? `⏰ ${w6.length} driver(s) reaching ${SB_MAX} days without a trip${w6o ? ` — ${w6o} already over` : ''} (no trip in the uploaded roster${ROSTER_TO ? ' up to ' + ROSTER_TO : ''})` : `⏰ ${w6.length} سائق قرب يتجاوز ${SB_MAX} أيام بدون رحلة${w6o ? ` — منهم ${w6o} تجاوزوا` : ''} (ما لهم رحلة في الروستر المرفوع${ROSTER_TO ? ' لين ' + ROSTER_TO : ''})`)}</div>` : '';
+  $('alerts').innerHTML = w6A + (swN ? `<div class="alert blue" data-f="swap">${esc(t_('swapA')(swN))}</div>` : '') + (due.length ? `<div class="alert blue" data-f="due">${esc(t_('due')(due.length, dueT))}</div>` : '') + (late.length ? `<div class="alert" data-f="late">${esc(t_('late')(late.length))}</div>` : '') +
+    (ce ? `<div class="alert red" data-f="cexp">${esc(t_('cardExp')(ce))}</div>` : '') +
+    (cs ? `<div class="alert" data-f="csoon">${esc(t_('cardSoon')(cs))}</div>` : '') +
+    (() => { const g = rosterGaps(depot), n = g.unknown.length + g.notOp.length + g.dup.length; return n ? `<div class="alert red" id="gapA" style="cursor:pointer">⚠️ ${n} ${LANG === 'en' ? 'scheduled captain(s) in this date\'s roster are not counted "On trips" — tap for details' : 'كابتن مجدول في روستر هذا التاريخ ما انحسب «على الرحلات» — اضغط للتفاصيل'}</div>` : ''; })();
+  const ga = $('gapA'); if (ga) ga.onclick = e => { e.stopPropagation(); showGaps(depot); };
+  renderList();
+}
+
+let LISTF = '';
+const k0 = f => f.slice(0, f.indexOf(':'));
+function applyF(rows) {
+  const f = LISTF; if (!f) return rows;
+  if (f === 'all') return rows;
+  if (f === 'req') return rows.filter(r => ['operation','Annual Leave','Emergency Leave','Sick Leave'].includes(r[C.ST]));
+  if (f === 'leave') return rows.filter(r => ST[r[C.ST]] && ST[r[C.ST]].grp === 'leave');
+  if (f === 'out') return rows.filter(r => ST[r[C.ST]] && ST[r[C.ST]].grp === 'out');
+  if (f === 'trip') return rows.filter(isOnTrip);
+  if (f === 'sb') return rows.filter(isStandby);
+  if (f === 'rest') return rows.filter(isRest);
+  if (f === 'late') return rows.filter(isLate);
+  if (f === 'due') return rows.filter(isDue);
+  if (f === 'cexp') return rows.filter(cardExpired);
+  if (f === 'csoon') return rows.filter(cardSoon);
+  if (f === 'outd') return rows.filter(isOut);
+  if (f === 'sb6') return rows.filter(r => sb6(r)).sort((a, b) => sb6(b).n - sb6(a).n);
+  if (k0(f) === 'do') return rows.filter(r => dep(r) === f.slice(3) && isOut(r));
+  if (f === 'swap') return rows.filter(r => isOut(r) || SWIN[r[C.IQ]]);
+  const [k, v] = [f.slice(0, f.indexOf(':')), f.slice(f.indexOf(':') + 1)];
+  if (k === 'st') return rows.filter(r => r[C.ST] === v);
+  if (k === 'n') return rows.filter(r => (r[C.NAT] || '—') === v);
+  if (k === 'ns') { const [n, s] = v.split('|'); return rows.filter(r => (r[C.NAT] || '—') === n && r[C.ST] === s); }
+  if (k === 'ds') { const [d, s] = v.split('|'); return rows.filter(r => dep(r) === d && r[C.ST] === s); }
+  if (k === 'dt') return rows.filter(r => dep(r) === v && isOnTrip(r));
+  if (k === 'db') return rows.filter(r => sbDep(r) === v && isStandby(r));
+  if (k === 'dr') return rows.filter(r => sbDep(r) === v && isRest(r));
+  return rows;
+}
+let PAGE = 1; const PER = 50;
+function renderList(reset) {
+  if (reset) PAGE = 1;
+  const q = $('q').value.trim().toLowerCase(), fs = $('fStatus').value, fn = $('fNat').value;
+  const dv = $('fDepot').value, sbView = ['sb', 'rest'].includes(LISTF) || LISTF.startsWith('db:') || LISTF.startsWith('dr:');
+  let rows = applyF(sbView ? D.filter(r => inDep(sbDep(r), dv)) : D.filter(r => inDep(curDep(r), dv))).filter(r => (!fs || r[C.ST] === fs) && (!fn || r[C.NAT] === fn) &&
+    (!q || [r[C.NAME], r[C.IQ], r[C.EMP], r[C.MOB], ROSTER[r[C.IQ]] || ''].join(' ').toLowerCase().includes(q)));
+  rows.sort(LISTF === 'sb6' ? (a, b) => sb6(b).n - sb6(a).n : (a, b) => String(a[C.NAME]).localeCompare(String(b[C.NAME])));
+  if (!D.length) { $('list').innerHTML = `<div class="msg">${esc(t_('noData'))}</div>`; return; }
+  const H = (t, c) => `<span class="${c || ''}">${t}</span>`;
+  const head = `<div class="row hd">${H(`${t_('fName')} · ${esc(t_('results')(rows.length))}${LISTF ? ` <a href="#" id="clrF" style="margin-inline-start:8px">✖</a>` : ''}`)}${H(t_('fDepot'), 'hm')}${H(t_('fNat'), 'hm')}${H(t_('fStatus'))}${H(t_('colDay'))}${H(t_('colLast'), 'hm')}${H(t_('colCard'), 'hm')}${H(t_('colRet'), 'hm')}<span></span></div>`;
+  const sub = (txt, col) => `<div class="sub2"${col ? ` style="color:${col}"` : ''}>${txt}</div>`;
+  const pages = Math.max(1, Math.ceil(rows.length / PER)); if (PAGE > pages) PAGE = pages;
+  const pager = pages > 1 ? `<div class="pager"><button class="btn light" data-pg="1" ${PAGE === 1 ? 'disabled' : ''}>«</button><button class="btn light" data-pg="${PAGE - 1}" ${PAGE === 1 ? 'disabled' : ''}>‹</button><span>${t_('pageOf')(PAGE, pages, rows.length)}</span><button class="btn light" data-pg="${PAGE + 1}" ${PAGE === pages ? 'disabled' : ''}>›</button><button class="btn light" data-pg="${pages}" ${PAGE === pages ? 'disabled' : ''}>»</button></div>` : '';
+  $('list').innerHTML = head + rows.slice((PAGE - 1) * PER, PAGE * PER).map(r => {
+    const iq = r[C.IQ], tr = ROSTER[iq], lt = lastTrip(r);
+    // الحالة (الوظيفية)
+    const stCol = `<span class="chip ${ST[r[C.ST]] ? ST[r[C.ST]].cls : ''}">${esc(stName(r[C.ST]))}</span>` +
+      (r[C.ST] !== 'operation' && r[C.FROM] ? sub(`${t_('fFrom')}: ${esc(r[C.FROM])}`) : '') + (r[C.NOTE] ? sub('📝 ' + esc(r[C.NOTE])) : '');
+    // اليوم: رحلة / راحة / استعداد / معتذر / تبديل
+    let day = '';
+    if (isOnTrip(r)) day = `<span class="chip s-trip">🚌 ${esc(tr)}</span>`;
+    if (isRest(r)) day = `<span class="chip" style="background:var(--nbg);color:var(--n)">😴 ${t_('rest')}${restManual(r) ? ' · ' + t_('manual') : ''}</span>`;
+    if (isStandby(r)) day = `<span class="chip s-sb">${t_('standby')}${isOut(r) ? ' · ' + t_('outTile1') : r[C.SB] === 'نعم' ? ' · ' + t_('manual') : ''}</span>` +
+      (!isOut(r) && r[C.SB] !== 'نعم' && SINCE[iq] ? sub(`${t_('since')(SINCE[iq])} · ${t_('offN')(sbDays(iq))}`) : '');
+    { const w = sb6(r); if (w) day += `<div style="margin-top:4px"><span class="chip ${w.over ? 's-late' : 's-emergency'}">${esc(sb6Txt(w))}</span></div>`; }
+    if (isX(iq)) day += sub(`🔁 ${t_('xWith')(esc(SWIN[iq].origName || SWIN[iq].orig), esc(SWOUT[iq].trip))} — ${esc(SWIN[iq].reason)}`, '#b45309');
+    else if (SWIN[iq]) day += sub(`🔄 ${t_('subFor')} ${esc(SWIN[iq].origName || SWIN[iq].orig)} — ${esc(SWIN[iq].reason)}`, '#0f766e');
+    if (isOut(r)) day += `<div style="margin-top:4px"><span class="chip s-late">❌ ${t_('outTile1')} · ${esc(SWOUT[iq].reason)}</span></div>` +
+      sub(t_('outLine')(esc(SWOUT[iq].trip), esc(SWOUT[iq].repName || SWOUT[iq].rep))) + (SWOUT[iq].note ? sub('📝 ' + esc(SWOUT[iq].note) + (SWOUT[iq].by ? ' — ' + esc(SWOUT[iq].by) : '')) : '');
+    if (!day) day = `<span class="dash">—</span>`;
+    // آخر رحلة
+    const last = lt ? `<b class="mono">${esc(lt.code)}</b>${sub(esc(lt.date))}${sub('🏁 ' + esc(tripEnd(lt.code) || '?'))}` : '<span class="dash">—</span>';
+    // كرت التشغيل
+    const card = !r[C.CARD] ? '<span class="dash">—</span>' : cardExpired(r) ? `<span class="chip s-late">${esc(r[C.CARD])}</span>${sub(t_('cExp'), '#dc2626')}` :
+      cardSoon(r) ? `<span class="chip s-emergency">${esc(r[C.CARD])}</span>${sub(t_('cSoon'), '#b45309')}` : `<span class="mono">${esc(r[C.CARD])}</span>`;
+    const cardF = CARDS[iq] ? `<div style="margin-top:6px"><button class="btn light" data-cd="${esc(iq)}" style="padding:5px 10px;font-size:12px">🪪 ${t_('cardDl')}</button></div>` : sub(t_('noCardF'));
+    // العودة من الإجازة
+    const lv = ST[r[C.ST]] && ST[r[C.ST]].grp === 'leave';
+    const ret = !(lv || r[C.ST] === 'Not Returned') || !r[C.TO] ? '<span class="dash">—</span>' : isLate(r) || r[C.ST] === 'Not Returned' ? `<span class="chip s-late">⏰ ${esc(r[C.TO])}</span>${sub(t_('lateS'), '#dc2626')}` :
+      isDue(r) ? `<span class="chip s-annual">↩ ${esc(r[C.TO])}</span>${r[C.TO] === today() ? sub(t_('retToday'), '#1d4ed8') : ''}` : `<span class="mono">${esc(r[C.TO])}</span>`;
+    const btns = `${canEdit && r[C.ST] === 'operation' && !ROSTER[iq] && !isOut(r) && (isStandby(r) || restManual(r)) ? `<button class="btn light" data-rm="${esc(iq)}" data-v="${restManual(r) ? '' : 'rest'}" title="${restManual(r) ? t_('toSbT') : t_('toRestT')}">${restManual(r) ? '↩︎ ' + t_('standby') : '😴 ' + t_('rest')}</button>` : ''}${canEdit && ROSTER_N && (isStandby(r) || isRest(r)) ? `<button class="btn" data-swf="${esc(iq)}" title="${t_('swFromT')}" style="background:#7c3aed">🔄 ${t_('swFromB')}</button>` : ''}${canEdit && isOnTrip(r) && !SWIN[iq] ? `<button class="btn light" data-sw="${esc(iq)}" title="${t_('swapT')}">🔄</button>` : ''}${canEdit && SWIN[iq] ? `<button class="btn light" data-unsw="${esc(iq)}" title="${t_('unswap')}" style="color:#b91c1c">↩︎</button>` : ''}<button class="btn light" data-e="${esc(iq)}">${canEdit ? t_('edit') : '👁'}</button>`;
+    return `<div class="row"><div class="nm"><b>${esc(r[C.NAME])}</b><small>${esc(iq)}${r[C.EMP] ? ' · ' + esc(r[C.EMP]) : ''}${r[C.MOB] ? ' · 📞 ' + esc(r[C.MOB]) : ''}</small></div>
+      <span class="hm">${esc(depName(curDep(r)))}${curDep(r) !== dep(r) ? sub(`📍 ${isRest(r) ? t_('rest') : t_('standby')} · ${t_('baseDep')}: ${esc(depName(dep(r)))}`, '#7c3aed') : ''}</span><span class="hm">${esc(r[C.NAT])}</span><span>${stCol}</span><span>${day}</span><span class="hm">${last}</span><span class="hm">${card}${cardF}</span><span class="hm">${ret}</span>
+      <span class="acts">${btns}</span></div>`;
+  }).join('') + pager;
+}
+
+/* ---------- التحميل ---------- */
+async function loadCards() {
+  try { const j = await NWAuth.call('cardsIndex', {}); CARDS = {}; if (j && j.ok) (j.ids || []).forEach(x => CARDS[x] = 1); } catch (e) {}
+}
+/* تحميل كرت التشغيل (من Drive عن طريق نظام الدخول) */
+async function cardDownload(iq, btn) {
+  const r = D.find(x => x[C.IQ] === iq), old = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = '⏳'; }
+  try {
+    const j = await NWAuth.call('cardGet', { iqama: iq });
+    if (j.error === 'AUTH') { NWAuth.relogin(); throw new Error(t_('eAuth')); }
+    if (!j.ok) throw new Error(j.error === 'NOT_FOUND' ? t_('noCardF') : j.error === 'FORBIDDEN' ? t_('eForb') : t_('eErr') + j.error);
+    const bin = atob(j.b64), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    const url = URL.createObjectURL(new Blob([u8], { type: j.mime })), a = document.createElement('a');
+    const ext = (j.name.match(/\.\w+$/) || ['.pdf'])[0];
+    a.href = url; a.download = `${t_('cardFile')}_${(r ? r[C.NAME] : '').replace(/[^\w\u0600-\u06FF ]+/g, '').trim().replace(/\s+/g, '_')}_${iq}${ext}`;
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch (e) { alert(e.message); }
+  finally { if (btn) { btn.disabled = false; btn.textContent = old; } }
+}
+/* عرض فوري من آخر نسخة محفوظة في الجهاز، ثم التحديث من النظام في الخلفية */
+const CK = 'nwDrvCache1';
+function showCached() {
+  try {
+    const c = JSON.parse(localStorage.getItem(CK) || 'null'); if (!c || !c.d || !c.d.length) return false;
+    D = c.d; canEdit = !!c.e; canCardsE = !!c.c; canImport = !!c.i; CARDS = c.k || {};
+    initMine(); fillFilters(); render();
+    $('alerts').insertAdjacentHTML('afterbegin', `<div class="alert" id="updMsg" style="cursor:default;background:var(--soft);border-color:var(--line);color:var(--muted)">${t_('upd')}</div>`);
+    return true;
+  } catch (e) { return false; }
+}
+let LOADP = null, ROSTER_P = null, ROSTER_ROWS = [];
+let SDUTY = null;   // رحلة → واجب (Nº Bus Duty) من جدول الرحلات المرفوع
+function loadDuties() { if (SDUTY) return Promise.resolve(SDUTY); return NWAuth.call('scheduleGet', {}).then(j => { const M = {}, nk = v => String(v || '').toUpperCase().replace(/\s+/g, '');
+  [((j && j.prev && j.prev.trips) || []), ((j && j.trips) || [])].forEach(L => L.forEach(t => { if (t.trip && t.duty) M[nk(t.trip)] = String(t.duty); }));
+  SDUTY = M; return M; }).catch(() => (SDUTY = {})); }   // تحميل جاري (الداش بورد ينتظره)
+function load() { LOADP = load_(); const p = LOADP; p.finally(() => { if (LOADP === p) LOADP = null; }); return p; }
+async function load_() {
+  if (!showCached()) $('list').innerHTML = `<div class="msg">${t_('loading')}</div>`;
+  try {
+    const a = await NWAuth.call('driversList', {});
+    if (a.error === 'AUTH') { NWAuth.relogin(); throw new Error(t_('eAuth')); }
+    if (!a.ok) throw new Error(t_('eErr') + (a.error || ''));
+    if (a.canView === false) {   // صلاحيات إدارة السائقين من صفحة الإعدادات
+      try { localStorage.removeItem(CK); } catch (e) {}
+      D = []; $('list').innerHTML = '<div class="msg err">🔒 ما عندك صلاحية عرض بيانات السائقين — راجع المدير</div>';
+      ['bAdd', 'bImport', 'bCards', 'bRpt', 'bLv'].forEach(id => { const b = $(id); if (b) b.style.display = 'none'; }); return;
+    }
+    D = a.drivers || []; canEdit = !!a.canEdit; canCardsE = !!(a.canCards || a.canEdit); canImport = !!a.canImport;
+    $('bRpt').style.display = a.canReports === false ? 'none' : '';
+    initMine();
+    await Promise.all([loadRoster(), loadTrips(), loadCards()]);
+    if ($('bLv')) $('bLv').style.display = (canEdit || a.canReports !== false) ? '' : 'none';   // الإجازات والاستعداد: المشرف (صلاحية تعديل) واللي عنده التقارير
+    $('bAdd').style.display = canEdit ? '' : 'none'; $('bImport').style.display = canImport ? '' : 'none'; $('bCards').style.display = canCardsE ? '' : 'none';
+    fillFilters(); render();
+    syncDepots();
+    try { localStorage.setItem(CK, JSON.stringify({ d: D, e: canEdit, c: canCardsE, i: canImport, k: CARDS, at: Date.now() })); } catch (e) {}
+  } catch (e) { const u = $('updMsg'); if (u) u.textContent = '⚠️ ' + (e.message || t_('eNet')); else $('list').innerHTML = `<div class="msg err">${esc(e.message || t_('eNet'))}</div>`; }
+}
+/* أيام الاستعداد حتى التاريخ المختار (من أول يوم غير مجدول إلى اليوم، شامل اليومين) */
+const sbDays = iq => SINCE[iq] ? Math.round((new Date($('fDate').value + 'T12:00:00') - new Date(SINCE[iq] + 'T12:00:00')) / 864e5) + 1 : 0;
+/* تنبيه 6 أيام بدون رحلة: السائق على رأس العمل وغير مجدول اليوم، وكمّل 4 أيام أو أكثر بدون رحلة،
+   وما له رحلة في الروستر المرفوع قبل ما يتجاوز 6 أيام → تنبيه قبل. أكثر من 6 أيام = تجاوز */
+const SB_MAX = 6, SB_WARN = 4;
+function sb6(r) {
+  const iq = r[C.IQ];
+  if (r[C.ST] !== 'operation' || ROSTER[iq] || !ROSTER_N || !SINCE[iq]) return null;
+  const n = sbDays(iq); if (n < SB_WARN) return null;
+  const limit = addD(SINCE[iq], SB_MAX - 1);          // آخر يوم مسموح (اليوم السادس)
+  const nx = NEXT[iq] || '';
+  if (nx && nx <= addD(limit, 1)) return null;         // له رحلة قبل ما يتجاوز
+  return { n, over: n > SB_MAX, left: SB_MAX - n, next: nx };
+}
+const sb6Txt = x => LANG === 'en'
+  ? (x.over ? `🔴 Over ${SB_MAX} days without a trip (${x.n} days)` : x.left === 0 ? `⏰ Day ${SB_MAX} today — no trip scheduled` : `⏰ ${x.left} day(s) left to ${SB_MAX} days — no trip scheduled`)
+  : (x.over ? `🔴 تجاوز ${SB_MAX} أيام بدون رحلة (${x.n} يوم)` : x.left === 0 ? `⏰ اليوم السادس — ما له رحلة في الروستر` : `⏰ باقي ${x.left === 1 ? 'يوم واحد' : x.left === 2 ? 'يومين' : x.left + ' أيام'} ويتجاوز ${SB_MAX} أيام — ما له رحلة`);
+/* تحديث الكراج المسجل تلقائياً: السائق اللي في راحة أو استعداد اليوم، وآخر رحلة له انتهت في كراج ثاني
+   → كراجه يتعدّل في الشيت لمكانه الحالي (ويتسجل في سجل السائقين). يشتغل لما يفتح الصفحة أحد عنده صلاحية تعديل */
+let DEPSYNC = '';
+async function syncDepots() {
+  try {
+    if (!canEdit || !ROSTER_N || $('fDate').value !== today()) return;
+    await loadTrips(); if (!Object.keys(TRIP_END).length) return;
+    const ch = D.filter(r => r[C.ST] === 'operation' && offLoc(r)).map(r => { const l = lastTrip(r), d = l && endDepot(tripEnd(l.code)); return d && d !== dep(r) ? [r[C.IQ], d, l.code + ' (' + l.date + ')'] : null; }).filter(Boolean);
+    if (!ch.length) return;
+    const key = today() + '|' + ch.map(x => x[0] + x[1]).join(',');
+    if (DEPSYNC === key) return; DEPSYNC = key;
+    const j = await NWAuth.call('driversDepot', { rows: ch });
+    if (!j || !j.ok || !j.changed) return;
+    ch.forEach(x => { const r = D.find(y => y[C.IQ] === x[0]); if (r) r[C.DEP] = x[1]; });
+    render();
+    try { localStorage.setItem(CK, JSON.stringify({ d: D, e: canEdit, c: canCardsE, i: canImport, k: CARDS, at: Date.now() })); } catch (e) {}
+  } catch (e) {}
+}
+/* الراحة والاستعداد: نحسب كم يوم متتالي السائق غير مجدول حول التاريخ المختار
+   (نرجع ونتقدم يوم يوم في الروستر المرفوع لين نلقاه مجدول أو ينقطع الروستر)
+   يومين متتاليين أو أقل = راحة، أكثر من يومين = استعداد */
+const ymd = d => d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const addD = (ds, n) => { const d = new Date(ds + 'T12:00:00'); d.setDate(d.getDate() + n); return ymd(d); };
+function loadRoster() { const p = ROSTER_P = loadRoster_(); p.finally(() => { if (ROSTER_P === p) ROSTER_P = null; }); return p; }
+async function loadRoster_() {
+  ROSTER = {}; ROSTER_N = 0; ROSTER_ROWS = []; ABSENT = {}; SINCE = {}; WEEK_N = 0;
+  const date = $('fDate').value, from = addD(date, -30), to = addD(date, 6);
+  let days = null;
+  let subs = [], marks = [];
+  try { const [j] = await Promise.all([NWAuth.call('rosterRange', { from, to }), loadDuties()]); if (j && j.ok) { days = j.days || {}; subs = j.subs || []; marks = j.marks || []; } } catch (e) {}
+  if (!days) { try { const j = await NWAuth.call('rosterGet', { date }); days = {}; if (j && j.ok) { if ((j.rows || []).length) days[date] = j.rows; subs = j.subs || []; marks = j.marks || []; } } catch (e) { days = {}; } }
+  RESTM = {}; marks.filter(x => x.date === date && x.mark === 'rest').forEach(x => { RESTM[x.iqama] = x; });
+  SWOUT = {}; SWIN = {};
+  subs.filter(x => x.date === date).forEach(x => { SWOUT[x.orig] = x; SWIN[x.rep] = x; });
+  const SETS = {}; LAST = {};
+  Object.keys(days).filter(k => (days[k] || []).length).forEach(k => {
+    const set = {}; days[k].forEach(r => [r[1], r[2]].forEach(x => { if (x) set[String(x).trim()] = String(r[0]); }));
+    SETS[k] = set; if (k === date) { ROSTER = set; ROSTER_N = days[k].length; ROSTER_ROWS = days[k]; }
+  });
+  WEEK_N = Object.keys(SETS).filter(k => k >= addD(date, -6)).length;
+  // أول رحلة جاية لكل سائق بعد التاريخ المختار (من الروستر المرفوع)
+  NEXT = {}; ROSTER_TO = '';
+  Object.keys(SETS).filter(k => k > date).sort().forEach(k => { ROSTER_TO = k; Object.keys(SETS[k]).forEach(iq => { if (!NEXT[iq]) NEXT[iq] = k; }); });
+  // آخر رحلة لكل سائق قبل التاريخ المختار (حتى 30 يوم)
+  Object.keys(SETS).filter(k => k < date).sort().forEach(k => { Object.keys(SETS[k]).forEach(iq => { LAST[iq] = { code: SETS[k][iq], date: k }; }); });
+  if (!ROSTER_N) return;
+  D.forEach(r => {
+    const iq = r[C.IQ]; if (ROSTER[iq]) return;
+    let n = 1, first = date;
+    // الرجوع من إجازة: الأيام تنحسب من يوم العودة (تاريخ «إلى» في سجل السائق)، مو من قبل الإجازة
+    const back = r[C.ST] === 'operation' && /^\d{4}-\d{2}-\d{2}$/.test(r[C.TO] || '') && r[C.TO] <= date ? r[C.TO] : '';
+    for (let k = 1; k <= 30; k++) { const dk = addD(date, -k), s = SETS[dk]; if (!s || s[iq] || (back && dk < back)) break; n++; first = dk; }
+    SINCE[iq] = first;
+    for (let k = 1; k <= 6; k++) { const s = SETS[addD(date, k)]; if (!s || s[iq]) break; n++; }
+    ABSENT[iq] = n;
+  });
+}
+function fillFilters() {
+  const keep = (id, html) => { const v = $(id).value; $(id).innerHTML = html; if ([...$(id).options].some(o => o.value === v)) $(id).value = v; };
+  if (MINE) {
+    keep('fDepot', (MINE.length > 1 ? `<option value="*mine">${t_('myDeps')}</option>` : '') + MINE.map(d => `<option value="${d}">${esc(depName(d))}</option>`).join(''));
+    $('fDepot').disabled = MINE.length === 1;
+  } else keep('fDepot', `<option value="">${t_('allDep')}</option>` + DEPOTS.map(d => `<option value="${d}">${esc(depName(d))}</option>`).join(''));
+  keep('fStatus', `<option value="">${t_('allSt')}</option>` + STATUSES.map(s => `<option value="${s}">${esc(stName(s))}</option>`).join(''));
+  const nats = [...new Set(D.map(r => r[C.NAT]).filter(Boolean))].sort();
+  keep('fNat', `<option value="">${t_('allNat')}</option>` + nats.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join(''));
+  $('eStatus').innerHTML = STATUSES.map(s => `<option value="${s}">${esc(stName(s))}</option>`).join('');
+  $('eDepot').innerHTML = DEPOTS.map(d => `<option value="${d}">${esc(depName(d))}</option>`).join('');
+}
+
+/* ---------- فرق الروستر: كباتن مجدولين ما انحسبوا «على الرحلات» ---------- */
+function rosterGaps(depot) {
+  const seen = {}, unknown = [], notOp = [], all = {};
+  (ROSTER_ROWS || []).forEach(row => [row[1], row[2]].forEach(x => { const iq = String(x || '').trim(); if (!iq) return;
+    (all[iq] = all[iq] || []).push(String(row[0])); if (!seen[iq]) seen[iq] = String(row[0]); }));
+  // أكثر من رحلة لنفس الكابتن: الطبيعي ذهاب وعودة على نفس الخط (مثل NW28 أو NW22-O-1 + NW22-I-2) — نطلع بس المشكوك فيه:
+  // رحلتين بنفس الاتجاه (مغادرة + مغادرة أو عودة + عودة) على خطين مختلفين، أو نفس الرحلة مكررة
+  const rk = t => (String(t).toUpperCase().match(/^NW\d+/) || [''])[0], dir = t => (String(t).toUpperCase().match(/-([OI])-/) || [, ''])[1];
+  const dup = [];
+  Object.keys(all).forEach(iq => { const T = all[iq]; if (T.length < 2) return;
+    // الأساس: رقم الواجب من جدول الرحلات — كل الرحلات في نفس الواجب = طبيعي، واجبين مختلفين = مشكوك
+    const du = T.map(t => (SDUTY || {})[String(t).toUpperCase().replace(/\s+/g, '')] || '');
+    // مشكوك = نفس الرحلة مكررة، أو رحلتين بنفس الاتجاه على خطين مختلفين وفي واجبين مختلفين
+    // (نفس الواجب = طبيعي · نفس الخط بأكثر من واجب مثل NW28 = طبيعي · وصول على خط ثم مغادرة على خط ثاني = طبيعي)
+    const odd = T.some((a, i) => T.some((b, j) => j > i && (a === b || (dir(a) && dir(a) === dir(b) && rk(a) !== rk(b) && !(du[i] && du[i] === du[j])))));
+    if (odd) dup.push({ iq, trips: T.map((t, i) => du[i] ? `${t} (${du[i]})` : t) }); });
+  Object.keys(seen).forEach(iq => { const r = D.find(x => String(x[C.IQ]) === iq);
+    if (!r) { if (!depot) unknown.push({ iq, trip:seen[iq] }); return; }
+    if (r[C.ST] !== 'operation' && inDep(r[C.DEP], depot)) notOp.push({ r, trip:seen[iq] }); });
+  return { unknown, notOp, dup:dup.filter(x => { const r = D.find(y => String(y[C.IQ]) === x.iq); return !depot || (r && inDep(r[C.DEP], depot)); }) };
+}
+function showGaps(depot) {
+  const g = rosterGaps(depot), m = document.createElement('div'); m.className = 'ov on';
+  const sec = (t, sub, body) => body ? `<h4 style="margin:14px 0 4px">${t}</h4><div class="sub" style="margin-bottom:6px">${sub}</div><div class="tw"><table><tbody>${body}</tbody></table></div>` : '';
+  m.innerHTML = `<div class="md" style="max-width:760px"><h3 style="margin:0">⚠️ فرق روستر ${esc($('fDate').value)}</h3>
+    <div class="sub">«على الرحلات» = الكباتن المسجّلين في روستر اليوم وحالتهم «على رأس العمل». هؤلاء موجودين في الروستر وما انحسبوا:</div>
+    ${sec('🌴 مجدول وحالته مو «على رأس العمل»', 'إما الحالة في إدارة السائقين لازم تتحدّث، أو الروستر لازم يتعدّل ويتبدّل الكابتن', g.notOp.map(x => `<tr><td><b>${esc(x.r[C.NAME])}</b><br><span class="sub">${esc(x.r[C.IQ])} · ${esc(depName(x.r[C.DEP]))}</span></td><td dir="ltr">${esc(x.trip)}</td><td><b>${esc(stName(x.r[C.ST]))}</b>${x.r[C.TO] ? '<br><span class="sub">يرجع ' + esc(x.r[C.TO]) + '</span>' : ''}</td><td><button class="btn light" data-ed="${esc(x.r[C.IQ])}">فتح</button></td></tr>`).join(''))}
+    ${sec('❓ رقم إقامة مو موجود في قائمة السائقين', 'غالباً رقم الإقامة مكتوب غلط في ملف الروستر، أو الكابتن جديد ما انضاف', g.unknown.map(x => `<tr><td dir="ltr"><b>${esc(x.iq)}</b></td><td dir="ltr">${esc(x.trip)}</td></tr>`).join(''))}
+    ${sec('🔁 كابتن على رحلتين ما يمديه يجمعهم', 'رحلتين مغادرة (أو عودة) على خطين مختلفين ومن واجبين مختلفين حسب جدول الرحلات — غالباً خطأ في الروستر. رحلات نفس الواجب، أو نفس الخط (مثل NW28)، أو وصول ثم مغادرة على خط ثاني = طبيعي وما تطلع هنا. الواجب (Nº Bus Duty) بين القوسين', g.dup.map(x => { const r = D.find(y => String(y[C.IQ]) === x.iq); return `<tr><td><b>${esc(r ? r[C.NAME] : x.iq)}</b><br><span class="sub">${esc(x.iq)}</span></td><td dir="ltr">${x.trips.map(esc).join(' · ')}</td></tr>`; }).join(''))}
+    <div class="mbtns"><button class="btn light" data-x>إغلاق</button></div></div>`;
+  document.body.appendChild(m);
+  m.addEventListener('click', e => { if (e.target === m || e.target.closest('[data-x]')) m.remove(); const b = e.target.closest('[data-ed]'); if (b) { m.remove(); openEdit(b.dataset.ed); } });
+}
+
+/* ---------- مقارنة روستر يومين: ليش اختلف عدد «على الرحلات» ---------- */
+$('bCmp').onclick = () => {
+  const d0 = $('fDate').value || ymd(new Date());
+  const m = document.createElement('div'); m.className = 'ov on';
+  m.innerHTML = `<div class="md" style="max-width:900px"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">⚖️ مقارنة روستر يومين</h3><button class="btn light" data-x>✕</button></div>
+    <div class="sub">يوضح ليش اختلف عدد «على الرحلات» بين يومين: الرحلات، والكباتن، والحالات.</div>
+    <div class="bar" style="margin-top:10px;align-items:flex-end"><div><label>اليوم الأول</label><input type="date" id="cA" value="${addD(d0, -1)}"></div><div><label>اليوم الثاني</label><input type="date" id="cB" value="${d0}"></div><div style="flex:0 0 auto"><button class="btn green" id="cGo">قارن</button></div></div>
+    <div id="cOut" style="margin-top:12px"></div></div>`;
+  document.body.appendChild(m);
+  m.addEventListener('click', e => { if (e.target === m || e.target.closest('[data-x]')) m.remove(); const b = e.target.closest('[data-ed]'); if (b) { m.remove(); openEdit(b.dataset.ed); } });
+  m.querySelector('#cGo').onclick = async () => {
+    const A = m.querySelector('#cA').value, B = m.querySelector('#cB').value, out = m.querySelector('#cOut'), depot = $('fDepot').value;
+    if (!A || !B || A === B) return alert('اختر يومين مختلفين');
+    out.innerHTML = '<div class="msg">⏳ جاري التحميل...</div>';
+    const from = A < B ? A : B, to = A < B ? B : A; let j = null;
+    try { j = await NWAuth.call('rosterRange', { from, to }); } catch (e) {}
+    if (!j || !j.ok) { out.innerHTML = '<div class="msg err">تعذّر تحميل الروستر</div>'; return; }
+    const info = k => { const rows = (j.days || {})[k] || [], trips = {}, iqs = {};
+      const dup = {}; let seats = 0;
+      rows.forEach(r => { const t = String(r[0]).trim(), L = [r[1], r[2]].map(x => String(x || '').trim()).filter(Boolean); trips[t] = L; seats += L.length; L.forEach(iq => { if (iqs[iq]) (dup[iq] = dup[iq] || [iqs[iq]]).push(t); else iqs[iq] = t; }); });
+      const R0 = iq => D.find(x => String(x[C.IQ]) === iq);
+      const counted = Object.keys(iqs).filter(iq => { const r = R0(iq); return r && r[C.ST] === 'operation' && inDep(r[C.DEP], depot); });
+      const per = {}; Object.keys(trips).forEach(t => trips[t].forEach(iq => (per[iq] = per[iq] || []).push(t)));
+      return { rows, trips, iqs, counted, R0, dup, seats, per }; };
+    const a = info(A), b = info(B);
+    if (!a.rows.length || !b.rows.length) { out.innerHTML = `<div class="msg err">ما فيه روستر مرفوع ليوم ${!a.rows.length ? A : B}</div>`; return; }
+    const nm = (x, iq) => { const r = x.R0(iq); return r ? `<b>${esc(r[C.NAME])}</b> <span class="sub">${esc(iq)} · ${esc(stName(r[C.ST]))}</span>` : `<b dir="ltr">${esc(iq)}</b> <span class="sub">مو موجود في قائمة السائقين</span>`; };
+    const onlyA = Object.keys(a.trips).filter(t => !b.trips[t]), onlyB = Object.keys(b.trips).filter(t => !a.trips[t]);
+    const seatDiff = Object.keys(a.trips).filter(t => b.trips[t] && a.trips[t].length !== b.trips[t].length);
+    const why = (x, k) => Object.keys(x.iqs).filter(iq => !x.counted.includes(iq)).map(iq => { const r = x.R0(iq); if (r && !inDep(r[C.DEP], depot)) return ''; return `<tr><td>${nm(x, iq)}</td><td dir="ltr">${esc(x.iqs[iq])}</td></tr>`; }).join('');
+    const tb = (head, body) => body ? `<div class="tw" style="margin-bottom:10px"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>` : '<div class="sub" style="margin-bottom:10px">— لا يوجد</div>';
+    out.innerHTML = `<div class="tw" style="margin-bottom:12px"><table><thead><tr><th></th><th>${A}</th><th>${B}</th><th>الفرق</th></tr></thead><tbody>
+      <tr><td>عدد الرحلات في الروستر</td><td>${Object.keys(a.trips).length}</td><td>${Object.keys(b.trips).length}</td><td><b>${Object.keys(b.trips).length - Object.keys(a.trips).length}</b></td></tr>
+      <tr><td>خانات الكباتن في الرحلات</td><td>${a.seats}</td><td>${b.seats}</td><td><b>${b.seats - a.seats}</b></td></tr>
+      <tr><td>الكباتن المسجّلين في الروستر (بدون تكرار)</td><td>${Object.keys(a.iqs).length}</td><td>${Object.keys(b.iqs).length}</td><td><b>${Object.keys(b.iqs).length - Object.keys(a.iqs).length}</b></td></tr>
+      <tr><td><b>على الرحلات</b> (على رأس العمل${depot ? ' · الكراج المختار' : ''})</td><td><b>${a.counted.length}</b></td><td><b>${b.counted.length}</b></td><td><b>${b.counted.length - a.counted.length}</b></td></tr></tbody></table></div>
+      ${(() => { const xa = a.seats - Object.keys(a.iqs).length, xb = b.seats - Object.keys(b.iqs).length;
+        return `<div class="alert blue" style="margin-bottom:12px;cursor:default">💡 «على الرحلات» = عدد الكباتن (الأشخاص)، مو عدد الخانات. الكابتن اللي يسوي أكثر من رحلة في اليوم (ذهاب وعودة مثلاً) ينحسب مرة وحدة.<br>
+          ${A}: ${a.seats} خانة − ${xa} رحلة إضافية لنفس الكباتن = <b>${Object.keys(a.iqs).length}</b> كابتن · ${B}: ${b.seats} خانة − ${xb} رحلة إضافية = <b>${Object.keys(b.iqs).length}</b> كابتن
+          ${xa !== xb ? `<br>👈 الفرق سببه توزيع الرحلات على الكباتن: في ${xb > xa ? B : A} فيه ${Math.abs(xb - xa)} رحلة زيادة انضافت لكابتن عنده رحلة ثانية بدل ما تروح لكابتن مستقل.` : ''}</div>`; })()}
+      <h4 style="margin:8px 0 4px">📈 كباتن تغيّر عدد رحلاتهم بين اليومين</h4>
+      ${tb(`<th>الكابتن</th><th>${A}</th><th>${B}</th>`, [...new Set(Object.keys(a.per).concat(Object.keys(b.per)))].filter(iq => (a.per[iq] || []).length !== (b.per[iq] || []).length).sort((x, y) => ((b.per[y] || []).length - (a.per[y] || []).length) - ((b.per[x] || []).length - (a.per[x] || []).length))
+        .map(iq => `<tr><td>${nm(a.R0(iq) ? a : b, iq)}</td><td dir="ltr">${(a.per[iq] || []).length ? (a.per[iq] || []).map(esc).join(' · ') : '<span class="sub">—</span>'}</td><td dir="ltr">${(b.per[iq] || []).length ? (b.per[iq] || []).map(esc).join(' · ') : '<span class="sub">—</span>'}</td></tr>`).join(''))}
+      <h4 style="margin:8px 0 4px">🚌 رحلات موجودة في يوم وناقصة في الثاني</h4>
+      ${tb('<th>الرحلة</th><th>موجودة في</th><th>الكباتن</th>', onlyA.map(t => `<tr><td dir="ltr"><b>${esc(t)}</b></td><td>${A} فقط</td><td>${a.trips[t].length}</td></tr>`).concat(onlyB.map(t => `<tr><td dir="ltr"><b>${esc(t)}</b></td><td>${B} فقط</td><td>${b.trips[t].length}</td></tr>`)).join(''))}
+      <h4 style="margin:8px 0 4px">👥 نفس الرحلة وعدد الكباتن مختلف</h4>
+      ${tb(`<th>الرحلة</th><th>${A}</th><th>${B}</th>`, seatDiff.map(t => `<tr><td dir="ltr"><b>${esc(t)}</b></td><td>${a.trips[t].length}</td><td>${b.trips[t].length}</td></tr>`).join(''))}
+      <details style="margin:8px 0"><summary style="cursor:pointer;font-weight:700">🔁 كل الكباتن اللي عندهم أكثر من رحلة (${Object.keys(a.dup).length} · ${Object.keys(b.dup).length}) — طبيعي للذهاب والعودة</summary>
+      ${tb('<th>اليوم</th><th>الكابتن</th><th>الرحلات</th>', [[A, a], [B, b]].map(([k, x]) => Object.keys(x.dup).map(iq => `<tr><td>${k}</td><td>${nm(x, iq)} <button class="btn light" data-ed="${esc(iq)}" style="padding:3px 9px">فتح</button></td><td dir="ltr">${x.dup[iq].map(esc).join(' · ')}</td></tr>`).join('')).join(''))}
+      </details>
+      <h4 style="margin:8px 0 4px">🌴 مسجّلين في الروستر وما انحسبوا — ${A}</h4>${tb('<th>الكابتن</th><th>الرحلة</th>', why(a, A))}
+      <h4 style="margin:8px 0 4px">🌴 مسجّلين في الروستر وما انحسبوا — ${B}</h4>${tb('<th>الكابتن</th><th>الرحلة</th>', why(b, B))}
+      <div class="sub">«على الرحلات» يحسب الكابتن مرة وحدة حتى لو مكرر في أكثر من رحلة. حالة الكابتن المعروضة هي حالته الحالية في إدارة السائقين.</div>`;
+  };
+  m.querySelector('#cGo').click();
+};
+
+/* ---------- التعديل ---------- */
+let EDIT = null;
+function openEdit(iq) {
+  const r = iq ? D.find(x => x[C.IQ] === iq) : null; EDIT = r ? r[C.IQ] : '';
+  $('newFields').style.display = r ? 'none' : 'block';
+  $('cardBox').style.display = r ? 'flex' : 'none';
+  if (r) { $('mCardDl').style.display = CARDS[r[C.IQ]] ? '' : 'none'; $('mCardUp').style.display = canCardsE ? '' : 'none'; $('mCardMsg').textContent = CARDS[r[C.IQ]] ? '' : t_('noCardF'); }
+  $('mTitle').textContent = r ? r[C.NAME] : t_('newTitle');
+  $('mSub').textContent = r ? `${r[C.IQ]}${r[C.EMP] ? ' · ' + r[C.EMP] : ''} · ${r[C.NAT]}${r[C.BY] ? ' — ' + t_('lastBy') + ': ' + r[C.BY] + ' (' + r[C.AT] + ')' : ''}` : '';
+  ['eIq','eEmp','eName','eNat','eFrom','eTo','eMob','eNote','eCard','eHire'].forEach(id => $(id).value = '');
+  $('eStatus').value = r ? r[C.ST] : 'operation'; $('eDepot').value = r ? (r[C.DEP] || 'Unassigned') : (($('fDepot').value && $('fDepot').value !== '*mine') ? $('fDepot').value : (MINE ? MINE[0] : 'Unassigned'));
+  $('eSb').checked = r ? r[C.SB] === 'نعم' : false;
+  if (r) { $('eFrom').value = r[C.FROM]; $('eTo').value = r[C.TO]; $('eMob').value = r[C.MOB]; $('eNote').value = r[C.NOTE]; $('eCard').value = r[C.CARD] || ''; $('eHire').value = r[C.HIRE] || ''; }
+  ['eStatus','eDepot','eSb','eFrom','eTo','eMob','eNote','eCard','eHire','eIq','eEmp','eName','eNat'].forEach(id => $(id).disabled = !canEdit);
+  $('eCard').disabled = !canCardsE;   // العلاقات الحكومية: تاريخ الكرت فقط
+  $('mSave').style.display = canEdit || (canCardsE && r) ? '' : 'none';
+  leaveFields(); $('ov').classList.add('on');
+  $('hist').innerHTML = r ? `<div class="msg" style="padding:8px">${t_('histLoading')}</div>` : '';
+  if (r) NWAuth.call('driverHistory', { iqama: r[C.IQ] }).then(j => {
+    const h = (j && j.history) || [];
+    $('hist').innerHTML = `<b>${t_('hist')}</b>` + (h.length ? h.map(x => `<div>🕒 ${esc(x[0])} · <b>${esc(x[3])}</b>: ${esc(x[4] || '—')} ${LANG==='en'?'→':'←'} ${esc(x[5])} · ${esc(x[6])}${x[7] ? ' — ' + esc(x[7]) : ''}</div>`).join('') : `<div>${t_('noHist')}</div>`);
+  }).catch(() => { $('hist').innerHTML = ''; });
+}
+function leaveFields() { const lv = ST[$('eStatus').value] && ST[$('eStatus').value].grp === 'leave'; $('leaveF').style.opacity = $('leaveT').style.opacity = lv ? 1 : .5; $('eSb').closest('.tog').style.display = $('eStatus').value === 'operation' ? '' : 'none'; }
+$('eStatus').addEventListener('change', leaveFields);
+$('mCancel').onclick = () => $('ov').classList.remove('on');
+$('ov').addEventListener('click', e => { if (e.target.id === 'ov') $('ov').classList.remove('on'); });
+$('mSave').onclick = async () => {
+  if (!canEdit && canCardsE && EDIT) {   // حفظ تاريخ الكرت فقط
+    const b = $('mSave'); b.disabled = true;
+    try {
+      if (!$('eCard').value) throw new Error(t_('fCard'));
+      const j = await NWAuth.call('driversCards', { rows: [[EDIT, $('eCard').value]] });
+      if (j.error === 'AUTH') { NWAuth.relogin(); throw new Error(t_('eAuth')); }
+      if (!j.ok) throw new Error(j.error === 'FORBIDDEN' ? t_('eForb') : t_('eErr') + j.error);
+      const r = D.find(x => x[C.IQ] === EDIT); if (r) r[C.CARD] = $('eCard').value;
+      $('ov').classList.remove('on'); render();
+    } catch (e) { alert(e.message); } finally { b.disabled = false; }
+    return;
+  }
+  const isNew = !EDIT, iq = isNew ? $('eIq').value.replace(/\D/g, '') : EDIT;
+  if (isNew) {
+    if (iq.length < 5) return alert(t_('eIq'));
+    if (!$('eName').value.trim()) return alert(t_('eName'));
+    if (D.some(r => r[C.IQ] === iq)) return alert(t_('exists'));
+    if (!$('eHire').value) return alert(t_('eHire'));
+  }
+  const st = $('eStatus').value, drv = { iqama: iq, status: st, depot: $('eDepot').value, standby: st === 'operation' && $('eSb').checked,
+    from: $('eFrom').value, to: $('eTo').value, mobile: $('eMob').value, note: $('eNote').value, card: $('eCard').value, hire: $('eHire').value };
+  if (isNew) Object.assign(drv, { emp: $('eEmp').value, name: $('eName').value, nat: $('eNat').value });
+  const b = $('mSave'); b.disabled = true; b.textContent = t_('saving');
+  try {
+    const j = await NWAuth.call('driverSave', { driver: drv });
+    if (j.error === 'AUTH') { NWAuth.relogin(); throw new Error(t_('eAuth')); }
+    if (j.error === 'FORBIDDEN') throw new Error(t_('eForb'));
+    if (!j.ok) throw new Error(t_('eErr') + j.error);
+    if (window.__clearHist) window.__clearHist(j.driver[0]);
+    const i = D.findIndex(r => r[C.IQ] === j.driver[0]); if (i > -1) D[i] = j.driver; else D.push(j.driver);
+    $('ov').classList.remove('on'); fillFilters(); render();
+  } catch (e) { alert(e.message); }
+  finally { b.disabled = false; b.textContent = t_('save'); }
+};
+
+/* ---------- الاستيراد (للمدير) والتصدير ---------- */
+function loadXlsx() { return window.XLSX ? Promise.resolve() : new Promise((ok, bad) => { const s = document.createElement('script'); s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js'; s.onload = ok; s.onerror = bad; document.head.appendChild(s); }); }
+const normSt = s => { s = String(s || '').trim().toLowerCase(); return STATUSES.find(x => x.toLowerCase() === s) || (s.startsWith('termination') ? 'Termination of services' : s.startsWith('sick') || s.includes('مرض') ? 'Sick Leave' : 'operation'); };
+const xlDate = v => {
+  if (v === '' || v == null) return '';
+  if (typeof v === 'number' && v > 20000) { const d = new Date(Date.UTC(1899, 11, 30) + Math.round(v) * 864e5); return d.toISOString().slice(0, 10); }
+  const s = String(v).trim(); let m;
+  if ((m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) return m[1] + '-' + pad(m[2]) + '-' + pad(m[3]);
+  if ((m = s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/))) return m[3] + '-' + pad(m[2]) + '-' + pad(m[1]);
+  return '';
+};
+/* الكراج من ملف Excel: نقبل اختلاف الكتابة (Ha'il / Hayel / حائل / Hail Depot / Shumaisi / Qassim ...) */
+const DEP_RE = [[/sh?uma[iy]?s[iy]?|الشميسي|شميسي/i, 'Shumaysi'], [/madin|medin|rafha|المدينة|رفحاء/i, 'Madinah'], [/tab[ou]k|تبوك/i, 'Tabuk'], [/riya?dh|الرياض/i, 'Riyadh'],
+  [/ja[zs]an|jizan|gizan|جازان|جيزان/i, 'Jazan'], [/khamis|mushait|خميس/i, 'Khamis Mushait'], [/bash?a[iy]er|البشائر/i, 'Al Bashayer'], [/buray?dah|buraidah|qassim|qaseem|بريدة|القصيم/i, 'Buraydah'],
+  [/ha'?[iy]e?l|hayel|حائل|حايل/i, 'Hail']];
+const normDep = d => { d = String(d || '').trim(); const x = DEPOTS.find(k => k.toLowerCase() === d.toLowerCase()); if (x) return x; for (const [re, k] of DEP_RE) if (re.test(d)) return k; return 'Unassigned'; };
+$('bImport').onclick = () => $('impFile').click();
+/* تحديث كروت التشغيل من ملف: عمود رقم الإقامة + عمود تاريخ انتهاء الكرت (أي ترتيب) — ما يغيّر شي ثاني */
+$('bCards').onclick = () => { alert(t_('cardsHow')); $('cardFile').click(); };
+$('cardFile').onchange = async () => {
+  const f = $('cardFile').files[0]; if (!f) return;
+  try {
+    await loadXlsx();
+    const wb = XLSX.read(await f.arrayBuffer(), { type: 'array' });
+    const ws = wb.Sheets['Drivers_Data'] || wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: '' });
+    // نلقى صف العناوين (أول 10 صفوف)
+    let hi = -1, iI = -1, iD = -1;
+    for (let k = 0; k < Math.min(10, rows.length) && hi < 0; k++) {
+      const h = rows[k].map(x => String(x).trim().toLowerCase());
+      const a = h.findIndex(x => /id number|iqama|إقامة|اقامة|هوية|الإقامة/.test(x));
+      const b = h.findIndex(x => x === 'oc' || /card|كرت|بطاقة|انتهاء|expir/.test(x));
+      if (a > -1 && b > -1) { hi = k; iI = a; iD = b; }
+    }
+    if (hi < 0) return alert(t_('cardsBad'));
+    const list = rows.slice(hi + 1).map(r => [String(r[iI] ?? '').replace(/\D/g, ''), xlDate(r[iD])]).filter(x => x[0].length >= 5 && x[1]);
+    if (!list.length) return alert(t_('cardsBad'));
+    const byIq = {}; D.forEach(r => byIq[r[C.IQ]] = r);
+    const found = list.filter(x => byIq[x[0]]), chg = found.filter(x => (byIq[x[0]][C.CARD] || '') !== x[1]);
+    if (!confirm(t_('cardsAsk')(list.length, found.length, chg.length, list.length - found.length))) return;
+    const j = await NWAuth.call('driversCards', { rows: list });
+    if (j.error === 'AUTH') { NWAuth.relogin(); throw new Error(t_('eAuth')); }
+    if (!j.ok) throw new Error(j.error === 'FORBIDDEN' ? t_('eForb') : t_('eErr') + j.error);
+    alert(t_('cardsDone')(j.changed, (j.notFound || []).length) + ((j.notFound || []).length ? '\n\n' + j.notFound.slice(0, 20).join('\n') : ''));
+    load();
+  } catch (e) { alert(e.message || t_('eErr')); }
+  finally { $('cardFile').value = ''; }
+};
+$('impFile').onchange = async () => {
+  const f = $('impFile').files[0]; if (!f) return;
+  try {
+    await loadXlsx();
+    const wb = XLSX.read(await f.arrayBuffer(), { type: 'array' });
+    const ws = wb.Sheets['Drivers_Data'] || wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: '' });
+    const h = (rows[0] || []).map(x => String(x).trim().toLowerCase());
+    const ix = n => h.findIndex(x => x === n);
+    const iCard = h.findIndex(x => x === 'oc' || x.includes('card') || x.includes('كرت')), iEmp = ix('employee id'), iId = ix('id number'), iName = ix('driver name'), iSt = ix('status'), iNat = ix('nationality'), iDep = ix('depot');
+    if (iId < 0 || iName < 0 || iSt < 0) return alert(t_('impBad'));
+    // الجوالات من برنامج مسار الرحلة (إن وُجدت)
+    let mob = {};
+    try { const tx = await (await fetch('https://hanode40-sketch.github.io/trip/')).text(); const m = tx.match(/const DRIVER_DATA=(\[[\s\S]*?\]);/); if (m) JSON.parse(m[1]).forEach(d => { mob[String(d[0])] = String(d[3] || ''); }); } catch (e) {}
+    const out = rows.slice(1).filter(r => r[iId] && r[iName]).map(r => { const id = String(r[iId]).replace(/\D/g, ''); return [id, String(r[iEmp] ?? '').replace(/\D/g, ''), String(r[iName]).trim(), String(r[iNat] || '').trim(), normSt(r[iSt]), normDep(r[iDep]), '', mob[id] || '', iCard > -1 ? xlDate(r[iCard]) : '']; });
+    if (!confirm(t_('impAsk')(out.length))) return;
+    const j = await NWAuth.call('driversImport', { rows: out });
+    if (!j.ok) throw new Error(j.error === 'FORBIDDEN' ? t_('eForb') : t_('eErr') + j.error);
+    alert(t_('impDone')(j.count)); load();
+  } catch (e) { alert(e.message || t_('eErr')); }
+  finally { $('impFile').value = ''; }
+};
+$('bExport').onclick = async () => {
+  await loadXlsx();
+  const head = ['No.', 'Employee ID', 'ID Number', 'Driver Name', 'Status', 'Nationality', 'Depot', 'Standby', 'Standby depot (last trip)', 'Standby since', 'Rest day', 'Rest depot (last trip)', 'On trip', 'Mobile', 'From', 'Expected return', 'Operating card expiry', 'Note', 'Last update by', 'Last update'];
+  const rows = applyF(filtered($('fDepot').value)).map((r, i) => [i + 1, r[C.EMP], r[C.IQ], r[C.NAME], r[C.ST], r[C.NAT], r[C.DEP], isStandby(r) ? 'Yes' : '', isStandby(r) ? sbDep(r) : '', isStandby(r) && r[C.SB] !== 'نعم' ? (SINCE[r[C.IQ]] || '') : '', isRest(r) ? 'Yes' : '', isRest(r) ? sbDep(r) : '', ROSTER[r[C.IQ]] || '', r[C.MOB], r[C.FROM], r[C.TO], r[C.CARD] || '', r[C.NOTE], r[C.BY], r[C.AT]]);
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([head, ...rows]), 'Drivers_Data');
+  XLSX.writeFile(wb, `Northwest_Bus_Drivers_${today()}.xlsx`);
+};
+
+/* ---------- تصدير الداش بورد (نفس شكل ملف Excel) — طباعة / PDF / صورة ---------- */
+$('bDash').onclick = async () => {
+  let w0 = null;
+  if (LOADP || ROSTER_P) {                 // البيانات لسا تتحمّل (مثلاً بعد تحديث الصفحة مباشرة): نفتح النافذة وننتظر
+    w0 = window.open('', '_blank');
+    if (w0) w0.document.write('<p dir="rtl" style="font-family:Tahoma;padding:40px;text-align:center">⏳ جاري تحميل الروستر والبيانات...</p>');
+    try { await (LOADP || ROSTER_P); if (ROSTER_P) await ROSTER_P; } catch (e) {}
+  }
+  const depot = $('fDepot').value, rows = filtered(depot), cnt = st => rows.filter(r => r[C.ST] === st).length;
+  const op = cnt('operation'), an = cnt('Annual Leave'), em = cnt('Emergency Leave'), sk = cnt('Sick Leave');
+  const nr = cnt('Not Returned'), su = cnt('Suspended'), ab = cnt('Absconding'), te = cnt('Termination of services');
+  const inDepSb = f => D.filter(r => f(r) && inDep(sbDep(r), depot)).length;
+  const trips = rows.filter(isOnTrip).length, sb = inDepSb(isStandby), rest = inDepSb(isRest), outN = rows.filter(isOut).length;
+  const date = $('fDate').value, dTxt = new Date(date + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  const scope = depot ? (depot === '*mine' ? MINE.map(depName).join('، ') : depName(depot)) : 'كل الكراجات · All depots';
+  const nats = [...new Set(rows.map(r => r[C.NAT] || '—'))].sort();
+  const COLS = [['operation', 'Operation', 'على رأس العمل'], ['Emergency Leave', 'Emergency Leave', 'إجازة اضطرارية'], ['Annual Leave', 'Annual Leave', 'إجازة سنوية'], ['Sick Leave', 'Sick Leave', 'إجازة مرضية'],
+    ['Not Returned', 'Not Returned', 'لم يعد من الإجازة'], ['Suspended', 'Suspended', 'موقوف عن العمل'], ['Absconding', 'Absconding', 'هروب'], ['Termination of services', 'Termination', 'إنهاء خدمات']];
+  const natRows = nats.map(n => { const rr = rows.filter(r => (r[C.NAT] || '—') === n); return `<tr><td class="l"><b>${esc(n)}</b></td>${COLS.map(c => `<td>${rr.filter(r => r[C.ST] === c[0]).length}</td>`).join('')}<td class="gt">${rr.length}</td></tr>`; }).join('');
+  const deps = DEPOTS.filter(d => inDep(d, depot));
+  const opRows = deps.map(d => [d, rows.filter(r => dep(r) === d && r[C.ST] === 'operation').length]);
+  const sbRows = deps.map(d => [d, D.filter(r => isStandby(r) && sbDep(r) === d).length, D.filter(r => isRest(r) && sbDep(r) === d).length]);
+  // ---- التصميم الداكن ----
+  const parts = [['على الرحلات', ROSTER_N ? trips : 0, '#2dd4bf'], ['راحة', ROSTER_N ? rest : 0, '#94a3b8'], ['استعداد', sb, '#a78bfa'], ['إجازة مرضية', sk, '#f9a8d4']];
+  const pTot = parts.reduce((a, x) => a + x[1], 0) || 1, R = 113, CIRC = 2 * Math.PI * R; let off = 0;
+  const donut = `<svg width="260" height="260" viewBox="0 0 260 260"><circle cx="130" cy="130" r="${R}" fill="none" stroke="#1b2a57" stroke-width="34"/>` +
+    parts.map(x => { const L = CIRC * x[1] / pTot, c = `<circle cx="130" cy="130" r="${R}" fill="none" stroke="${x[2]}" stroke-width="34" stroke-dasharray="${L} ${CIRC - L}" stroke-dashoffset="${-off}" transform="rotate(-90 130 130)"/>`; off += L; return c; }).join('') + '</svg>';
+  const dRows = deps.map(d => { const opN = rows.filter(r => dep(r) === d && r[C.ST] === 'operation').length;
+    return [d, opN, rows.filter(r => dep(r) === d && isOnTrip(r)).length, D.filter(r => isRest(r) && sbDep(r) === d).length, D.filter(r => isStandby(r) && sbDep(r) === d).length]; }).filter(x => x[1] || x[3] || x[4]);
+  const dMax = Math.max(1, ...dRows.map(x => Math.max(x[1], x[2] + x[3] + x[4])));
+  const pct = rows.length ? Math.round(op / rows.length * 100) : 0;
+  const dark = `<div id="dash2" dir="rtl"><div class="hd2"><div><h1>لوحة السائقين · Drivers Overview</h1><small>${dTxt} · ${esc(scope)}</small></div><img src="${new URL('icon-192.png', location.href).href}" alt="" onerror="this.style.display='none'"></div>
+<div class="k5">${[['إجمالي الاحتياج', rows.length, '', ''], ['على رأس العمل', op + an + em + sk, '', ''], ['المتاحين للتشغيل', op, '', pct + '% من الإجمالي'], ['في إجازات', an + em, '#60a5fa', ''], ['خارج الخدمة', nr + su + ab + te, '#f87171', '']].map(x => `<div class="c2"><span>${x[0]}</span><b style="color:${x[2] || '#fff'}">${x[1]}</b>${x[3] ? `<i>${x[3]}</i>` : ''}</div>`).join('')}</div>
+<div class="g2"><div class="c2 dn"><h3>توزيع المتاحين اليوم</h3><div class="dw">${donut}<div class="ctr"><b>${op}</b><span>متاح</span></div></div>
+<div class="lg">${parts.map(x => `<div><span><em style="background:${x[2]}"></em>${x[0]}</span><b>${x[0] === 'استعداد' || x[0] === 'إجازة مرضية' || ROSTER_N ? x[1] : '—'}</b></div>`).join('')}</div></div>
+<div class="c2 bars"><h3>الكراجات: <em style="background:#2dd4bf"></em>رحلات · <em style="background:#94a3b8"></em>راحة · <em style="background:#a78bfa"></em>استعداد</h3>
+${dRows.map(x => `<div class="br"><span>${esc(depName(x[0]))}</span><div class="tr"><i style="width:${x[2] / dMax * 100}%;background:#2dd4bf"></i><i style="width:${x[3] / dMax * 100}%;background:#94a3b8"></i><i style="width:${x[4] / dMax * 100}%;background:#a78bfa"></i></div><b>${x[1]}</b><small>${x[2]} · ${x[3]} · ${x[4]}</small></div>`).join('')}</div></div>
+<div class="k7">${[['إجازة سنوية', an, '#60a5fa'], ['اضطرارية', em, '#60a5fa'], ['مرضية', sk, '#f9a8d4'], ['لم يعد', nr, '#f87171'], ['موقوف', su, '#f87171'], ['هروب', ab, '#f87171'], ['إنهاء خدمات', te, '#f87171']].map(x => `<div class="c2"><span>${x[0]}</span><b style="color:${x[2]}">${x[1]}</b></div>`).join('')}</div>
+<div class="nat2">${nats.map(n => { const v = rows.filter(r => (r[C.NAT] || '—') === n).length; return `<div><span>${esc(n)}</span><b>${v}</b></div>`; }).join('')}</div>
+<div class="ft2">NORTHWEST BUS · OPERATIONS MANAGEMENT · ${esc(new Date().toLocaleString('en-GB'))}</div></div>`;
+  const box = (cls, en, ar, v, ic) => `<div class="k ${cls}"><div class="ic">${ic}</div><div class="t"><b>${en}</b><span>${ar}</span></div><div class="v">${v}</div></div>`;
+  const small = (cls, en, ar, v, ic) => `<div class="s ${cls}"><div class="ic">${ic}</div><b>${en}</b><span>${ar}</span><div class="v">${v}</div></div>`;
+  const html = `<!DOCTYPE html><html lang="ar" dir="ltr"><head><meta charset="utf-8"><title>Drivers Dashboard ${date}</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#dfe5ee;font-family:"Segoe UI",Tahoma,Arial,sans-serif;color:#0f2447}
+.bar{position:sticky;top:0;display:flex;gap:8px;justify-content:center;padding:10px;background:#0f2447}.bar button{font:inherit;font-weight:700;border:0;border-radius:8px;padding:9px 16px;cursor:pointer;background:#f97316;color:#fff}.bar button.b{background:#fff;color:#0f2447}
+#dash{width:1400px;margin:16px auto;background:#fff;border:1px solid #c9d3e2;box-shadow:0 10px 30px rgba(0,0,0,.15)}
+.hd{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:4px solid #f97316}
+.hd img{width:250px;height:100px;object-fit:cover}.hd h1{margin:0;font-size:34px}.hd .dt{background:#eef3fb;border:1px solid #c9d3e2;border-radius:10px;padding:10px 20px;text-align:center;font-weight:800;font-size:20px}.hd .dt small{display:block;font-size:12px;color:#5b6b85;font-weight:600}
+.top{display:grid;grid-template-columns:270px 1fr 1fr;gap:12px;padding:16px 24px}
+.req{background:#0f2447;color:#fff;border-radius:12px;padding:18px;display:flex;flex-direction:column;justify-content:space-between}
+.req b{font-size:17px}.req span{font-size:15px;opacity:.85}.req .v{font-size:76px;font-weight:900;text-align:center;background:rgba(255,255,255,.12);border-radius:12px;margin:12px 0}
+.col{display:flex;flex-direction:column;gap:10px;justify-content:flex-start}.col>*{flex:none}.col>.fill{flex:1;align-items:stretch}.col>.fill .s{align-self:stretch;justify-content:center}.row{align-items:start}.s{align-self:start}.top{align-items:stretch}
+.k{display:flex;align-items:center;gap:12px;border-radius:12px;padding:12px 16px}.k .ic{font-size:30px}.k .t{flex:1;display:flex;flex-direction:column}.k .t b{font-size:16px}.k .t span{font-size:14px;color:#3b4b66}.k .v{font-size:34px;font-weight:900;background:rgba(255,255,255,.75);border-radius:10px;padding:2px 18px;min-width:96px;text-align:center}
+.g{background:#dcfce7}.bl{background:#dbeafe}.gr{background:#e8f5e9}.rd{background:#fee2e2}.or{background:#ffedd5}.pu{background:#ede9fe}.gy{background:#eef1f5}
+.row{display:grid;gap:10px}.r2{grid-template-columns:repeat(2,1fr)}.r3{grid-template-columns:repeat(3,1fr)}.r4{grid-template-columns:repeat(4,1fr)}.r5{grid-template-columns:repeat(5,1fr);align-items:stretch}.r5>*{height:auto}
+.s{border-radius:12px;padding:10px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px}.s .ic{font-size:24px}.s b{font-size:14px}.s span{font-size:13px;color:#3b4b66}.s .v{font-size:28px;font-weight:900;background:rgba(255,255,255,.8);border-radius:8px;padding:0 18px;margin-top:4px}
+.sec{margin:6px 24px 0;background:#0f2447;color:#fff;border-radius:10px 10px 0 0;padding:10px 16px;font-weight:800;font-size:18px;display:flex;justify-content:space-between}
+table{width:100%;border-collapse:collapse;font-size:15px}th{background:#e8eef7;color:#0f2447;padding:8px 6px;font-size:13px;border-bottom:2px solid #0f2447}th span{display:block;font-weight:600;color:#5b6b85}
+td{padding:7px 6px;text-align:center;border-bottom:1px solid #e3e8f0}td.l{text-align:left}.gt{background:#eef3fb;font-weight:800}tr.tot td{background:#0f2447;color:#fff;font-weight:800}
+.tw{margin:0 24px;border:1px solid #c9d3e2;border-top:0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 24px 8px}.two .sec{margin:0;font-size:16px;white-space:nowrap;gap:12px}.two>div{display:flex;flex-direction:column}.two .tw{flex:1;background:#fff}.two .tw{margin:0}.sec.o{background:#f97316}
+.ft{text-align:center;color:#f97316;font-weight:800;font-size:13px;background:#0f2447;padding:10px;margin-top:12px}
+#dash2{width:1400px;margin:16px auto;background:#0b1530;color:#e7edf8;padding:28px 32px}
+#dash2 .hd2{display:flex;justify-content:space-between;align-items:center}#dash2 h1{margin:0;font-size:30px}#dash2 .hd2 small{color:#8fa3c7;font-size:15px}#dash2 .hd2 img{width:280px;height:128px;object-fit:cover;background:#fff;border-radius:16px}
+#dash2 .k5{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:22px 0}#dash2 .c2{background:#13214a;border:1px solid #22356b;border-radius:16px;padding:18px}#dash2 .c2 span{color:#8fa3c7;font-size:14px}#dash2 .c2>b{display:block;font-size:42px;margin-top:6px}#dash2 .c2 i{font-style:normal;font-size:13px;color:#8fa3c7}
+#dash2 .g2{display:grid;grid-template-columns:420px 1fr;gap:14px;align-items:stretch}#dash2 .bars{display:flex;flex-direction:column}#dash2 .bars .br{flex:1;margin:4px 0}#dash2 .dn{justify-content:space-between}#dash2 .dn{display:flex;flex-direction:column;align-items:center}#dash2 .dw{position:relative;width:260px;height:260px}#dash2 .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}#dash2 .ctr b{font-size:46px}
+#dash2 .lg{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px;margin-top:18px;font-size:16px;width:100%}#dash2 .lg div{display:flex;justify-content:space-between;align-items:center}#dash2 .lg b{font-size:26px}#dash2 em{display:inline-block;width:12px;height:12px;border-radius:3px;margin:0 6px}
+#dash2 h3{margin:0 0 14px;font-size:17px;color:#c5d3ee;font-weight:700}#dash2 .br{display:grid;grid-template-columns:110px 1fr 50px 110px;gap:12px;align-items:center;margin:10px 0;font-size:15px}#dash2 .tr{display:flex;height:20px;background:#1b2a57;border-radius:6px;overflow:hidden}#dash2 .tr i{display:block}#dash2 .br b{font-size:18px}#dash2 .br small{color:#8fa3c7;font-size:13px}
+#dash2 .k7{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-top:14px}#dash2 .k7 .c2>b{font-size:30px}
+#dash2 .nat2{display:flex;gap:10px;margin-top:14px}#dash2 .nat2 div{flex:1;display:flex;justify-content:space-between;background:#13214a;border:1px solid #22356b;border-radius:12px;padding:10px 16px;color:#c5d3ee}#dash2 .nat2 b{color:#fff}
+#dash2 .ft2{text-align:center;color:#f59e0b;font-weight:800;font-size:13px;margin-top:16px}
+body.v-dark{background:#050b1c}body.v-dark #dash{display:none}body:not(.v-dark) #dash2{display:none}
+.bar button.t{background:#24345f;color:#cbd6ef}.bar button.t.on{background:#fff;color:#0f2447}
+@media print{.bar{display:none}body{background:#fff}#dash,#dash2{margin:0 auto;box-shadow:none;border:0;break-inside:avoid}html,body{height:auto;overflow:hidden}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{size:A4 landscape;margin:6mm}}
+</style></head><body>
+<div class="bar"><button class="t" data-v="dark">🌙 داكن</button><button class="t" data-v="classic">📋 كلاسيكي</button><span style="width:16px"></span><button onclick="fit();print()">🖨️ طباعة / حفظ PDF</button><button class="b" id="png">🖼️ حفظ صورة PNG</button></div>
+<div id="dash">
+<div class="hd"><img src="${new URL('icon-192.png', location.href).href}" alt="" onerror="this.style.display='none'"><h1>DRIVERS DASHBOARD | لوحة بيانات السائقين</h1><div class="dt">${dTxt}<small>${esc(scope)}</small></div></div>
+<div class="top">
+ <div class="req"><div><b>Total Operational Requirement</b><br><span>إجمالي احتياج التشغيل</span></div><div class="v">${rows.length}</div><div style="height:6px;border-radius:3px;background:linear-gradient(90deg,#f97316 ${rows.length ? Math.round((op / rows.length) * 100) : 0}%,rgba(255,255,255,.25) 0)"></div></div>
+ <div class="col">
+  ${box('g', 'Active Drivers (On Duty)', 'السائقون على رأس العمل', op + an + em + sk, '👥')}
+  ${box('bl', 'Available for Operation', 'المتاحون للتشغيل', op, '🚌')}
+  <div class="row r4 fill">${small('bl', 'OnTrips', 'على الرحلات', ROSTER_N ? trips : '—', '🚌')}${small('gy', 'Rest Day', 'راحة', ROSTER_N ? rest : '—', '😴')}${small('or', 'Standby', 'الاستعداد', sb, '⏱️')}${small('rd', 'Sick Leave', 'إجازة مرضية', sk, '🩺')}</div>
+ </div>
+ <div class="col">
+  ${box('gr', 'Drivers on Leave', 'السائقون في إجازات', an + em, '🌴')}
+  <div class="row r2">${small('gr', 'Annual Leave', 'إجازة سنوية', an, '📅')}${small('gr', 'Emergency Leave', 'إجازة اضطرارية', em, '🚨')}</div>
+  ${box('rd', 'Out of Service / Replacement Required', 'خارج الخدمة / مطلوب تعويضهم', nr + su + ab + te, '⚙️')}
+  <div class="row r4">${small('rd', 'Not Returned', 'لم يعد من الإجازة', nr, '↩️')}${small('rd', 'Suspended', 'موقوف عن العمل', su, '⏸️')}${small('rd', 'Absconding', 'هروب', ab, '🏃')}${small('rd', 'Termination', 'إنهاء خدمات', te, '📄')}</div>
+ </div>
+</div>
+<div class="sec"><span>👥 DRIVERS BY NATIONALITY &amp; STATUS</span><span>السائقون حسب الجنسية والحالة</span></div>
+<div class="tw"><table><thead><tr><th style="text-align:left">Nationality<span>الجنسية</span></th>${COLS.map(c => `<th>${c[1]}<span>${c[2]}</span></th>`).join('')}<th>Grand Total<span>الإجمالي</span></th></tr></thead>
+<tbody>${natRows}<tr class="tot"><td class="l">Grand Total | الإجمالي</td>${COLS.map(c => `<td>${cnt(c[0])}</td>`).join('')}<td>${rows.length}</td></tr></tbody></table></div>
+<div class="two">
+ <div><div class="sec"><span>🚌 Operational Drivers by Garage</span><span>السائقون العاملون في الكراجات</span></div><div class="tw"><table><thead><tr><th style="text-align:left">Depot | الكراج</th><th>Count | العدد</th></tr></thead><tbody>
+ ${opRows.map(x => `<tr><td class="l"><b>${x[0]}</b></td><td>${x[1]}</td></tr>`).join('')}<tr class="tot"><td class="l">Grand Total | الإجمالي</td><td>${opRows.reduce((a, x) => a + x[1], 0)}</td></tr></tbody></table></div></div>
+ <div><div class="sec o"><span>⏱️ Standby &amp; Rest by Garage</span><span>الاستعداد والراحة في الكراجات</span></div><div class="tw"><table><thead><tr><th style="text-align:left">Depot | الكراج</th><th>Standby | الاستعداد</th><th>Rest | راحة</th></tr></thead><tbody>
+ ${sbRows.map(x => `<tr><td class="l"><b>${x[0]}</b></td><td>${x[1]}</td><td>${ROSTER_N ? x[2] : '—'}</td></tr>`).join('')}<tr class="tot" style="--x:1"><td class="l">Grand Total | الإجمالي</td><td>${sbRows.reduce((a, x) => a + x[1], 0)}</td><td>${ROSTER_N ? sbRows.reduce((a, x) => a + x[2], 0) : '—'}</td></tr></tbody></table></div></div>
+</div>
+<div class="ft">NORTHWEST BUS | OPERATIONS MANAGEMENT · ${esc(new Date().toLocaleString('en-GB'))}</div>
+</div>
+${dark}
+<script>
+// صفحة وحدة: نصغّر اللوحة على مقاس A4 بالعرض قبل الطباعة
+function fit(){var el=document.getElementById(document.body.classList.contains('v-dark')?'dash2':'dash');el.style.zoom=1;var h=el.scrollHeight,w=el.scrollWidth;var z=Math.min(1060/w,700/h)*0.97;el.style.zoom=z;}
+function unfit(){['dash','dash2'].forEach(function(i){var e=document.getElementById(i);if(e)e.style.zoom=''});}
+window.addEventListener('beforeprint',fit);window.addEventListener('afterprint',unfit);
+function setV(v){document.body.classList.toggle('v-dark',v==='dark');document.querySelectorAll('.bar .t').forEach(function(b){b.classList.toggle('on',b.dataset.v===v)});try{localStorage.setItem('nwDashV',v)}catch(e){}}
+document.querySelectorAll('.bar .t').forEach(function(b){b.onclick=function(){setV(b.dataset.v)}});
+var v0='dark';try{v0=localStorage.getItem('nwDashV')||'dark'}catch(e){}setV(v0);
+document.getElementById('png').onclick=function(){var b=this;b.disabled=true;b.textContent='...';
+ function go(){(function(){var dk=document.body.classList.contains('v-dark');return html2canvas(document.getElementById(dk?'dash2':'dash'),{scale:2,useCORS:true,backgroundColor:dk?'#0b1530':'#ffffff'})})().then(function(c){var a=document.createElement('a');a.download='Drivers_Dashboard_${date}.png';a.href=c.toDataURL('image/png');a.click();b.disabled=false;b.textContent='🖼️ حفظ صورة PNG';});}
+ if(window.html2canvas)return go();var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';s.onload=go;s.onerror=function(){alert('تعذّر تحميل أداة الصور — استخدم الطباعة / PDF');b.disabled=false;};document.head.appendChild(s);};
+<\/script></body></html>`;
+  const w = w0 || window.open('', '_blank');
+  if (!w) { alert(LANG === 'en' ? 'Allow pop-ups to open the dashboard' : 'اسمح بالنوافذ المنبثقة لفتح الداش بورد'); return; }
+  w.document.open(); w.document.write(html); w.document.close();
+};
+
+/* ---------- الأحداث ---------- */
+document.addEventListener('click', e => {
+  const f = e.target.closest('[data-f]'); if (f) { LISTF = f.dataset.f; renderList(true); document.getElementById('list').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+  const rm = e.target.closest('[data-rm]'); if (rm) { dayMark(rm.dataset.rm, rm.dataset.v); return; }
+  const swf = e.target.closest('[data-swf]'); if (swf) { openSwapFrom(swf.dataset.swf); return; }
+  const sw = e.target.closest('[data-sw]'); if (sw) { openSwap(sw.dataset.sw); return; }
+  const us = e.target.closest('[data-unsw]'); if (us) { unswap(us.dataset.unsw); return; }
+  const cd = e.target.closest('[data-cd]'); if (cd) { cardDownload(cd.dataset.cd, cd); return; }
+  const ed = e.target.closest('[data-e]'); if (ed) { openEdit(ed.dataset.e); return; }
+  if (e.target.id === 'clrF') { e.preventDefault(); LISTF = ''; renderList(true); }
+  const pg = e.target.closest('[data-pg]'); if (pg && !pg.disabled) { PAGE = +pg.dataset.pg; renderList(); document.getElementById('list').scrollIntoView({ block: 'start' }); return; }
+});
+$('bAdd').onclick = () => openEdit('');
+/* ---------- كرت التشغيل من نافذة السائق ---------- */
+$('mCardDl').onclick = () => cardDownload(EDIT, $('mCardDl'));
+$('mCardUp').onclick = () => { alert(t_('cardUpHow')); $('cardUpFile').click(); };
+$('cardUpFile').onchange = async () => {
+  const f = $('cardUpFile').files[0], iq = EDIT; if (!f || !iq) return;
+  try {
+    if (f.size > 5 * 1024 * 1024) throw new Error(t_('cardBig'));
+    const b64 = await new Promise((ok, bad) => { const fr = new FileReader(); fr.onload = () => ok(String(fr.result).split(',')[1]); fr.onerror = bad; fr.readAsDataURL(f); });
+    $('mCardMsg').textContent = '⏳ ' + t_('saving');
+    const j = await NWAuth.call('cardUpload', { iqama: iq, mime: f.type, b64, exp: $('eCard').value });
+    if (j.error === 'AUTH') { NWAuth.relogin(); throw new Error(t_('eAuth')); }
+    if (!j.ok) throw new Error(j.error === 'FORBIDDEN' ? t_('eForb') : j.error === 'BAD_TYPE' ? t_('cardType') : t_('eErr') + j.error);
+    CARDS[iq] = 1; $('mCardDl').style.display = ''; $('mCardMsg').textContent = '✅ ' + t_('cardUpDone');
+    const r = D.find(x => x[C.IQ] === iq); if (r && $('eCard').value) r[C.CARD] = $('eCard').value;
+    render();
+  } catch (e) { $('mCardMsg').textContent = ''; alert(e.message); }
+  finally { $('cardUpFile').value = ''; }
+};
+
+/* ---------- تبديل سائق ---------- */
+/* بحث داخل قائمة الاختيار: يكتب جزء من الاسم أو الإقامة أو الرحلة وتطلع الاقتراحات */
+function picker(qId, sId, selId) {
+  const q = $(qId), box = $(sId), sel = $(selId); let hits = [], act = -1;
+  const hide = () => { box.classList.remove('on'); box.innerHTML = ''; hits = []; act = -1; };
+  const show = () => {
+    const v = q.value.trim().toLowerCase(); if (!v) { hide(); return; }
+    hits = [...sel.options].filter(o => o.value && (o.text.toLowerCase().includes(v) || o.value.includes(v))).slice(0, 20);
+    if (!hits.length) { box.innerHTML = `<div style="cursor:default;color:var(--muted)">${t_('noMatch')}</div>`; box.classList.add('on'); return; }
+    box.innerHTML = hits.map((o, i) => `<div data-pk="${i}">${esc(o.text)}<br><small>${esc(o.value)}</small></div>`).join(''); box.classList.add('on'); act = -1;
+  };
+  const pick = i => { const o = hits[i]; if (!o) return; sel.value = o.value; q.value = ''; hide(); sel.style.outline = '3px solid #16a34a'; setTimeout(() => sel.style.outline = '', 900); };
+  q.addEventListener('input', show); q.addEventListener('focus', show); q.addEventListener('blur', () => setTimeout(hide, 150));
+  q.addEventListener('keydown', e => {
+    if (!hits.length) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); act = (act + (e.key === 'ArrowDown' ? 1 : -1) + hits.length) % hits.length; [...box.children].forEach((x, i) => x.classList.toggle('act', i === act)); }
+    else if (e.key === 'Enter') { e.preventDefault(); pick(act < 0 ? 0 : act); }
+    else if (e.key === 'Escape') hide();
+  });
+  box.addEventListener('mousedown', e => { const x = e.target.closest('[data-pk]'); if (x) { e.preventDefault(); pick(+x.dataset.pk); } });
+}
+picker('swOrigQ', 'swOrigS', 'swOrig'); picker('swRepQ', 'swRepS', 'swRep');
+let SW = null;
+function openSwapFrom(iq) {           // من سائق الاستعداد/الراحة: يختار الرحلة اللي بيغطيها
+  const r = D.find(x => x[C.IQ] === iq); if (!r) return;
+  const here = sbDep(r);
+  SW = { rep: iq, date: $('fDate').value };
+  $('swSub').textContent = `${t_('swRep')}: ${r[C.NAME]} · 📍 ${depName(here)} · ${SW.date}`;
+  const on = D.filter(isOnTrip).filter(x => !SWIN[x[C.IQ]])
+    .sort((x, y) => (dep(y) === here) - (dep(x) === here) || String(ROSTER[x[C.IQ]]).localeCompare(String(ROSTER[y[C.IQ]])));
+  $('swOrig').innerHTML = `<option value="">— ${t_('swPickO')} —</option>` + on.map(x => `<option value="${esc(x[C.IQ])}">🚌 ${esc(ROSTER[x[C.IQ]])} · ${esc(x[C.NAME])} · ${esc(depName(dep(x)))}${dep(x) === here ? ' ✓' : ''}</option>`).join('');
+  $('swOrigW').style.display = ''; $('swRepW').style.display = 'none';
+  $('swNote').value = ''; $('swReason').value = ''; $('swOrigQ').value = ''; $('swOv').classList.add('on'); setTimeout(() => $('swOrigQ').focus(), 50);
+}
+function openSwap(iq) {
+  const r = D.find(x => x[C.IQ] === iq); if (!r) return;
+  const trip = ROSTER[iq], here = dep(r);
+  SW = { orig: iq, trip, date: $('fDate').value };
+  $('swOrigW').style.display = 'none'; $('swRepW').style.display = '';
+  $('swSub').textContent = `${r[C.NAME]} · 🚌 ${trip} · ${SW.date}`;
+  const opt = x => { const loc = sbDep(x), l = lastTrip(x); return `<option value="${esc(x[C.IQ])}">${esc(x[C.NAME])} · 📍 ${esc(depName(loc))}${loc === here ? ' ✓' : ''}${l ? ' · ' + esc(l.code) : ''}</option>`; };
+  const sort = a => a.sort((x, y) => (sbDep(y) === here) - (sbDep(x) === here) || String(x[C.NAME]).localeCompare(String(y[C.NAME])));
+  const sb = sort(D.filter(isStandby)), rs = sort(D.filter(isRest));
+  const ex = D.filter(x => isOnTrip(x) && x[C.IQ] !== iq && !SWIN[x[C.IQ]] && ROSTER[x[C.IQ]] !== trip)
+    .sort((x, y) => (dep(y) === here) - (dep(x) === here) || String(ROSTER[x[C.IQ]]).localeCompare(String(ROSTER[y[C.IQ]])));
+  const optX = x => `<option value="${esc(x[C.IQ])}">🔁 ${esc(ROSTER[x[C.IQ]])} · ${esc(x[C.NAME])} · ${esc(depName(dep(x)))}${dep(x) === here ? ' ✓' : ''}</option>`;
+  $('swRep').innerHTML = `<option value="">— ${t_('swPick')} —</option>` + (sb.length ? `<optgroup label="${t_('swG1')} (${sb.length})">${sb.map(opt).join('')}</optgroup>` : '') + (rs.length ? `<optgroup label="${t_('swG2')} (${rs.length})">${rs.map(opt).join('')}</optgroup>` : '') + (ex.length ? `<optgroup label="${t_('swG3')} (${ex.length})">${ex.map(optX).join('')}</optgroup>` : '');
+  $('swNote').value = ''; $('swReason').value = ''; $('swRepQ').value = ''; $('swOv').classList.add('on'); setTimeout(() => $('swRepQ').focus(), 50);
+}
+$('swCancel').onclick = () => { $('swOv').classList.remove('on'); SW = null; };
+$('swOv').addEventListener('click', e => { if (e.target.id === 'swOv') $('swOv').classList.remove('on'); });
+$('swSave').onclick = async () => {
+  if (SW.rep) { const o = $('swOrig').value; if (!o) return alert(t_('swPickO')); SW.orig = o; SW.trip = ROSTER[o]; }
+  const rep = SW.rep || $('swRep').value; if (!rep) return alert(t_('swPick'));
+  if (!$('swReason').value) { $('swReason').focus(); return alert(t_('swNeedR')); }
+  if ($('swNote').value.trim().length < 3) { $('swNote').focus(); return alert(t_('swNeedN')); }
+  const b = $('swSave'); b.disabled = true;
+  try {
+    const exchange = !!ROSTER[rep];
+    if (exchange) { const a = D.find(x => x[C.IQ] === SW.orig), bb = D.find(x => x[C.IQ] === rep);
+      if (!confirm(t_('xAsk')(a ? a[C.NAME] : SW.orig, SW.trip, bb ? bb[C.NAME] : rep, ROSTER[rep]))) return; }
+    const j = await NWAuth.call('driverSwap', { swap: { date: SW.date, trip: SW.trip, orig: SW.orig, rep, reason: $('swReason').value, note: $('swNote').value, exchange } });
+    if (j.error === 'AUTH') { NWAuth.relogin(); throw new Error(t_('eAuth')); }
+    if (!j.ok) throw new Error({ FORBIDDEN: t_('eForb'), REP_BUSY: t_('swBusy'), SAME_TRIP: t_('swSame2'), NEED_REASON: t_('swNeedN'), NOT_IN_ROSTER: t_('swNotIn') }[j.error] || t_('eErr') + j.error);
+    $('swOv').classList.remove('on'); SW = null; await loadRoster(); render(); alert(t_('swDone'));
+  } catch (e) { alert(e.message); } finally { b.disabled = false; }
+};
+async function dayMark(iq, mark) {
+  const r = D.find(x => x[C.IQ] === iq), date = $('fDate').value;
+  if (!confirm((mark ? t_('toRestAsk') : t_('toSbAsk'))(r ? r[C.NAME] : iq, date))) return;
+  try {
+    const j = await NWAuth.call('dayMark', { date, iqama: iq, mark });
+    if (j.error === 'AUTH') { NWAuth.relogin(); throw new Error(t_('eAuth')); }
+    if (!j.ok) throw new Error(j.error === 'FORBIDDEN' ? t_('eForb') : t_('eErr') + j.error);
+    if (mark) RESTM[iq] = { date, iqama: iq, mark }; else delete RESTM[iq];
+    render();
+  } catch (e) { alert(e.message); }
+}
+async function unswap(iq) {
+  const x = SWIN[iq]; if (!x || !confirm(t_('unswAsk'))) return;
+  try {
+    const pair = isX(iq) ? SWOUT[iq] : null;   // تبادل: يلغي الطرفين
+    const j = await NWAuth.call('swapCancel', { swap: pair ? { date: x.date, trip: x.trip, rep: x.rep, orig: x.orig, pairTrip: pair.trip } : { date: x.date, trip: x.trip, rep: x.rep } });
+    if (!j.ok) throw new Error(j.error === 'FORBIDDEN' ? t_('eForb') : t_('eErr') + j.error);
+    await loadRoster(); render();
+  } catch (e) { alert(e.message); }
+}
+$('bRefresh').onclick = load;
+$('fDepot').onchange = () => { PAGE = 1; render(); };
+$('fDate').onchange = async () => { await loadRoster(); render(); syncDepots(); };
+['fStatus', 'fNat'].forEach(id => $(id).addEventListener('input', () => renderList(true)));
+/* بحث بالاقتراحات (نفس طريقة باقي البرامج) */
+let SUG = [], SUGI = -1;
+function sugHide() { $('qSug').classList.remove('on'); $('qSug').innerHTML = ''; SUG = []; SUGI = -1; }
+function sugShow() {
+  const q = $('q').value.trim().toLowerCase(); if (!q) { sugHide(); return; }
+  SUG = filtered($('fDepot').value).filter(r => [r[C.NAME], r[C.IQ], r[C.EMP], r[C.MOB], ROSTER[r[C.IQ]] || ''].join(' ').toLowerCase().includes(q)).slice(0, 15);
+  if (!SUG.length) { sugHide(); return; }
+  $('qSug').innerHTML = SUG.map((r, i) => `<div data-sg="${i}"><b>${esc(r[C.NAME])}</b><small>${esc(r[C.IQ])} · ${esc(depName(r[C.DEP]))} · ${esc(stName(r[C.ST]))}${ROSTER[r[C.IQ]] ? ' · 🚌 ' + esc(ROSTER[r[C.IQ]]) : isRest(r) ? ' · 😴 ' + t_('rest') : isStandby(r) ? ' · ' + t_('standby') : ''}</small></div>`).join('');
+  $('qSug').classList.add('on'); SUGI = -1;
+}
+function sugPick(i) {
+  const r = SUG[i]; if (!r) return;
+  $('q').value = r[C.IQ]; sugHide(); LISTF = ''; $('fStatus').value = ''; $('fNat').value = ''; renderList(true);
+}
+$('q').addEventListener('input', () => { renderList(true); sugShow(); });
+$('q').addEventListener('focus', sugShow);
+$('q').addEventListener('blur', () => setTimeout(sugHide, 150));
+$('q').addEventListener('keydown', e => {
+  if (!SUG.length) return;
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); SUGI = (SUGI + (e.key === 'ArrowDown' ? 1 : -1) + SUG.length) % SUG.length;
+    [...$('qSug').children].forEach((x, i) => x.classList.toggle('act', i === SUGI)); }
+  else if (e.key === 'Enter') { e.preventDefault(); sugPick(SUGI < 0 ? 0 : SUGI); }
+  else if (e.key === 'Escape') sugHide();
+});
+$('qSug').addEventListener('mousedown', e => { const x = e.target.closest('[data-sg]'); if (x) { e.preventDefault(); sugPick(+x.dataset.sg); } });
+function applyLang() {
+  const h = document.documentElement; h.lang = LANG; h.dir = LANG === 'en' ? 'ltr' : 'rtl';
+  document.querySelectorAll('[data-i]').forEach(e => { const v = t_(e.dataset.i); if (typeof v === 'string') e.textContent = v; });
+  document.querySelectorAll('[data-ph]').forEach(e => e.placeholder = t_(e.dataset.ph));
+  document.title = t_('title') + ' · ' + (LANG === 'en' ? 'Operations Tools' : 'أدوات التشغيل');
+}
+window.addEventListener('storage', e => { if (e.key === 'hubLang') { LANG = e.newValue === 'en' ? 'en' : 'ar'; applyLang(); fillFilters(); render(); } });
+$('fDate').value = today();
+if (window.NWIcon) $('tIc').innerHTML = NWIcon('drivers', 26);
+applyLang(); fillFilters();
+if (window.NWAuth) load();
+</script>
+
+<script>
+/* ====================== تقرير عمل السائقين ====================== */
+(function(){
+  const KIND = { trip:['على رحلة','rp-trip'], rest:['راحة','rp-rest'], sb:['استعداد','rp-sb'], leave:['إجازة','rp-leave'], swap:['اعتذر / تم تبديله','rp-swap'], out:['خارج الخدمة','rp-out'], none:['لا يوجد روستر','rp-none'] };
+  const WD = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  const wd = k => WD[new Date(k + 'T12:00:00').getDay()];
+  const dmy = k => k ? k.slice(8, 10) + '/' + k.slice(5, 7) + '/' + k.slice(0, 4) : '';
+  let LAST_RES = null, RATES = null;
+  /* حافز المسار: لكل رحلة باتجاه واحد، وكل كابتن ياخذه كامل — الأسعار من allowance.json */
+  async function loadRates() { if (RATES) return RATES; try { RATES = await (await fetch('allowance.json?v=' + Date.now())).json(); } catch (e) { RATES = { rates:{} }; } return RATES; }
+  const routeKey = c => { const m = String(c || '').toUpperCase().replace(/\s+/g, '').match(/^NW\d+[A-Z]?/); return m ? m[0] : ''; };
+  const legsOf = code => String(code || '').split(' + ').map(x => x.split('+')[0].trim()).filter(Boolean);   // رحلات اليوم مفصولة بـ « + » — والرحلة المدموجة (NW13-O-1+NW19-O-1) تنحسب على أول خط فقط مثل ملف الموارد
+  const incOf = code => { let sum = 0; const miss = []; legsOf(code).forEach(c => { const k = routeKey(c), r = RATES && RATES.rates && RATES.rates[k]; if (r) sum += Number(r.amt) || 0; else miss.push(c); }); return { sum: Math.round(sum * 100) / 100, miss }; };
+  const sar = v => (Math.round((v || 0) * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const rpDrivers = () => D.filter(r => inDep(r[C.DEP], $('fDepot').value));
+  $('bRpt').onclick = () => {
+    const sel = $('fDate').value || ymd(new Date());
+    if (!$('rpFrom').value) { $('rpFrom').value = sel.slice(0, 8) + '01'; $('rpTo').value = sel; }
+    $('rpDl').innerHTML = rpDrivers().map(r => `<option value="${esc(r[C.NAME])} — ${esc(r[C.IQ])}">`).join('');
+    $('rpOut').innerHTML = ''; $('rpOv').classList.add('on');
+  };
+  $('rpX').onclick = () => $('rpOv').classList.remove('on');
+  $('rpOv').addEventListener('click', e => { if (e.target.id === 'rpOv') $('rpOv').classList.remove('on'); });
+
+  async function fetchRange(from, to) {
+    const days = {}, subs = [], marks = [];
+    let a = from;
+    while (a <= to) {                          // على دفعات 31 يوم
+      let b = addD(a, 30); if (b > to) b = to;
+      const j = await NWAuth.call('rosterRange', { from: a, to: b });
+      if (j && j.error === 'AUTH') { NWAuth.relogin && NWAuth.relogin(); throw new Error(t_('eAuth')); }
+      if (j && j.ok) { Object.assign(days, j.days || {}); (j.subs || []).forEach(x => subs.push(x)); (j.marks || []).forEach(x => marks.push(x)); }
+      a = addD(b, 1);
+    }
+    return { days, subs, marks };
+  }
+  // تصنيف يوم كل سائق
+  /* سجل الحالات: السائق اللي رجع من إجازة حالته الحين «على رأس العمل» — نرجع لسجل التغييرات عشان أيام الإجازة ما تطلع استعداد */
+  let HIST = {};
+  const stKey = v => { v = String(v || '').trim(); if (ST[v]) return v; return STATUSES.find(k => ST[k].ar === v || ST[k].en === v) || ''; };
+  const hDates = v => { const out = []; String(v || '').replace(/(\d{4})-(\d{1,2})-(\d{1,2})|(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/g, (m, y, mo, d, d2, mo2, y2) => { out.push(y ? y + '-' + mo.padStart(2, '0') + '-' + d.padStart(2, '0') : y2 + '-' + mo2.padStart(2, '0') + '-' + d2.padStart(2, '0')); }); return out; };
+  const hDate = v => hDates(v)[0] || '';
+  /* فترات الإجازة = تقاطع (فترة الحالة «إجازة» في السجل) مع (تواريخ الإجازة المسجلة من/إلى) — بدون تواريخ ما نحسب شي */
+  function histIntervals(h, r) {
+    const ev = (h || []).map(x => ({ ts: String(x[0] || ''), d: hDate(x[0]), f: String(x[3] || ''), o: x[4], n: x[5] })).filter(x => x.d).sort((a, z) => a.ts < z.ts ? -1 : a.ts > z.ts ? 1 : 0);
+    const isSt = x => (/status|الحالة|حالة/i.test(x.f) && (stKey(x.n) || stKey(x.o))) || (stKey(x.n) && stKey(x.o));
+    const stEv = ev.filter(isSt);
+    // تاريخ الإجازة المعتمد = آخر قيمة انحفظت قبل ما يرجع (القيم القديمة اللي تعدّلت ما تنحسب)
+    const dEv = ev.filter(x => !isSt(x) && /تاريخ|date|from|to|من|إلى|عودة|بداية/i.test(x.f)).map(x => { const d = hDates(x.n); return d.length >= 2 ? { ts: x.ts, rg: [d[0] < d[1] ? d[0] : d[1], d[0] < d[1] ? d[1] : d[0]] } : null; }).filter(Boolean);
+    const f0 = hDate(r[C.FROM]), t0 = hDate(r[C.TO]), cur0 = f0 && t0 ? [f0 < t0 ? f0 : t0, f0 < t0 ? t0 : f0] : null;
+    const rangeAt = ts => { const L = dEv.filter(x => !ts || x.ts <= ts).pop(); return L ? L.rg : cur0; };
+    const out = []; let cur = null;
+    if (stEv.length) { const o = stKey(stEv[0].o); if (o && o !== 'operation' && (ST[o] || {}).grp === 'leave') cur = { s: '0000-00-00', st: o }; }
+    const close = (e, ts) => { const rg = rangeAt(ts); if (rg) { const s2 = rg[0] > cur.s ? rg[0] : cur.s, e2 = rg[1] < e ? rg[1] : e; if (s2 <= e2) out.push({ s: s2, e: e2, st: cur.st }); } cur = null; };
+    stEv.forEach(x => { const n = stKey(x.n); if (cur) close(addD(x.d, -1), x.ts); if (n && n !== 'operation' && (ST[n] || {}).grp === 'leave') cur = { s: '0000-00-00', st: n }; });
+    if (cur) close('9999-12-31', '');
+    return out;
+  }
+  // تشغيل طلبات كثيرة بالتوازي (حد أقصى n في نفس الوقت) مع مهلة لكل طلب عشان طلب معلّق ما يوقف الكل
+  async function pool(items, n, fn, prog) { let i = 0, done = 0; const tmo = p2 => Promise.race([p2, new Promise(r => setTimeout(r, 20000))]);
+    await Promise.all(Array.from({ length: Math.min(n, items.length) }, async () => { while (i < items.length) { const it = items[i++]; try { await tmo(fn(it)); } catch (e) {} done++; if (prog) prog(done, items.length); } })); }
+  const SS = (k, v) => { try { if (v === undefined) return JSON.parse(sessionStorage.getItem(k) || 'null'); sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) { return null; } };
+  HIST = SS('nwHist2') || {}; const BUSC = SS('nwBus1') || {};
+  window.__clearHist = iq => { if (iq) delete HIST[String(iq)]; else HIST = {}; SS('nwHist2', HIST); };   // بعد تعديل سائق نعيد قراءة سجله
+  async function loadHist(list, from, to, data, prog) {
+    const pre = build(from, to, data, list), need = [];
+    pre.forEach(x => { let run = 0, mx = 0; x.rows.forEach(d => { if (d.kind === 'sb' || d.kind === 'rest' || d.kind === 'none') { run++; mx = Math.max(mx, run); } else run = 0; }); if (mx >= 3 && !(String(x.iq) in HIST)) need.push(x); });
+    if (prog) prog(0, need.length);
+    await pool(need, 12, x => NWAuth.call('driverHistory', { iqama: x.iq }).then(j => { HIST[String(x.iq)] = histIntervals((j && j.history) || [], x.r); }), prog);
+    SS('nwHist2', HIST);
+  }
+  function build(from, to, data, list) {
+    const SET = {}, SWO = {}, SWI = {}, MK = {};
+    Object.keys(data.days).forEach(k => { const rows = data.days[k] || []; if (!rows.length) return; const set = {}; rows.forEach(r => [r[1], r[2]].forEach(x => { if (!x) return; const q = String(x).trim(); set[q] = set[q] ? set[q] + ' + ' + String(r[0]) : String(r[0]); })); SET[k] = set; });
+    data.subs.forEach((x, n) => { x.__n = n; (SWO[x.date] = SWO[x.date] || {})[String(x.orig)] = x; (SWI[x.date] = SWI[x.date] || {})[String(x.rep)] = x; });
+    // بديل ثم اعتذر (أو انتقلت رحلته لغيره) = ما نفّذ — الأحدث هو اللي يحكم
+    const subIn = (k, iq) => { const i = SWI[k] && SWI[k][iq], o = SWO[k] && SWO[k][iq]; if (i && o) { const later = (o.at && i.at && o.at !== i.at) ? String(o.at) > String(i.at) : o.__n > i.__n; return later ? { o } : { i }; } return { i, o }; };
+    data.marks.forEach(x => { (MK[x.date] = MK[x.date] || {})[String(x.iqama)] = x.mark; });
+    const allDays = []; for (let k = from; k <= to; k = addD(k, 1)) allDays.push(k);
+    const sched = (iq, k) => { if (!SET[k]) return null; const { i, o } = subIn(k, iq); if (i) return true; if (o) return false; return !!SET[k][iq]; };
+    return list.map(r => {
+      const iq = String(r[C.IQ]), st = ST[r[C.ST]] || {}, rows = [];
+      const HI = HIST[iq] || [], hOn = k => HI.find(v => k >= v.s && k <= v.e);
+      const leaveOn = k => st.grp === 'leave' && r[C.FROM] && k >= String(r[C.FROM]).slice(0, 10) && (!r[C.TO] || k <= String(r[C.TO]).slice(0, 10));
+      allDays.forEach(k => {
+        const x = { date: k, kind: 'none', trip: '', note: '' };
+        if (SET[k]) {
+          const { i, o } = subIn(k, iq);
+          if (i) { x.kind = 'trip'; x.trip = String(i.trip || ''); x.note = 'بديل' + (i.reason ? ' — ' + i.reason : ''); }
+          else if (o) { x.kind = 'swap'; x.trip = String(o.trip || SET[k][iq] || ''); x.reason = String(o.reason || ''); x.note = (o.reason || '') + (o.note ? ' — ' + o.note : '');
+            let n = 1; for (let d = 1; d <= 30; d++) { if (sched(iq, addD(k, -d)) !== false) break; n++; } for (let d = 1; d <= 30; d++) { if (sched(iq, addD(k, d)) !== false) break; n++; }
+            x.alt = n <= 2 ? 'R' : 'SB'; }
+          else if (SET[k][iq]) { x.kind = 'trip'; x.trip = SET[k][iq]; }
+          else if (MK[k] && MK[k][iq] === 'rest') { x.kind = 'rest'; x.note = 'راحة يدوية'; }
+          else if (leaveOn(k)) { x.kind = 'leave'; x.note = stName(r[C.ST]); x.st = r[C.ST]; }
+          else if (hOn(k)) { const v = hOn(k), g = (ST[v.st] || {}).grp; x.kind = g === 'leave' ? 'leave' : 'out'; x.note = stName(v.st) + ' (من سجل التغييرات)'; x.st = v.st; }
+          else if (st.grp === 'out') { x.kind = 'out'; x.note = stName(r[C.ST]); }
+          else if (r[C.SB] === 'نعم') { x.kind = 'sb'; x.note = 'استعداد يدوي'; }
+          else {                                // يومين متتاليين أو أقل بدون جدولة = راحة، أكثر = استعداد
+            let n = 1;
+            for (let d = 1; d <= 30; d++) { const s2 = sched(iq, addD(k, -d)); if (s2 !== false) break; n++; }
+            for (let d = 1; d <= 30; d++) { const s2 = sched(iq, addD(k, d)); if (s2 !== false) break; n++; }
+            x.kind = n <= 2 ? 'rest' : 'sb';
+          }
+        } else if (leaveOn(k)) { x.kind = 'leave'; x.note = stName(r[C.ST]); x.st = r[C.ST]; }
+        else if (hOn(k) && (ST[hOn(k).st] || {}).grp === 'leave') { x.kind = 'leave'; x.note = stName(hOn(k).st) + ' (من سجل التغييرات)'; x.st = hOn(k).st; }
+        rows.push(x);
+      });
+      rows.forEach(x => { if (x.kind === 'trip') { const v = incOf(x.trip); x.inc = v.sum; x.miss = v.miss; } else x.inc = 0; });
+      const c = {}; Object.keys(KIND).forEach(q => c[q] = rows.filter(x => x.kind === q).length);
+      c.inc = Math.round(rows.reduce((s2, x) => s2 + (x.inc || 0), 0) * 100) / 100; c.legs = rows.reduce((s2, x) => s2 + (x.kind === 'trip' ? legsOf(x.trip).length : 0), 0);
+      c.trips = new Set(rows.filter(x => x.kind === 'trip').map(x => x.date + x.trip)).size;
+      c.sub = rows.filter(x => x.kind === 'trip' && x.note.indexOf('بديل') === 0).length;
+      return { r, iq, rows, c };
+    });
+  }
+  const badge = k => `<span class="rp-b ${KIND[k][1]}">${KIND[k][0]}</span>`;
+  function showAll(res) {
+    const tot = q => res.reduce((s2, x) => s2 + x.c[q], 0);
+    $('rpOut').innerHTML = `<div class="rp-acts"><b>${res.length} سائق · من ${dmy(LAST_RES.from)} إلى ${dmy(LAST_RES.to)} · ${esc(LAST_RES.scope)}</b><span style="display:flex;gap:6px"><button class="btn light" id="rpPrint">🖨️ طباعة / PDF</button><button class="btn light" id="rpXls">⬇️ Excel</button></span></div>
+     <div class="rp-k"><div><b>${sar(tot('inc'))}</b><span>إجمالي الحوافز (ريال)</span></div><div><b>${tot('legs')}</b><span>رحلة منفّذة</span></div><div><b>${tot('trip')}</b><span>يوم على رحلة</span></div><div><b>${tot('rest')}</b><span>يوم راحة</span></div><div><b>${tot('sb')}</b><span>يوم استعداد</span></div><div><b>${tot('leave')}</b><span>يوم إجازة</span></div><div><b>${tot('swap')}</b><span>اعتذار / تبديل</span></div></div>
+     <div class="rp-w"><table class="rp-t"><thead><tr><th>#</th><th>السائق</th><th>رقم الإقامة</th><th>الكراج</th><th>الحالة الحالية</th><th>على رحلة</th><th>الرحلات</th><th>الحافز (ريال)</th><th>منها بديل</th><th>راحة</th><th>استعداد</th><th>إجازة</th><th>اعتذر / تبديل</th><th>خارج الخدمة</th><th>بدون روستر</th></tr></thead><tbody>
+     ${res.map((x, i) => `<tr class="cl" data-iq="${esc(x.iq)}"><td>${i + 1}</td><td><b>${esc(x.r[C.NAME])}</b></td><td>${esc(x.iq)}</td><td>${esc(depName(x.r[C.DEP]))}</td><td>${esc(stName(x.r[C.ST]))}</td><td><b>${x.c.trip}</b></td><td>${x.c.legs}</td><td><b>${sar(x.c.inc)}</b></td><td>${x.c.sub || ''}</td><td>${x.c.rest}</td><td>${x.c.sb}</td><td>${x.c.leave}</td><td>${x.c.swap || ''}</td><td>${x.c.out || ''}</td><td>${x.c.none || ''}</td></tr>`).join('')}</tbody></table></div>
+     <div class="sub" style="margin-top:6px">اضغط على أي سائق لعرض تفاصيل عمله يوم بيوم. الحوافز حسب جدول «${esc((RATES && RATES.title) || '')}» — لكل رحلة باتجاه واحد، وكل كابتن ياخذ الحافز كامل.</div>${missNote(res)}`;
+    $('rpOut').querySelectorAll('[data-iq]').forEach(tr => tr.onclick = () => showOne(res.find(x => x.iq === tr.dataset.iq), true));
+    $('rpPrint').onclick = () => printIt(allHtml(res)); $('rpXls').onclick = () => xls(res, null);
+  }
+  function missNote(res) { const m = {}; res.forEach(x => x.rows.forEach(d => (d.miss || []).forEach(c => m[routeKey(c) || c] = 1))); const k = Object.keys(m); return k.length ? `<div class="msg err" style="margin-top:6px">⚠️ رحلات ما لها سعر حافز في الجدول (انحسبت صفر): ${k.map(esc).join('، ')}</div>` : ''; }
+  function oneTable(x) {
+    return `<table class="rp-t"><thead><tr><th>التاريخ</th><th>اليوم</th><th>الحالة</th><th>الرحلة</th><th>الحافز (ريال)</th><th>ملاحظة</th></tr></thead><tbody>${x.rows.map(d => `<tr><td>${dmy(d.date)}</td><td>${wd(d.date)}</td><td>${badge(d.kind)}</td><td dir="ltr" style="text-align:start">${esc(d.trip)}</td><td>${d.inc ? sar(d.inc) : ''}${d.miss && d.miss.length ? ' ⚠️' : ''}</td><td>${esc(d.note)}</td></tr>`).join('')}<tr><td colspan="4"><b>الإجمالي</b></td><td><b>${sar(x.c.inc)}</b></td><td></td></tr></tbody></table>`;
+  }
+  function kpis(x) { return `<div class="rp-k"><div><b>${sar(x.c.inc)}</b><span>الحافز (ريال)</span></div><div><b>${x.c.legs}</b><span>رحلة منفّذة</span></div><div><b>${x.c.trip}</b><span>يوم على رحلة</span></div><div><b>${x.c.rest}</b><span>راحة</span></div><div><b>${x.c.sb}</b><span>استعداد</span></div><div><b>${x.c.leave}</b><span>إجازة</span></div><div><b>${x.c.swap}</b><span>اعتذر / تبديل</span></div><div><b>${x.c.sub}</b><span>عمل كبديل</span></div></div>`; }
+  function showOne(x, back) {
+    $('rpOut').innerHTML = `<div class="rp-acts"><div>${back ? '<button class="btn light" id="rpBack">→ رجوع لكل السائقين</button> ' : ''}<b>${esc(x.r[C.NAME])}</b> · ${esc(x.iq)} · ${esc(depName(x.r[C.DEP]))} · ${esc(stName(x.r[C.ST]))} · من ${dmy(LAST_RES.from)} إلى ${dmy(LAST_RES.to)}</div>
+      <span style="display:flex;gap:6px"><button class="btn light" id="rpPrint">🖨️ طباعة / PDF</button><button class="btn light" id="rpXls">⬇️ Excel</button></span></div>${kpis(x)}<div class="rp-w">${oneTable(x)}</div>${missNote([x])}`;
+    if (back) $('rpBack').onclick = () => showAll(LAST_RES.res);
+    $('rpPrint').onclick = () => printIt(oneHtml(x)); $('rpXls').onclick = () => xls([x], x);
+  }
+  const head = t => `<div style="display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #1F3864;padding-bottom:8px;margin-bottom:10px"><div><h1 style="margin:0;font-size:20px;color:#1F3864">${t}</h1><div style="font-size:12px;color:#555">Northwest Bus · من ${dmy(LAST_RES.from)} إلى ${dmy(LAST_RES.to)} · ${esc(LAST_RES.scope)}</div></div><div style="font-size:11px;color:#777">طُبع: ${new Date().toLocaleString('en-GB')}${window.NWAuth && NWAuth.name ? ' · ' + esc(NWAuth.name) : ''}</div></div>`;
+  function oneHtml(x) { return head('تقرير عمل السائق — ' + esc(x.r[C.NAME])) + `<p style="margin:0 0 6px">رقم الإقامة: <b>${esc(x.iq)}</b> · الكراج: <b>${esc(depName(x.r[C.DEP]))}</b> · الحالة الحالية: <b>${esc(stName(x.r[C.ST]))}</b></p>` + kpis(x) + oneTable(x); }
+  function allHtml(res) { const t = $('rpOut').querySelector('.rp-t').outerHTML; return head('تقرير عمل السائقين') + $('rpOut').querySelector('.rp-k').outerHTML + t; }
+  function printIt(body) {
+    const w = window.open('', '_blank'); if (!w) return alert('اسمح بالنوافذ المنبثقة للطباعة');
+    w.document.write(`<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>تقرير عمل السائقين</title><style>body{font-family:Tahoma,Arial,sans-serif;margin:18px;color:#111}
+      .rp-k{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin:8px 0}.rp-k div{border:1px solid #ccc;border-radius:8px;padding:6px;text-align:center}.rp-k b{display:block;font-size:18px}.rp-k span{font-size:11px;color:#555}
+      table{width:100%;border-collapse:collapse;font-size:11.5px}th,td{border:1px solid #bbb;padding:4px 6px;text-align:right}th{background:#1F3864;color:#fff}tr:nth-child(even) td{background:#f5f7fb}
+      .rp-b{font-weight:700}.rp-trip{color:#15803d}.rp-rest{color:#475569}.rp-sb{color:#6d28d9}.rp-leave{color:#1d4ed8}.rp-swap{color:#c2410c}.rp-out{color:#b91c1c}.rp-none{color:#94a3b8}
+      @page{size:A4 landscape;margin:10mm}</style></head><body>${body}<script>setTimeout(()=>print(),300)<\/script></body></html>`);
+    w.document.close();
+  }
+  async function xls(res, one) {
+    await loadXlsx(); const wb = XLSX.utils.book_new();
+    const sum = [['السائق', 'رقم الإقامة', 'الكراج', 'الحالة الحالية', 'على رحلة', 'الرحلات', 'الحافز (ريال)', 'منها بديل', 'راحة', 'استعداد', 'إجازة', 'اعتذر / تبديل', 'خارج الخدمة', 'بدون روستر']]
+      .concat(res.map(x => [x.r[C.NAME], x.iq, depName(x.r[C.DEP]), stName(x.r[C.ST]), x.c.trip, x.c.legs, x.c.inc, x.c.sub, x.c.rest, x.c.sb, x.c.leave, x.c.swap, x.c.out, x.c.none]));
+    const ws1 = XLSX.utils.aoa_to_sheet(sum); ws1['!cols'] = sum[0].map((_, i) => ({ wch: i ? 14 : 32 })); XLSX.utils.book_append_sheet(wb, ws1, 'الملخص');
+    const det = [['السائق', 'رقم الإقامة', 'التاريخ', 'اليوم', 'الحالة', 'الرحلة', 'الحافز (ريال)', 'ملاحظة']];
+    res.forEach(x => x.rows.forEach(d => det.push([x.r[C.NAME], x.iq, d.date, wd(d.date), KIND[d.kind][0], d.trip, d.inc || 0, d.note])));
+    const ws2 = XLSX.utils.aoa_to_sheet(det); ws2['!cols'] = [{ wch: 32 }, { wch: 13 }, { wch: 12 }, { wch: 10 }, { wch: 16 }, { wch: 26 }, { wch: 12 }, { wch: 30 }]; XLSX.utils.book_append_sheet(wb, ws2, 'التفاصيل اليومية');
+    wb.Workbook = { Views: [{ RTL: true }] };
+    XLSX.writeFile(wb, (one ? 'تقرير عمل ' + one.r[C.NAME] : 'تقرير عمل السائقين') + ' ' + LAST_RES.from + ' — ' + LAST_RES.to + '.xlsx');
+  }
+  /* ===== ملف الموارد الشهري (Daily driver) — من 21 الشهر السابق إلى 20، بنفس تنسيق ملف الموارد (hr_template.xlsx) ===== */
+  const hrPeriod = () => { const t = new Date(), y = t.getFullYear(), m = t.getMonth(), end = t.getDate() > 20 ? new Date(y, m, 20) : new Date(y, m - 1, 20), st = new Date(end.getFullYear(), end.getMonth() - 1, 21); return [ymd(st), ymd(end)]; };
+  const hrCode = (d, r) => { switch (d.kind) { case 'trip': return 1; case 'rest': return 'R'; case 'sb': return 'SB'; case 'leave': return (d.st || r[C.ST]) === 'Sick Leave' ? 'SL' : 'V'; case 'swap': return /غياب|رفض/.test(d.reason || '') ? 'A' : /مريض|مرض/.test(d.reason || '') ? 'SL' : (d.alt || 'R'); case 'out': { const q = d.st || r[C.ST]; return q === 'Suspended' ? 'SUS' : q === 'Termination of services' ? '' : 'A'; } default: return ''; } };
+  const HR_CODES = ['NW01','NW02','NW03','NW04','NW05','NW06','NW07','NW08','NW10','NW11','NW12','NW13','NW14','NW15','NW15B','NW16B','NW16','NW17','NW18','NW18B','NW19','NW20','NW21','NW22','NW23','NW26','NW27','NW28','NW29','NW30','NW31','NW32','NW33','NW17B'];
+  const colL = n => { let s2 = ''; n++; while (n) { const m = (n - 1) % 26; s2 = String.fromCharCode(65 + m) + s2; n = Math.floor((n - 1) / 26); } return s2; };   // 0 → A
+  const colN = l => l.split('').reduce((a, ch) => a * 26 + ch.charCodeAt(0) - 64, 0) - 1;
+  const serial = k => { const [y, m, d] = k.split('-').map(Number); return (Date.UTC(y, m - 1, d) - Date.UTC(1899, 11, 30)) / 864e5; };
+  const xe = v => String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const numOr = v => { const s2 = String(v == null ? '' : v).trim(); return /^\d{1,15}$/.test(s2) ? Number(s2) : s2; };
+  function cx(ref, s, v) {                       // خلية XML بنفس الستايل
+    const a = `<c r="${ref}"${s ? ` s="${s}"` : ''}`;
+    if (v == null || v === '') return a + '/>';
+    if (typeof v === 'object' && v.f != null) return `${a}><f>${v.raw ? v.f : xe(v.f)}</f></c>`;
+    if (typeof v === 'number') return `${a}><v>${v}</v></c>`;
+    return `${a} t="inlineStr"><is><t xml:space="preserve">${xe(v)}</t></is></c>`;
+  }
+  function setCell(xml, ref, v) {
+    const re = new RegExp(`<c r="${ref}"([^>]*?)(?:/>|>[\\s\\S]*?</c>)`);
+    return xml.replace(re, (m0, at) => cx(ref, (at.match(/s="(\d+)"/) || [])[1], v));
+  }
+  function fillSheet(xml, start, data) {          // data: [{A:..., B:...}]
+    const proto = xml.match(/<!--PROTO([\s\S]*?)PROTO-->/)[1], open = proto.match(/^<row [^>]*>/)[0];
+    const cells = [...proto.matchAll(/<c r="([A-Z]+)\{R\}"([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g)].map(x => ({ col: x[1], s: (x[2].match(/s="(\d+)"/) || [])[1], f: ((x[3] || '').match(/<f[^>]*>([\s\S]*?)<\/f>/) || [])[1] }));
+    const last = Math.max(start, start + data.length - 1);
+    const rows = data.map((d, i) => { const R = start + i, cols = new Set(cells.map(c => c.col)), out = [];
+      const all = cells.map(c => c.col).concat(Object.keys(d).filter(k => !cols.has(k))).sort((a, z) => colN(a) - colN(z));
+      all.forEach(col => { const c = cells.find(x => x.col === col) || {}; let v = d[col];
+        if (v === undefined && c.f) v = { f: c.f.replace(/\{R\}/g, R), raw: true };
+        if (v && v.f && !v.raw) v = { f: v.f.replace(/\{R\}/g, R).replace(/\{L\}/g, last) };
+        out.push(cx(col + R, c.s, v)); });
+      return open.replace('{R}', R) + out.join('') + '</row>'; }).join('');
+    // مدى الصيغ في صفوف العناوين (SUBTOTAL ...) حتى آخر صف — قبل إضافة صفوف البيانات
+    const at = xml.indexOf('<!--PROTO'), headPart = xml.slice(0, at).replace(/(<f[^>]*>)([^<]*)<\/f>/g, (m0, o, f) => o + f.replace(new RegExp(`([A-Z]{1,3})${start}:([A-Z]{1,3})(\\d+)`, 'g'), (m1, a, b) => `${a}${start}:${b}${last}`) + '</f>');
+    return (headPart + xml.slice(at)).replace(/<!--PROTO[\s\S]*?PROTO-->/, rows).replace(/\{L\}/g, last);
+  }
+  const loadZip = () => window.JSZip ? Promise.resolve() : new Promise((ok, bad) => { const s2 = document.createElement('script'); s2.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js'; s2.onload = ok; s2.onerror = () => bad(new Error('تعذر تحميل مكتبة Excel — تأكد من الإنترنت')); document.head.appendChild(s2); });
+  /* اختيار الشهر: كل شهر = من 21 الشهر السابق إلى 20 */
+  (function () { const sel = $('rpMon'); if (!sel) return; const MN = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+    const [, e0] = hrPeriod(), E = new Date(e0 + 'T12:00:00'); let h = '<option value="">فترة مخصصة</option>';
+    for (let i = -1; i < 12; i++) { const e = new Date(E.getFullYear(), E.getMonth() - i, 20), st = new Date(e.getFullYear(), e.getMonth() - 1, 21);
+      h += `<option value="${ymd(st)}|${ymd(e)}">${MN[e.getMonth()]} ${e.getFullYear()}</option>`; }
+    sel.innerHTML = h;
+    const setM = () => { const v = sel.value; if (!v) return; const [f, t] = v.split('|'); $('rpFrom').value = f; $('rpTo').value = t; };
+    sel.onchange = setM;
+    const sync = () => { const v = $('rpFrom').value + '|' + $('rpTo').value; sel.value = [...sel.options].some(o => o.value === v) ? v : ''; };
+    $('rpFrom').addEventListener('change', sync); $('rpTo').addEventListener('change', sync);
+    const def = [...sel.options].find(o => o.value === hrPeriod().join('|')); if (def) { sel.value = def.value; setM(); }
+    window.__rpMonSync = sync;
+  })();
+  $('rpHr').onclick = () => hrExport('amt');
+  $('rpKm').onclick = () => hrExport('km');
+  const hrExport = async (mode) => {
+    const KM = mode === 'km', TITLE = KM ? 'ملف الكيلومترات' : 'ملف التحضير الشهري';
+    let from = $('rpFrom').value, to = $('rpTo').value;
+    // الفترة دايماً من 21 إلى 20 الشهر اللي بعده — نصححها تلقائياً بدل رسالة خطأ
+    if (!from || from.slice(8) !== '21') [from, to] = hrPeriod();
+    else { const f = new Date(from + 'T12:00:00'); to = ymd(new Date(f.getFullYear(), f.getMonth() + 1, 20)); }
+    $('rpFrom').value = from; $('rpTo').value = to; if (window.__rpMonSync) window.__rpMonSync();
+    const list = D.filter(r => inDep(r[C.DEP], $('fDepot').value));
+    const b = $(KM ? 'rpKm' : 'rpHr'); b.disabled = true; $('rpOut').innerHTML = `<div class="msg">⏳ جاري تجهيز ${TITLE} من ${dmy(from)} إلى ${dmy(to)}...</div>`;
+    try {
+      const [data, , , tplBuf] = await Promise.all([fetchRange(addD(from, -31), addD(to, 7)), loadRates(), loadZip(), fetch('hr_template.xlsx?v=3').then(r => { if (!r.ok) throw new Error('ما لقيت قالب ملف التحضير'); return r.arrayBuffer(); })]);
+      if (!Object.keys(data.days).some(k => k >= from && k <= to && (data.days[k] || []).length)) { $('rpOut').innerHTML = '<div class="msg err">لا يوجد روستر مرفوع في هذي الفترة</div>'; return; }
+      const dts = Object.keys(data.days).filter(k => k >= from && k <= to && (data.days[k] || []).length).sort();
+      const PG = { h: [0, 0], b: [0, 0] }, show = () => { $('rpOut').innerHTML = `<div class="msg">⏳ جاري التجهيز... سجل الإجازات ${PG.h[0]}/${PG.h[1]} · أرقام الحافلات ${PG.b[0]}/${PG.b[1]}</div>`; };
+      const BUS = {}, needB = dts.filter(k => { if (BUSC[k] && k < ymd(new Date())) { BUS[k] = BUSC[k]; return false; } return true; });
+      const [sch] = await Promise.all([
+        NWAuth.call('scheduleGet', {}).catch(() => null),
+        loadHist(list, from, to, data, (i, n) => { PG.h = [i, n]; show(); }),
+        pool(needB, 10, k => NWAuth.call('routeDay', { date: k }).then(j => { BUS[k] = BUSC[k] = (j && j.ok && j.buses) || {}; }), (i, n) => { PG.b = [i, n]; show(); })]);
+      SS('nwBus1', BUSC);
+      const res = build(from, to, data, list).sort((a, z) => String(a.r[C.NAME]).localeCompare(z.r[C.NAME]));
+      const days = []; for (let k = from; k <= to; k = addD(k, 1)) days.push(k);
+      const stTxt = r => r[C.ST] === 'operation' ? '' : stName(r[C.ST]);
+      const zip = await JSZip.loadAsync(tplBuf), P = 'xl/worksheets/';
+      // 1) List
+      let x1 = await zip.file(P + 'sheet1.xml').async('string');
+      x1 = fillSheet(x1, 2, list.slice().sort((a, z) => String(a[C.NAME]).localeCompare(z[C.NAME])).map((r, i) => ({ A: i + 1, B: numOr(r[C.EMP]), C: numOr(r[C.IQ]), D: r[C.NAME], E: r[C.NAT] || '', G: (ST[r[C.ST]] || {}).grp === 'out' ? 'OUT' : 'IN', H: [stTxt(r), r[C.NOTE] || ''].filter(Boolean).join(' — ') })));
+      zip.file(P + 'sheet1.xml', x1);
+      // 2) trip details
+      let x2 = await zip.file(P + 'sheet2.xml').async('string');
+      // جدول الرحلات (المحطات والأوقات وواجب الحافلة) + أرقام الحافلات من صفحة جدول الرحلة
+      const nk = v => String(v || '').toUpperCase().replace(/\s+/g, ''), mins = v => { const m = String(v || '').match(/(\d{1,2}):(\d{2})/); return m ? +m[1] * 60 + +m[2] : null; };
+      const sStart = v => { const m = String(v || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m ? m[3] + '-' + m[2].padStart(2, '0') + '-' + m[1].padStart(2, '0') : ''; };
+      const idx = L => { const M = {}, by = {}; (L || []).forEach(t => (by[t.duty] = by[t.duty] || []).push(t));
+        Object.keys(by).forEach(du => { const T = by[du], d0 = T.find(t => !/no dispatch/i.test(t.disp || '')) || T[0], st = mins(d0.t0) || 0;
+          T.slice().sort((a, z) => ((mins(a.t0) - st + 1440) % 1440) - ((mins(z.t0) - st + 1440) % 1440)).forEach((t, i) => { M[nk(t.trip)] = Object.assign({}, t, { dd: du + '-' + (i + 1) }); }); }); return M; };
+      const CURI = idx(sch && sch.ok && sch.trips), PREVI = idx(sch && sch.ok && sch.prev && sch.prev.trips), cs = sStart(sch && sch.meta && sch.meta.valid);
+      const tday = v => { const m = mins(v); return m == null ? (v || '') : m / 1440; };
+      // ورقة التفاصيل = مصدر واحد للرحلات: كل رحلة (leg) في سطر، بعد تطبيق التبديلات (البديل يحل محل الأصلي في نفس الواجب)
+      const det = [], SEATS = {}, DUPX = [], MERGEX = {};   // MERGEX: الرحلة المدموجة تنحسب رحلة وحدة في Total Trips (والحافز للخطين)   // SEATS[iq] = [كود الرحلة...] — منها تنحسب ورقة Trips عشان الإجماليات تتطابق
+      const subsBy = {}; (data.subs || []).forEach((x, n) => { (subsBy[x.date] = subsBy[x.date] || []).push(Object.assign({ __n: n }, x)); });
+      dts.forEach(k => { const SI = cs && k < cs && Object.keys(PREVI).length ? PREVI : CURI, look = c => SI[nk(c)] || CURI[nk(c)] || null;
+        // الرحلة المدموجة (NW13-O-1+NW19-O-1) = سطر واحد في التفاصيل مثل الملف اليدوي، لكنها رحلتين في ورقة Trips (كل خط له حافز)
+        const legs = [];
+        (data.days[k] || []).forEach(r => { const parts = String(r[0]).split('+').map(c => c.trim()).filter(Boolean); if (parts.length) legs.push({ code: parts.join('+'), parts, seat: [String(r[1] || '').trim(), String(r[2] || '').trim()] }); });
+        (subsBy[k] || []).sort((x, y) => (x.at && y.at && x.at !== y.at) ? (String(x.at) < String(y.at) ? -1 : 1) : x.__n - y.__n).forEach(sb => {
+          const st = look(sb.trip), du = st && st.duty, orig = String(sb.orig || '').trim(), rep = String(sb.rep || '').trim();
+          legs.forEach(L => { if (!L.parts.some(c => nk(c) === nk(sb.trip) || (du && (look(c) || {}).duty === du))) return; L.seat = L.seat.map(q => q === orig ? rep : q); }); });
+        const seenL = {}; legs.splice(0, legs.length, ...legs.filter(L => { const key = nk(L.code) + '|' + L.seat.join('|'), ck = nk(L.code);
+          if (seenL[key]) { DUPX.push(dmy(k) + ' ' + L.code + ' (مكرر بنفس الكباتن — انحسب مرة)'); return false; }
+          if (seenL['c|' + ck]) DUPX.push(dmy(k) + ' ' + L.code + ' (مكرر بكباتن مختلفين — راجع الروستر)');
+          seenL[key] = seenL['c|' + ck] = 1; return true; }));
+        legs.forEach(L => { const [a, z] = L.seat, t = look(L.parts[0]), tl = look(L.parts[L.parts.length - 1]) || t;
+          [a, z].forEach(q => { if (q) (SEATS[q] = SEATS[q] || []).push(L.parts[0]); });   // المدموجة = رحلة وحدة على أول خط (مثل الملف اليدوي)
+          const route = L.parts.map(c => ((look(c) || {}).route) || routeKey(c)).filter((v, i, A) => v && A.indexOf(v) === i).join('+');
+          const o = { B: serial(k), C: route, D: L.code, N: a ? numOr(a) : '', P: z ? numOr(z) : '', ...(z ? {} : { Q: '' }), ...(a ? {} : { O: '' }) };
+          if (t) Object.assign(o, { E: t.duty || '', F: t.dd || '', G: t.disp || '', H: /no dispatch/i.test(t.disp || '') ? '<--Check info' : tday(t.dt), I: t.fr || '', J: tday(t.t0), K: (tl && tl.to) || '', L: tday(tl && tl.t1), M: numOr([].concat((BUS[k] || {})[t.duty] || '')[0] || '') });
+          det.push(o); }); });
+      const inList = new Set(D.map(r => String(r[C.IQ]).trim())), notIn = Object.keys(SEATS).filter(q => !inList.has(q));
+      x2 = setCell(x2, 'F1', `Schedule valid for period: ${dmy(from)} (00.01h) to ${dmy(to)} (23.59h)`);
+      x2 = fillSheet(x2, 8, det); zip.file(P + 'sheet2.xml', x2);
+      // 3) Attendance
+      let x3 = await zip.file(P + 'sheet3.xml').async('string');
+      for (let j = 0; j < 31; j++) x3 = setCell(x3, colL(4 + j) + '6', days[j] ? serial(days[j]) : '');
+      x3 = setCell(x3, 'H3', { f: colL(4 + days.length - 1) + '6' });
+      x3 = fillSheet(x3, 7, res.map((x, i) => { const o = { A: i + 1, B: numOr(x.r[C.EMP]), C: numOr(x.iq), D: x.r[C.NAME], AS: x.r[C.ST] === 'operation' && x.rows.some(d => d.kind === 'leave') ? 'عودة من إجازة' : stTxt(x.r) }; x.rows.forEach((d, j) => { o[colL(4 + j)] = hrCode(d, x.r); }); for (let j = x.rows.length; j < 31; j++) o[colL(4 + j)] = ''; return o; }));
+      zip.file(P + 'sheet3.xml', x3);
+      // 4) Trips
+      let x4 = await zip.file(P + 'sheet4.xml').async('string');
+      const RT = (RATES && RATES.rates) || {}, extra = {};
+      const noRate = []; HR_CODES.forEach((k, j) => { const r = RT[k], v = r ? (KM ? r.km : r.amt) : null; if (v != null && v !== '' && isFinite(Number(v))) x4 = setCell(x4, colL(5 + j) + '1', Number(v)); else { x4 = setCell(x4, colL(5 + j) + '1', 0); noRate.push(k); } });
+      if (KM) { x4 = setCell(x4, 'D1', 'Trip KM'); x4 = setCell(x4, 'AO1', 'Total KM'); }   // نفس الملف: بدل المبلغ = عدد الرحلات × كيلومترات المسار   // الأسعار من جدول الحوافز المرفوع فقط
+      const colOf = t => { const k = routeKey(t); if (!k) return null; if (HR_CODES.includes(k)) return k; const k2 = k.replace(/[A-Z]$/, ''); if (HR_CODES.includes(k2)) return k2; extra[k] = 1; return null; };
+      x4 = fillSheet(x4, 5, res.map((x, i) => { const m = {}; (SEATS[String(x.iq)] || []).forEach(t => { const k = colOf(t); if (k) m[k] = (m[k] || 0) + 1; });
+        const o = { A: i + 1, B: numOr(x.r[C.EMP]), C: numOr(x.iq), D: x.r[C.NAME], E: x.r[C.NAT] || '', AP: { f: `IFERROR(""&VLOOKUP(C{R},'DRIVERS SUMMARY  Attendance2'!$C$7:$AS${7 + res.length - 1},43,FALSE()),"")` } };
+        HR_CODES.forEach((k, j) => o[colL(5 + j)] = m[k] || 0); const mx = MERGEX[String(x.iq)] || 0; if (mx) o.AN = { f: `SUM(F{R}:AM{R})-${mx}` }; return o; }));
+      zip.file(P + 'sheet4.xml', x4);
+      // اسم ورقة التفاصيل حسب الفترة
+      const d2 = k => (+k.slice(8)) + '-' + (+k.slice(5, 7));
+      let wbx = await zip.file('xl/workbook.xml').async('string');
+      wbx = wbx.replace(/name="[^"]*trip details"/, `name="${d2(from)} to ${d2(to)} trip details"`); zip.file('xl/workbook.xml', wbx);
+      const blob = await zip.generateAsync({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', compression: 'DEFLATE' });
+      const ed = new Date(to + 'T12:00:00'), mon = ed.toLocaleString('en-US', { month: 'short' }).toUpperCase();
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Daily_driver${KM ? '_KM' : ''}_20-${mon}${ed.getFullYear()}.xlsx`; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+      window.__hrLast = a.download;
+      const miss = Object.keys(extra);
+      $('rpOut').innerHTML = `<div class="msg">✅ تم تصدير ${TITLE} (إصدار 23/11-ز): ${res.length} سائق · ${det.length} رحلة · من ${dmy(from)} إلى ${dmy(to)}</div>` + (miss.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها عمود في ملف الموارد (ما انحسبت): ${miss.map(esc).join('، ')}</div>` : '') + (noRate.length ? `<div class="msg err" style="margin-top:6px">⚠️ مسارات ما لها ${KM ? 'كيلومترات' : 'سعر'} في جدول الحوافز (= 0): ${noRate.map(esc).join('، ')}</div>` : '') + (DUPX.length ? `<div class="msg err" style="margin-top:6px">⚠️ رحلات مكررة في الروستر (${DUPX.length}): ${DUPX.slice(0, 20).map(esc).join('، ')}${DUPX.length > 20 ? '…' : ''}</div>` : '') + (notIn.length ? `<div class="msg err" style="margin-top:6px">⚠️ ${notIn.length} رقم إقامة في الروستر مو موجود في قائمة السائقين (${notIn.reduce((a2, q) => a2 + SEATS[q].length, 0)} رحلة) — تطلع في ورقة التفاصيل وما تنحسب في ورقة Trips: <span dir="ltr">${notIn.slice(0, 15).map(esc).join(', ')}</span></div>` : '');
+    } catch (e) { $('rpOut').innerHTML = `<div class="msg err">${esc(e.message || t_('eNet'))}</div>`; }
+    finally { b.disabled = false; }
+  };
+  $('rpGo').onclick = async () => {
+    const from = $('rpFrom').value, to = $('rpTo').value;
+    if (!from || !to || from > to) return alert('حدد الفترة بشكل صحيح');
+    if ((new Date(to) - new Date(from)) / 864e5 > 92) return alert('أقصى فترة للتقرير 3 أشهر');
+    const q = $('rpDrv').value.trim(); let list = rpDrivers();
+    if (q) { const iq = (q.match(/(\d{6,})\s*$/) || [])[1]; list = list.filter(r => iq ? String(r[C.IQ]) === iq : (r[C.NAME] + ' ' + r[C.IQ]).toLowerCase().includes(q.toLowerCase())); if (!list.length) return alert('ما لقيت السائق'); }
+    const b = $('rpGo'); b.disabled = true; $('rpOut').innerHTML = '<div class="msg">⏳ جاري تجهيز التقرير...</div>';
+    try {
+      const [data] = await Promise.all([fetchRange(addD(from, -31), addD(to, 7)), loadRates()]);
+      await loadHist(list, from, to, data, (i, n) => { $('rpOut').innerHTML = `<div class="msg">⏳ مراجعة سجل الإجازات (${i}/${n})...</div>`; });
+      const res = build(from, to, data, list).sort((a, z) => z.c.trip - a.c.trip || String(a.r[C.NAME]).localeCompare(z.r[C.NAME]));
+      const dv = $('fDepot').value; LAST_RES = { from, to, res, scope: dv ? (dv === '*mine' ? (MINE || []).map(depName).join('، ') : depName(dv)) : 'كل الكراجات' };
+      if (!Object.keys(data.days).some(k => k >= from && k <= to && (data.days[k] || []).length)) $('rpOut').innerHTML = '<div class="msg err">لا يوجد روستر مرفوع في هذي الفترة</div>';
+      else if (list.length === 1) showOne(res[0], false); else showAll(res);
+    } catch (e) { $('rpOut').innerHTML = `<div class="msg err">${esc(e.message || t_('eNet'))}</div>`; }
+    finally { b.disabled = false; }
+  };
+})();
+</script>
+<script src="leaves.js?v=20261128a"></script>
+</body>
+</html>

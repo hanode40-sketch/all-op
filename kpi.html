@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<script>try{var t=localStorage.getItem('nwTheme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<script src="https://hanode40-sketch.github.io/all-op/auth.js" data-tool="kpi"></script>
+<script src="stats-widget.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2c4a7a">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<title>المؤشرات التشغيلية · أدوات التشغيل</title>
+<style>
+  :root{ --navy:#1f3f7a; --ink:#0f172a; --muted:#64748b; --line:#e5e7eb; --soft:#f8fafc;
+    --g:#16a34a; --gbg:#e7f5ed; --y:#d97706; --ybg:#fef3c7; --r:#dc2626; --rbg:#fdecea; --n:#94a3b8; --nbg:#f1f5f9; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Tahoma,Arial,sans-serif;color:var(--ink);
+    background:#2c4a7a;position:relative;min-height:100vh;padding:20px 14px 90px}
+  .wrap{max-width:none;margin:0 auto}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#fff;margin-bottom:18px}
+  .top h1{margin:0;font-size:22px;text-shadow:0 2px 8px rgba(0,0,0,.45)}
+  .top .en{font-size:13px;opacity:.8;text-shadow:0 2px 8px rgba(0,0,0,.45)}
+  .back{color:#fff;text-decoration:none;font-size:14px;background:rgba(255,255,255,.15);padding:8px 14px;border-radius:999px;white-space:nowrap}
+  .panel{background:#fff;border-radius:16px;border:1px solid rgba(15,23,42,.06);box-shadow:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(10,25,55,.16)}
+  .filters{padding:14px;display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end}
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600}
+  select,input[type=number]{width:100%;font:inherit;font-size:15px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink)}
+  .btns{display:flex;gap:8px}
+  .btn{font:inherit;font-size:14px;font-weight:700;border:0;border-radius:10px;padding:11px 14px;cursor:pointer;background:var(--navy);color:#fff;white-space:nowrap}
+  .btn.light{background:#eef2f7;color:var(--navy)}
+  .sec{margin:22px 4px 10px;color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;gap:10px;text-shadow:0 2px 6px rgba(0,0,0,.4)}
+  .sec::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.25)}
+  .sec small{font-weight:500;opacity:.85}
+
+  /* النتيجة العامة */
+  .score{display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;padding:18px 22px;margin-top:14px}
+  .score .big{font-size:15px;color:var(--muted);font-weight:600}
+  .score .big b{display:block;font-size:26px;color:var(--ink);margin:2px 0 8px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px}
+  .chip.g{background:var(--gbg);color:var(--g)} .chip.y{background:var(--ybg);color:var(--y)} .chip.r{background:var(--rbg);color:var(--r)} .chip.n{background:var(--nbg);color:var(--n)}
+
+  /* بطاقات المؤشرات */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .kpi{all:unset;box-sizing:border-box;display:flex;flex-direction:column;gap:8px;cursor:pointer;background:#fff;border-radius:16px;padding:16px;position:relative;overflow:hidden;
+    border:1px solid rgba(15,23,42,.06);box-shadow:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(10,25,55,.16);transition:transform .15s,box-shadow .15s;color:var(--ink);font-family:inherit}
+  .kpi:hover{transform:translateY(-3px);box-shadow:0 2px 4px rgba(15,23,42,.08),0 16px 32px rgba(10,25,55,.26)}
+  .kpi:focus-visible{outline:3px solid #f28c28;outline-offset:2px}
+  .kpi::before{content:"";position:absolute;inset-inline-start:0;top:0;bottom:0;width:5px;background:var(--st)}
+  .kpi .hd{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--muted)}
+  .kpi .hd .ic{font-size:18px}
+  .kpi .stt{margin-inline-start:auto;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--stbg);color:var(--st)}
+  .kpi .row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+  .kpi .val{font-size:34px;font-weight:800;line-height:1}
+  .kpi .val small{font-size:15px;color:var(--muted);font-weight:700;margin-inline-start:3px}
+  .kpi .tg{font-size:12.5px;color:var(--muted)}
+  .kpi .bar{height:8px;border-radius:5px;background:#eef2f7;position:relative;overflow:visible}
+  .kpi .bar i{position:absolute;inset-block:0;inset-inline-start:0;border-radius:5px;background:var(--st)}
+  .kpi .bar u{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink);opacity:.55;border-radius:2px}
+  .kpi .ft{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;color:var(--muted)}
+  .kpi .spark{display:block}
+  .dl{font-weight:700;padding:2px 8px;border-radius:999px;background:#eef2f7}
+  .dl.good{background:var(--gbg);color:var(--g)} .dl.bad{background:var(--rbg);color:var(--r)}
+
+  /* جدول الكراجات */
+  .card{padding:16px}
+  .card h2{margin:0 0 12px;font-size:16px;color:var(--navy)}
+  .tw{overflow-x:auto}
+  table{width:100%;border-collapse:separate;border-spacing:0 5px;font-size:13.5px}
+  th{font-size:12px;color:var(--muted);font-weight:700;padding:6px 8px;text-align:center;white-space:nowrap}
+  th:first-child,td:first-child{text-align:start}
+  td{padding:9px 8px;text-align:center;white-space:nowrap;background:var(--soft)}
+  td:first-child{font-weight:700;border-start-start-radius:10px;border-end-start-radius:10px}
+  td:last-child{border-start-end-radius:10px;border-end-end-radius:10px}
+  td.c{cursor:pointer;font-weight:700}
+  td.c span{display:inline-block;min-width:58px;padding:4px 8px;border-radius:8px}
+  td.c.g span{background:var(--gbg);color:var(--g)} td.c.y span{background:var(--ybg);color:var(--y)} td.c.r span{background:var(--rbg);color:var(--r)} td.c.n span{color:var(--n)}
+  td.c:hover span{outline:2px solid #f28c28}
+  td.sc{font-weight:800}
+  .msg{text-align:center;padding:28px 10px;color:var(--muted)} .msg.err{color:var(--r);font-weight:700}
+  .note{color:rgba(255,255,255,.85);font-size:12px;margin:10px 4px 0;text-shadow:0 1px 4px rgba(0,0,0,.4);line-height:1.7}
+
+  /* نافذة الأهداف */
+  .ov{position:fixed;inset:0;z-index:100000;background:rgba(8,15,30,.55);display:none;align-items:flex-start;justify-content:center;padding:4vh 12px;overflow:auto}
+  .ov.on{display:flex}
+  .md{background:#fff;border-radius:18px;width:100%;max-width:640px;padding:20px;box-shadow:0 30px 80px rgba(0,0,0,.35)}
+  .md h3{margin:0 0 4px} .md p{margin:0 0 14px;color:var(--muted);font-size:13px}
+  .tgrow{display:grid;grid-template-columns:1fr 110px 110px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .tgrow.h{font-size:12px;color:var(--muted);font-weight:700}
+  .md .btns{margin-top:16px;justify-content:flex-end}
+
+  html[data-theme="dark"]{--ink:#e5e7eb;--muted:#9aa6b8;--line:#263042;--soft:#0f1624;--gbg:#12301f;--g:#4ade80;--ybg:#3a2e12;--y:#fbbf24;--rbg:#3a1e22;--r:#f87171;--nbg:#1e2a44}
+  html[data-theme="dark"] body{background:#0b1220}
+  
+  html[data-theme="dark"] .panel,html[data-theme="dark"] .kpi,html[data-theme="dark"] .md{background:#151c2b;border-color:var(--line)}
+  html[data-theme="dark"] .card h2{color:#9ec1ff}
+  html[data-theme="dark"] .btn.light,html[data-theme="dark"] .dl,html[data-theme="dark"] .kpi .bar{background:#1e2a44;color:#c7d7f5}
+
+  html[data-theme="dark"] .dl.good{background:var(--gbg);color:var(--g)} html[data-theme="dark"] .dl.bad{background:var(--rbg);color:var(--r)}
+  @media (max-width:980px){ .grid{grid-template-columns:1fr 1fr} }
+  @media (max-width:640px){
+    .grid{grid-template-columns:1fr} .filters{grid-template-columns:1fr 1fr} .btns{grid-column:span 2} .btns .btn{flex:1}
+    .score{grid-template-columns:1fr;justify-items:center;text-align:center} .chips{justify-content:center}
+    .top h1{font-size:18px} .tgrow{grid-template-columns:1fr 80px 80px}
+  }
+  @media print{
+    body{background:#fff!important;padding:0} body::before,.filters,.back,.nws,.btns{display:none!important}
+    .top,.sec,.note{color:#0f172a;text-shadow:none} .panel,.kpi{box-shadow:none;border:1px solid #e5e7eb;break-inside:avoid}
+  }
+
+  /* شريط العنوان ثابت أعلى الصفحة عند النزول */
+  .top{position:sticky;top:0;z-index:50;margin:-20px -14px 18px;padding:14px 14px 12px;border-radius:0 0 16px 16px;
+    background:rgba(31,63,122,.88);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 6px 20px rgba(0,0,0,.18)}
+  html[data-theme="dark"] .top{background:rgba(11,18,32,.88);border-bottom:1px solid #263042}
+  @media print{ .top{position:static;background:none;box-shadow:none;margin:0 0 18px;padding:0} }
+
+  /* ===== التصميم الموحد (ألوان auth.js --nw-*) ===== */
+  :root,html[data-theme="dark"]{--ink:var(--nw-ink,#0f172a);--muted:var(--nw-muted,#64748b);--line:var(--nw-line,#e5e7eb);--soft:var(--nw-soft,#f8fafc)}
+  body{background:var(--nw-bg,#eef2f8)!important;color:var(--nw-ink,#0f172a);font-family:var(--nw-font,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif);-webkit-font-smoothing:antialiased}
+  .top{background:var(--nw-hero,#13274f)!important;border-bottom:0!important;box-shadow:0 8px 24px rgba(19,39,79,.18)!important}
+  .top h1,.top .en{text-shadow:none!important}
+  .panel,.kpi,.md{background:var(--nw-card,#fff)!important;border:1px solid var(--nw-line,#e5e7eb)!important;box-shadow:var(--nw-shadow)!important}
+  .kpi::before{height:3px!important;opacity:.85}
+  .sec{color:var(--nw-muted,#64748b)!important;text-shadow:none!important;font-size:14px;font-weight:800}
+  .sec::after{background:var(--nw-line,#e2e8f0)!important}
+  .note,.clickhint{color:var(--nw-muted,#64748b)!important;text-shadow:none!important}
+  .btn{background:var(--nw-navy,#13274f)} .btn.light{background:var(--nw-soft,#eef2f7);color:var(--nw-ink,#13274f);border:1px solid var(--nw-line,#e2e8f0)}
+  html[data-theme="dark"] .btn.light{background:#1b2540;color:#dbe5f7;border-color:#24304a}
+  .card h2{color:var(--nw-ink,#13274f)}
+  select,input{background:var(--nw-card,#fff);color:var(--nw-ink,#0f172a)}
+  .seg,.tabs{background:var(--nw-card,#fff)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><h1 style="display:flex;align-items:center;gap:10px"><span class="tIc">🎯</span> <span data-i="title">المؤشرات التشغيلية</span></h1><div class="en" data-i="subtitle">Operational KPIs</div></div>
+    <a class="back" href="./" data-i="back">← أدوات التشغيل</a>
+  </div>
+
+  <div class="panel filters">
+    <div><label data-i="lMonth">الشهر</label><select id="fMonth"></select></div>
+    <div><label data-i="lGarage">الكراج</label><select id="fGarage"></select></div>
+    <div class="btns"><button class="btn light" onclick="openTargets()" data-i="targets">⚙️ الأهداف</button><button class="btn light" onclick="load(true)" data-i="refresh">↻ تحديث</button><button class="btn" onclick="window.print()" data-i="print">طباعة / PDF</button></div>
+  </div>
+
+  <div class="panel score" id="score"><div class="msg" data-i="loading">جاري التحميل...</div></div>
+
+  <div class="sec"><span data-i="secKpi">المؤشرات</span> <small data-i="tapHint">— اضغط على أي مؤشر لعرض التفاصيل</small></div>
+  <div class="grid" id="grid"></div>
+
+  <div class="sec" data-i="secGarage">بطاقة أداء الكراجات</div>
+  <div class="panel card"><h2 data-i="garTitle">كل مؤشر لكل كراج — اضغط على أي خانة لعرض التفاصيل</h2><div class="tw" id="garages"><div class="msg" data-i="loading">جاري التحميل...</div></div></div>
+
+  <div class="note" data-i="note">الأرقام تنحسب تلقائياً من عمليات البرامج (تسليم الوردية، المهام، مسار الرحلة، الحوادث، المخالفات، التقييم). الخط الصغير الرمادي في الشريط = الهدف. والرسم الصغير = آخر ٦ أشهر.</div>
+</div>
+
+<div class="ov" id="tgOv"><div class="md">
+  <h3 data-i="tgTitle">⚙️ أهداف المؤشرات</h3>
+  <p data-i="tgHint">الهدف = الحد اللي يعتبر عنده المؤشر محقق (أخضر). حد التنبيه = بعده يصير أحمر. تنحفظ الأهداف على هذا الجهاز.</p>
+  <div id="tgList"></div>
+  <div class="btns"><button class="btn light" onclick="resetTargets()" data-i="tgReset">الأهداف الافتراضية</button><button class="btn light" onclick="closeTargets()" data-i="tgCancel">إلغاء</button><button class="btn" onclick="saveTargets()" data-i="tgSave">حفظ</button></div>
+</div></div>
+
+<script>
+/* ====================================================================
+   المؤشرات التشغيلية — تنحسب من «سجل النشاط» لكل البرامج
+   dir: 'up' = الأعلى أفضل ، 'down' = الأقل أفضل ، 'prev' = أقل من الشهر السابق
+   target = حد الأخضر ، warn = حد الأصفر (بعده أحمر)
+   ==================================================================== */
+const KPIS = [
+  { id:'shiftAck',  ic:'🔄', c:'#f59e0b', ar:'تأكيد استلام الورديات', en:'Shift receipt confirmation', short:['الاستلام','Receipt'], unit:'%', dir:'up',   target:95, warn:85 },
+  { id:'shiftTime', ic:'⏱️', c:'#f59e0b', ar:'سرعة تأكيد الاستلام',   en:'Time to confirm receipt',   short:['زمن الاستلام','Receipt time'], unit:'min', dir:'down', target:30, warn:60 },
+  { id:'taskDone',  ic:'✅', c:'#16a34a', ar:'إنجاز المهام',           en:'Task completion',            short:['المهام','Tasks'], unit:'%', dir:'up',   target:90, warn:75 },
+  { id:'taskTime',  ic:'⌛', c:'#16a34a', ar:'متوسط زمن إنجاز المهمة', en:'Avg. task completion time',  short:['زمن المهمة','Task time'], unit:'h', dir:'down', target:24, warn:48 },
+  { id:'checklist', ic:'📋', c:'#16a34a', ar:'الالتزام بالقائمة اليومية', en:'Daily checklist compliance', short:['القائمة','Checklist'], unit:'%', dir:'up', target:95, warn:80 },
+  { id:'tripDays',  ic:'🚌', c:'#0d9488', ar:'انتظام إرسال مسارات الرحلات', en:'Trip route sending regularity', short:['المسارات','Routes'], unit:'%', dir:'up', target:100, warn:90 },
+  { id:'accidents', ic:'🚨', c:'#ea580c', ar:'الحوادث',                en:'Accidents',                  short:['الحوادث','Accidents'], unit:'', dir:'prev' },
+  { id:'violations',ic:'📝', c:'#dc2626', ar:'المخالفات',              en:'Violations',                 short:['المخالفات','Violations'], unit:'', dir:'prev' },
+  { id:'evals',     ic:'⭐', c:'#2563eb', ar:'تقييمات السائقين',        en:'Driver evaluations',         short:['التقييمات','Evaluations'], unit:'', dir:'up', target:60, warn:30 },
+  { id:'staff',     ic:'👥', c:'#7c3aed', ar:'مشاركة الموظفين في البرامج', en:'Staff engagement',       short:['المشاركة','Engagement'], unit:'%', dir:'up', target:90, warn:75 }
+];
+
+let LANG = (() => { try { return localStorage.getItem('hubLang') === 'en' ? 'en' : 'ar'; } catch (e) { return 'ar'; } })();
+const I18N = {
+  ar: { title:'المؤشرات التشغيلية', subtitle:'Operational KPIs', back:'← أدوات التشغيل', lMonth:'الشهر', lGarage:'الكراج', allGarages:'كل الكراجات',
+    targets:'⚙️ الأهداف', refresh:'↻ تحديث', print:'طباعة / PDF', loading:'جاري التحميل...', secKpi:'المؤشرات', tapHint:'— اضغط على أي مؤشر لعرض التفاصيل',
+    secGarage:'بطاقة أداء الكراجات', garTitle:'كل مؤشر لكل كراج — اضغط على أي خانة لعرض التفاصيل',
+    note:'الأرقام تنحسب تلقائياً من عمليات البرامج (تسليم الوردية، المهام، مسار الرحلة، الحوادث، المخالفات، التقييم). الخط الصغير الرمادي في الشريط = الهدف. والرسم الصغير = آخر ٦ أشهر.',
+    tgTitle:'⚙️ أهداف المؤشرات', tgHint:'الهدف = الحد اللي يعتبر عنده المؤشر محقق (أخضر). حد التنبيه = بعده يصير أحمر. تنحفظ الأهداف على هذا الجهاز.',
+    tgReset:'الأهداف الافتراضية', tgCancel:'إلغاء', tgSave:'حفظ', tgK:'المؤشر', tgT:'الهدف', tgW:'حد التنبيه', tgPrev:'أقل من الشهر السابق',
+    sG:'محقق', sY:'قريب', sR:'متأخر', sN:'لا توجد بيانات', scoreLbl:'المؤشرات المحققة', of:'من',
+    tgtUp:v=>`الهدف: ${v} أو أكثر`, tgtDown:v=>`الهدف: ${v} أو أقل`, tgtPrev:'الهدف: أقل من الشهر السابق', prevWas:'الشهر السابق: ',
+    vsPrev:'عن الشهر السابق', u:{ '%':'%', min:'د', h:'س', '':'' }, garage:'الكراج', overall:'النتيجة', unassigned:'غير محدد',
+    eNet:'تعذّر الاتصال — تأكد من الإنترنت', eAuth:'انتهت مدة الدخول — سجّل دخول ثم اضغط تحديث', eForbidden:'هذه الصفحة للمدير والمشرف فقط', eErr:'خطأ: ',
+    missDays:'أيام بدون تسجيل', pendShift:'ورديات مسلّمة لم يتأكد استلامها', pendTask:'مهام مكلّفة لم تُنجز', slow:'الأبطأ', noMatch:'لا يوجد ربط بالمرجع بين العمليتين — المؤشر يحتاج نفس المرجع في التسليم والاستلام',
+    inactive:'موظفين بدون أي عملية', detailSub:(n,d)=>`${n} من ${d}`, days:'يوم', mins:'دقيقة', hours:'ساعة' },
+  en: { title:'Operational KPIs', subtitle:'المؤشرات التشغيلية', back:'← Operations Tools', lMonth:'Month', lGarage:'Garage', allGarages:'All garages',
+    targets:'⚙️ Targets', refresh:'↻ Refresh', print:'Print / PDF', loading:'Loading...', secKpi:'Indicators', tapHint:'— tap any indicator for details',
+    secGarage:'Garage scorecard', garTitle:'Every KPI per garage — tap any cell for details',
+    note:'Figures are calculated automatically from tool operations (shift handover, tasks, trip route, accidents, violations, evaluations). The small grey line on each bar is the target; the mini chart shows the last 6 months.',
+    tgTitle:'⚙️ KPI targets', tgHint:'Target = the level counted as achieved (green). Alert limit = beyond it the KPI turns red. Targets are saved on this device.',
+    tgReset:'Default targets', tgCancel:'Cancel', tgSave:'Save', tgK:'Indicator', tgT:'Target', tgW:'Alert limit', tgPrev:'Lower than last month',
+    sG:'On target', sY:'Close', sR:'Off target', sN:'No data', scoreLbl:'Indicators on target', of:'of',
+    tgtUp:v=>`Target: ≥ ${v}`, tgtDown:v=>`Target: ≤ ${v}`, tgtPrev:'Target: below last month', prevWas:'Last month: ',
+    vsPrev:'vs last month', u:{ '%':'%', min:'m', h:'h', '':'' }, garage:'Garage', overall:'Score', unassigned:'Unassigned',
+    eNet:'Connection failed — check your internet', eAuth:'Session expired — sign in, then tap Refresh', eForbidden:'This page is for managers and supervisors only', eErr:'Error: ',
+    missDays:'Days with no entries', pendShift:'Handed-over shifts not confirmed', pendTask:'Assigned tasks not completed', slow:'Slowest', noMatch:'No reference link between the two operations — this KPI needs the same reference on handover and receipt',
+    inactive:'Employees with no operations', detailSub:(n,d)=>`${n} of ${d}`, days:'days', mins:'minutes', hours:'hours' }
+};
+const t_ = k => (I18N[LANG][k] ?? I18N.ar[k] ?? k);
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n => String(n).padStart(2,'0');
+const dkey = d => d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const MONTHS_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+const MONTHS_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const monthLabel = (m, short) => { const [y,mm] = m.split('-'); return (LANG==='en' ? MONTHS_EN : MONTHS_AR)[+mm-1] + (short ? '' : ' ' + y); };
+const fmtDT = iso => new Date(iso).toLocaleString(LANG==='en'?'en-GB':'ar-SA-u-ca-gregory-nu-latn',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+const kName = k => LANG === 'en' ? k.en : k.ar;
+const act = r => String(r[4] ?? '').trim();
+const LOGIN_TOOL = 'الدخول';
+
+/* ---------- الأهداف (قابلة للتعديل، محفوظة على الجهاز) ---------- */
+const DEFAULTS = Object.fromEntries(KPIS.map(k => [k.id, { target:k.target, warn:k.warn }]));
+function loadTargets() {
+  try { const s = JSON.parse(localStorage.getItem('nwKpiTargets') || '{}');
+    KPIS.forEach(k => { if (s[k.id]) { if (isFinite(s[k.id].target)) k.target = +s[k.id].target; if (isFinite(s[k.id].warn)) k.warn = +s[k.id].warn; } }); } catch (e) {}
+}
+loadTargets();
+
+/* ---------- البيانات ---------- */
+let ALL = null, USERS = [];
+const monthOf = r => dkey(new Date(r[0])).slice(0,7);
+const thisMonth = () => dkey(new Date()).slice(0,7);
+const shiftMonth = (m, n) => { let [y,mm] = m.split('-').map(Number); mm += n; while (mm < 1) { mm += 12; y--; } while (mm > 12) { mm -= 12; y++; } return y+'-'+pad(mm); };
+const garagesOf = u => NWStats.userGarages(u);
+function inGarage(r, g) { if (!g) return true; const gs = garagesOf(r[1]); return g === t_('unassigned') ? !gs.length : gs.includes(g); }
+
+function daysOfMonth(m) {
+  const [y,mm] = m.split('-').map(Number), n = new Date(y, mm, 0).getDate();
+  const last = m === thisMonth() ? new Date().getDate() : n;
+  return Array.from({length:last}, (_,i) => `${m}-${pad(i+1)}`);
+}
+/** يربط العملية الأولى بالثانية بنفس المرجع ويرجع المدة بالدقائق */
+function pairTimes(aRows, bRows) {
+  const firstB = {};
+  bRows.forEach(r => { const k = String(r[5]||'').trim(); if (!k) return; const tm = new Date(r[0]).getTime(); if (!(k in firstB) || tm < firstB[k].tm) firstB[k] = { tm, r }; });
+  const out = [];
+  aRows.forEach(r => { const k = String(r[5]||'').trim(); if (!k || !firstB[k]) return; const d = (firstB[k].tm - new Date(r[0]).getTime()) / 60000; if (d >= 0) out.push({ a:r, b:firstB[k].r, min:d }); });
+  return out;
+}
+const avg = a => a.length ? a.reduce((s,x)=>s+x,0)/a.length : null;
+
+/** يحسب كل المؤشرات لشهر وكراج */
+function compute(month, garage) {
+  const rows = ALL.filter(r => r[3] && r[3] !== LOGIN_TOOL && monthOf(r) === month && inGarage(r, garage));
+  const prevRows = ALL.filter(r => r[3] && r[3] !== LOGIN_TOOL && monthOf(r) === shiftMonth(month,-1) && inGarage(r, garage));
+  const A = (rs, a) => rs.filter(r => act(r) === a);
+  const days = daysOfMonth(month);
+  const res = {};
+
+  const sH = A(rows,'تسليم وردية'), sR = A(rows,'استلام وردية');
+  res.shiftAck = { v: sH.length ? Math.min(100, sR.length / sH.length * 100) : null, num:sR.length, den:sH.length, rows: sH.concat(sR), pending: NWStats_pending(sH, sR), pendLbl:t_('pendShift') };
+  const sp = pairTimes(sH, sR);
+  res.shiftTime = { v: sp.length ? avg(sp.map(x=>x.min)) : null, rows: sp.flatMap(x=>[x.a,x.b]), pairs: sp, unit:'min', note: (sH.length && sR.length && !sp.length) ? t_('noMatch') : '' };
+
+  const tA = A(rows,'تكليف مهمة'), tD = A(rows,'إنجاز مهمة');
+  res.taskDone = { v: tA.length ? Math.min(100, tD.length / tA.length * 100) : null, num:tD.length, den:tA.length, rows: tA.concat(tD), pending: NWStats_pending(tA, tD), pendLbl:t_('pendTask') };
+  const tp = pairTimes(tA, tD);
+  res.taskTime = { v: tp.length ? avg(tp.map(x=>x.min)) / 60 : null, rows: tp.flatMap(x=>[x.a,x.b]), pairs: tp, unit:'h' };
+
+  const ck = A(rows,'بند القائمة اليومية'), ckDays = new Set(ck.map(r => dkey(new Date(r[0]))));
+  const anyCk = ALL.some(r => act(r) === 'بند القائمة اليومية');
+  res.checklist = { v: anyCk && days.length ? ckDays.size / days.length * 100 : null, num:ckDays.size, den:days.length, rows:ck, missing: days.filter(d => !ckDays.has(d)) };
+
+  const tr = rows.filter(r => r[3] === 'مسار الرحلة' && !/حذف/.test(act(r))), trDays = new Set(tr.map(r => dkey(new Date(r[0]))));
+  const anyTr = ALL.some(r => r[3] === 'مسار الرحلة');
+  res.tripDays = { v: anyTr && days.length ? trDays.size / days.length * 100 : null, num:trDays.size, den:days.length, rows:tr, missing: days.filter(d => !trDays.has(d)) };
+
+  const acc = A(rows,'تقرير حادث'), accP = A(prevRows,'تقرير حادث');
+  res.accidents = { v: acc.length, prev: accP.length, rows: acc };
+  const vi = rows.filter(r => r[3] === 'محضر المخالفة' && !/حذف/.test(act(r))), viP = prevRows.filter(r => r[3] === 'محضر المخالفة' && !/حذف/.test(act(r)));
+  res.violations = { v: vi.length, prev: viP.length, rows: vi };
+
+  const ev = A(rows,'تقييم سائق');
+  res.evals = { v: ALL.some(r => act(r) === 'تقييم سائق') ? ev.length : null, rows: ev };
+
+  const users = USERS.filter(u => u.active !== false && (!garage || (garage === t_('unassigned') ? !garagesOf(u.u).length : garagesOf(u.u).includes(garage))));
+  const act_ = new Set(rows.map(r => r[1]));
+  const activeN = users.filter(u => act_.has(u.u)).length;
+  res.staff = { v: users.length ? activeN / users.length * 100 : null, num:activeN, den:users.length, rows, idle: users.filter(u => !act_.has(u.u)) };
+  return res;
+}
+function NWStats_pending(a, b) {
+  const refs = new Set(b.map(r => String(r[5]||'').trim()).filter(Boolean));
+  if (!refs.size || !a.some(r => r[5])) return null;
+  return a.filter(r => r[5] && !refs.has(String(r[5]).trim()));
+}
+
+/** حالة المؤشر: g / y / r / n */
+function status(k, x) {
+  if (!x || x.v == null) return 'n';
+  if (k.dir === 'prev') { if (x.v === 0) return 'g'; return x.v < x.prev ? 'g' : x.v === x.prev ? 'y' : 'r'; }
+  if (k.dir === 'up') return x.v >= k.target ? 'g' : x.v >= k.warn ? 'y' : 'r';
+  return x.v <= k.target ? 'g' : x.v <= k.warn ? 'y' : 'r';
+}
+function fmtV(k, v) {
+  if (v == null) return '—';
+  if (k.unit === '%') return Math.round(v) + '';
+  if (k.unit === 'min') return v < 100 ? Math.round(v) + '' : (v/60).toFixed(1);
+  if (k.unit === 'h') return v < 10 ? v.toFixed(1) : Math.round(v) + '';
+  return Math.round(v) + '';
+}
+function unitOf(k, v) { const U = t_('u'); if (k.unit === 'min' && v != null && v >= 100) return U.h; return U[k.unit] ?? ''; }
+const ST = { g:['--g','--gbg'], y:['--y','--ybg'], r:['--r','--rbg'], n:['--n','--nbg'] };
+const stName = s => t_({g:'sG',y:'sY',r:'sR',n:'sN'}[s]);
+
+function spark(vals, color) {
+  const W = 120, H = 34, ok = vals.filter(v => v != null);
+  if (ok.length < 2) return '';
+  const mx = Math.max(...ok), mn = Math.min(...ok), rg = (mx - mn) || 1;
+  const pts = vals.map((v,i) => v == null ? null : [ (LANG==='en' ? i : vals.length-1-i) * (W-6)/(vals.length-1) + 3, H-4 - (v-mn)/rg*(H-8) ]);
+  const path = pts.filter(Boolean).sort((a,b)=>a[0]-b[0]).map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const last = pts[pts.length-1];
+  return `<svg class="spark" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><path d="${path}" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".85"/>${last?`<circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="3.2" fill="${color}"/>`:''}</svg>`;
+}
+
+/* ---------- العرض ---------- */
+function render() {
+  if (!ALL) return;
+  const month = $('fMonth').value, garage = $('fGarage').value;
+  const cur = compute(month, garage), prv = compute(shiftMonth(month,-1), garage);
+  const trendMonths = Array.from({length:6}, (_,i) => shiftMonth(month, i-5));
+  const trends = trendMonths.map(m => compute(m, garage));
+
+  /* النتيجة العامة */
+  const cnt = { g:0, y:0, r:0, n:0 };
+  KPIS.forEach(k => cnt[status(k, cur[k.id])]++);
+  const measured = KPIS.length - cnt.n, pct = measured ? Math.round(cnt.g / measured * 100) : 0;
+  const rc = pct >= 80 ? 'var(--g)' : pct >= 50 ? 'var(--y)' : 'var(--r)';
+  const R = 42, C = 2*Math.PI*R;
+  $('score').innerHTML = `<svg width="110" height="110" viewBox="0 0 110 110" style="color:var(--ink)"><circle cx="55" cy="55" r="${R}" fill="none" stroke="currentColor" stroke-opacity=".1" stroke-width="11"/>
+      <circle cx="55" cy="55" r="${R}" fill="none" stroke="${rc}" stroke-width="11" stroke-linecap="round" stroke-dasharray="${C*pct/100} ${C}" transform="rotate(-90 55 55)"/>
+      <text x="55" y="62" text-anchor="middle" font-size="22" font-weight="800" fill="currentColor">${pct}%</text></svg>
+    <div><div class="big">${t_('scoreLbl')} · ${esc(monthLabel(month))}${garage ? ' · ' + esc(NWStats.garageName(garage)) : ''}<b>${cnt.g} ${t_('of')} ${measured}</b></div>
+      <div class="chips"><span class="chip g">● ${t_('sG')}: ${cnt.g}</span><span class="chip y">● ${t_('sY')}: ${cnt.y}</span><span class="chip r">● ${t_('sR')}: ${cnt.r}</span>${cnt.n ? `<span class="chip n">● ${t_('sN')}: ${cnt.n}</span>` : ''}</div></div>`;
+
+  /* البطاقات */
+  $('grid').innerHTML = KPIS.map(k => {
+    const x = cur[k.id], p = prv[k.id], s = status(k, x), [c1,c2] = ST[s];
+    let tgt, barPct = 0, mark = null;
+    if (k.dir === 'prev') { tgt = t_('tgtPrev') + ` (${p ? p.v : 0})`; }
+    else if (k.dir === 'up') { tgt = t_('tgtUp')(k.target + unitOf(k, k.target)); const top = k.unit === '%' ? 100 : Math.max(k.target*1.25, x && x.v || 0); barPct = x && x.v != null ? Math.min(100, x.v/top*100) : 0; mark = k.target/top*100; }
+    else { tgt = t_('tgtDown')(k.target + unitOf(k, k.target)); const top = Math.max(k.warn*1.2, x && x.v || 0); barPct = x && x.v != null ? Math.min(100, x.v/top*100) : 0; mark = k.target/top*100; }
+    let dl = '';
+    if (x && x.v != null && p && p.v != null && k.dir !== 'prev') {
+      const d = x.v - p.v, good = k.dir === 'up' ? d > 0 : d < 0;
+      if (Math.abs(d) >= 0.5) dl = `<span class="dl ${good?'good':'bad'}">${d>0?'▲':'▼'} ${fmtV(k, Math.abs(d))}${unitOf(k, Math.abs(d))} ${t_('vsPrev')}</span>`;
+    }
+    const sub = x && x.den != null ? `<span>${t_('detailSub')(x.num, x.den)}</span>` : (k.dir === 'prev' && p ? `<span>${t_('prevWas')}${p.v}</span>` : '<span></span>');
+    const sp = spark(trends.map(tr => tr[k.id] && tr[k.id].v), `var(${c1})`);
+    return `<button type="button" class="kpi" style="--st:var(${c1});--stbg:var(${c2})" data-k="${k.id}">
+      <div class="hd"><span class="ic">${k.ic}</span>${esc(kName(k))}<span class="stt">${stName(s)}</span></div>
+      <div class="row"><div class="val">${fmtV(k, x && x.v)}<small>${x && x.v != null ? unitOf(k, x.v) : ''}</small></div>${sp}</div>
+      ${k.dir !== 'prev' ? `<div class="bar"><i style="width:${barPct}%"></i>${mark!=null?`<u style="inset-inline-start:${Math.min(99,mark)}%"></u>`:''}</div>` : ''}
+      <div class="tg">${esc(tgt)}</div>
+      <div class="ft">${sub}${dl}</div></button>`;
+  }).join('');
+
+  /* بطاقة الكراجات */
+  const gs = NWStats.allGarages();
+  if (!gs.length) { $('garages').innerHTML = `<div class="msg">—</div>`; }
+  else {
+    const list = garage ? [garage] : gs;
+    let h = `<table><thead><tr><th>${t_('garage')}</th>${KPIS.map(k => `<th title="${esc(kName(k))}">${k.ic} ${esc(k.short[LANG==='en'?1:0])}</th>`).join('')}<th>${t_('overall')}</th></tr></thead><tbody>`;
+    list.forEach(g => {
+      const x = compute(month, g); let ok = 0, ms = 0;
+      h += `<tr><td>${esc(NWStats.garageName(g))}</td>` + KPIS.map(k => { const s = status(k, x[k.id]); if (s !== 'n') { ms++; if (s === 'g') ok++; }
+        return `<td class="c ${s}" data-k="${k.id}" data-g="${esc(g)}"><span>${fmtV(k, x[k.id] && x[k.id].v)}${x[k.id] && x[k.id].v != null ? unitOf(k, x[k.id].v) : ''}</span></td>`; }).join('') +
+        `<td class="sc">${ms ? ok + '/' + ms : '—'}</td></tr>`;
+    });
+    $('garages').innerHTML = h + '</tbody></table>';
+  }
+}
+
+/* ---------- التفاصيل ---------- */
+function openKpi(id, g) {
+  const k = KPIS.find(x => x.id === id), month = $('fMonth').value, garage = g ?? $('fGarage').value;
+  const x = compute(month, garage)[id]; if (!x) return;
+  const spec = { lb: kName(k) + (garage ? ' · ' + NWStats.garageName(garage) : ''), ic: k.ic, c: k.c, rows: x.rows || [], sub: monthLabel(month) + (x.v != null ? ' · ' + fmtV(k, x.v) + unitOf(k, x.v) : '') };
+  if (x.pending) { spec.pending = x.pending; spec.pendLbl = x.pendLbl; }
+  if (x.missing && x.missing.length) spec.box = { warn:true, title: `${t_('missDays')} (${x.missing.length})`, html: x.missing.map(d => esc(d.slice(5))).join(' · ') };
+  if (x.pairs && x.pairs.length) {
+    const sl = x.pairs.slice().sort((a,b)=>b.min-a.min).slice(0,6);
+    spec.box = { warn:true, title: t_('slow'), html: sl.map(p => `<div style="display:flex;gap:10px;justify-content:space-between;padding:4px 0;border-bottom:1px dashed rgba(148,163,184,.3)"><span>${esc(p.a[2]||p.a[1])} <small style="opacity:.7">· ${esc(fmtDT(p.a[0]))}</small></span><b style="white-space:nowrap">${p.min >= 120 ? (p.min/60).toFixed(1)+' '+t_('hours') : Math.round(p.min)+' '+t_('mins')}</b></div>`).join('') };
+  }
+  if (x.note) spec.box = { warn:true, title:'ℹ️', html: esc(x.note) };
+  if (id === 'staff') { spec.mode = 'users'; }
+  NWStats.details(spec);
+}
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-k]'); if (!el) return;
+  openKpi(el.dataset.k, el.dataset.g);
+});
+
+/* ---------- الأهداف ---------- */
+function openTargets() {
+  $('tgList').innerHTML = `<div class="tgrow h"><span>${t_('tgK')}</span><span>${t_('tgT')}</span><span>${t_('tgW')}</span></div>` +
+    KPIS.map(k => k.dir === 'prev' ? `<div class="tgrow"><span>${k.ic} ${esc(kName(k))}</span><span style="grid-column:span 2;color:var(--muted);font-size:13px">${t_('tgPrev')}</span></div>`
+      : `<div class="tgrow"><span>${k.ic} ${esc(kName(k))} <small style="color:var(--muted)">(${LANG==='en'?(k.dir==='up'?'higher is better':'lower is better'):(k.dir==='up'?'الأعلى أفضل':'الأقل أفضل')}${t_('u')[k.unit]?' · '+t_('u')[k.unit]:''})</small></span>
+         <input type="number" min="0" step="any" id="t_${k.id}" value="${k.target}"><input type="number" min="0" step="any" id="w_${k.id}" value="${k.warn}"></div>`).join('');
+  $('tgOv').classList.add('on');
+}
+function closeTargets() { $('tgOv').classList.remove('on'); }
+function saveTargets() {
+  const s = {};
+  KPIS.forEach(k => { if (k.dir === 'prev') return; const tv = parseFloat($('t_'+k.id).value), wv = parseFloat($('w_'+k.id).value);
+    if (isFinite(tv)) k.target = tv; if (isFinite(wv)) k.warn = wv; s[k.id] = { target:k.target, warn:k.warn }; });
+  try { localStorage.setItem('nwKpiTargets', JSON.stringify(s)); } catch (e) {}
+  closeTargets(); render();
+}
+function resetTargets() { KPIS.forEach(k => { k.target = DEFAULTS[k.id].target; k.warn = DEFAULTS[k.id].warn; }); try { localStorage.removeItem('nwKpiTargets'); } catch (e) {} closeTargets(); render(); }
+$('tgOv').addEventListener('click', e => { if (e.target.id === 'tgOv') closeTargets(); });
+
+/* ---------- التحميل ---------- */
+function fail(m) { $('score').innerHTML = `<div class="msg err">${esc(m)}</div>`; $('grid').innerHTML = ''; $('garages').innerHTML = ''; }
+async function load(force) {
+  $('score').innerHTML = `<div class="msg">${t_('loading')}</div>`;
+  let a;
+  // آخر ٦ أشهر بس (هذا الشهر + ٥ قبله) — أخف بكثير من كل الفترات
+  try { a = await NWStats.fetchMonth('all', force, shiftMonth(thisMonth(), -5)); } catch (e) { return fail(t_('eNet')); }
+  if (a.error === 'AUTH') { NWAuth.relogin(); return fail(t_('eAuth')); }
+  if (a.error === 'FORBIDDEN') return fail(t_('eForbidden'));
+  if (!a.ok) return fail(t_('eErr') + (a.message || a.error));
+  ALL = NWStats.dedupe(a.rows || []).filter(r => !NWStats.isRemoved(r)); USERS = a.users || []; NWStats.setUsers(USERS);
+  const months = new Set(ALL.map(monthOf)); months.add(thisMonth());
+  const cur = $('fMonth').value || thisMonth();
+  $('fMonth').innerHTML = [...months].sort().reverse().map(m => `<option value="${m}">${monthLabel(m)}</option>`).join('');
+  $('fMonth').value = months.has(cur) ? cur : thisMonth();
+  const gs = NWStats.allGarages(), g = $('fGarage').value;
+  $('fGarage').innerHTML = `<option value="">${t_('allGarages')}</option>` + gs.map(x => `<option value="${esc(x)}">${esc(NWStats.garageName(x))}</option>`).join('');
+  $('fGarage').value = gs.includes(g) ? g : '';
+  render();
+}
+function applyLang() {
+  const h = document.documentElement; h.lang = LANG; h.dir = LANG === 'en' ? 'ltr' : 'rtl';
+  document.querySelectorAll('[data-i]').forEach(e => { const v = t_(e.dataset.i); if (typeof v === 'string') e.textContent = v; });
+  document.title = (LANG === 'en' ? 'Operational KPIs' : 'المؤشرات التشغيلية') + ' · ' + (LANG === 'en' ? 'Operations Tools' : 'أدوات التشغيل');
+}
+$('fMonth').addEventListener('change', render);
+$('fGarage').addEventListener('change', render);
+window.addEventListener('storage', e => { if (e.key === 'hubLang') { LANG = e.newValue === 'en' ? 'en' : 'ar'; applyLang(); render(); } });
+applyLang();
+if (window.NWAuth) load();
+</script>
+<script>try{if(window.NWIcon)document.querySelectorAll(".tIc").forEach(function(e){e.innerHTML=NWIcon("kpi",26)})}catch(e){}</script>
+</body>
+</html>

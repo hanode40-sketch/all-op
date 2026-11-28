@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>  
+<meta charset="UTF-8">
+<script>try{var t=localStorage.getItem('nwTheme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<script src="https://hanode40-sketch.github.io/all-op/auth.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#13274f">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="أدوات التشغيل">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>نورث ويست باص - أدوات التشغيل</title>
+<style>
+  /* ===== الصفحة الرئيسية — التصميم الموحد (الألوان من auth.js: --nw-*) ===== */
+  * { box-sizing: border-box; }
+  body { -webkit-font-smoothing: antialiased; margin: 0; padding: 18px 16px 40px; min-height: 100vh; font-family: var(--nw-font, -apple-system, "Segoe UI", Tahoma, Arial, sans-serif);
+    background: var(--nw-bg, #eef2f8); color: var(--nw-ink, #0f1e3d); }
+  .wrap { max-width: none; margin: 0 auto; }   /* الصفحة تملأ عرض الشاشة كامل */
+
+  /* الشريط العلوي */
+  .top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+  .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .logo-wrap img { height: 48px; background: #fff; border-radius: 12px; padding: 4px 8px; box-shadow: var(--nw-shadow); display: block; }
+  h1 { margin: 0; font-size: 19px; font-weight: 800; color: var(--nw-ink); }
+  .brand-s { color: var(--nw-muted); font-size: 12.5px; margin-top: 2px; }
+  .lang-bar { display: flex; gap: 8px; align-items: center; }
+  .lang-btn { font: inherit; font-size: 13px; font-weight: 700; background: var(--nw-card); color: var(--nw-ink); border: 1px solid var(--nw-line);
+    border-radius: 999px; padding: 7px 14px; cursor: pointer; }
+  .theme-btn { min-width: 42px; font-size: 15px; padding: 5px 10px; }
+
+  /* الترحيب + الوردية */
+  /* صورة الباص في خلفية شريط الترحيب */
+  .hero { position: relative; overflow: hidden; isolation: isolate; }
+  .hero::before { content: ""; position: absolute; inset: 0; z-index: -2; background: url("bg-buses.jpg?v=1") center 62% / cover no-repeat; }
+  .hero::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg, rgba(10,22,48,.35) 0%, rgba(10,22,48,.78) 60%, rgba(10,22,48,.9) 100%); }
+  html[dir="ltr"] .hero::after { background: linear-gradient(270deg, rgba(10,22,48,.35) 0%, rgba(10,22,48,.78) 60%, rgba(10,22,48,.9) 100%); }
+  html[data-theme="dark"] .hero::after { background: linear-gradient(90deg, rgba(5,10,22,.5) 0%, rgba(5,10,22,.85) 60%, rgba(5,10,22,.94) 100%); }
+  .hero { min-height: 190px; }
+  .shift-card { -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+  .hero { display: grid; grid-template-columns: 1fr minmax(260px, 340px); gap: 18px; align-items: center; background: var(--nw-hero);
+    color: #fff; border-radius: 20px; padding: 22px 24px; margin-bottom: 16px; box-shadow: 0 10px 30px rgba(19,39,79,.18); }
+  .hello { font-size: 30px; font-weight: 700; letter-spacing: -.3px; }
+  .hello-s { color: rgba(255,255,255,.82); font-size: 14px; margin-top: 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .chip { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.22); color: #fff; border-radius: 999px; padding: 3px 11px; font-size: 12.5px; font-weight: 700; }
+  .shift-card { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.2); border-radius: 16px; padding: 14px 18px; }
+  .sc-top { display: flex; justify-content: space-between; align-items: center; }
+  .sc-label { font-size: 12px; font-weight: 700; color: rgba(255,255,255,.75); }
+  .sc-clock { font-size: 20px; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .sc-name { font-size: 18px; font-weight: 800; margin: 4px 0 10px; }
+  .sc-bar { height: 7px; background: rgba(255,255,255,.2); border-radius: 99px; overflow: hidden; }
+  .sc-bar i { display: block; height: 100%; width: 0; background: var(--nw-acc, #f97316); border-radius: 99px; transition: width .6s; }
+  .sc-foot { display: flex; justify-content: space-between; font-size: 12px; color: rgba(255,255,255,.75); margin-top: 7px; }
+
+  /* يحتاج انتباهك (من بيانات إدارة السائقين المحفوظة في الجهاز) */
+  .att { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .att:empty { display: none; }
+  .att a { display: flex; align-items: center; gap: 12px; background: var(--nw-card); border-radius: 14px; padding: 12px 16px; text-decoration: none; color: var(--nw-ink);
+    box-shadow: var(--nw-shadow); border-inline-start: 5px solid var(--c); transition: transform .15s; }
+  .att a:hover { transform: translateY(-2px); }
+  .att b { font-size: 26px; color: var(--c); min-width: 34px; }
+  .att strong { display: block; font-size: 14.5px; } .att small { color: var(--nw-muted); font-size: 12.5px; }
+  .att em { margin-inline-start: auto; font-style: normal; font-size: 12.5px; font-weight: 800; color: var(--c); white-space: nowrap; }
+
+  /* المجموعات والبرامج */
+  .groups { display: flex; flex-direction: column; gap: 22px; margin-top: 8px; }
+  .grp-t { display: flex; align-items: center; gap: 12px; margin: 0 2px 10px; font-size: 14px; font-weight: 800; color: var(--nw-muted); }
+  .grp-t::after { content: ""; flex: 1; height: 1px; background: var(--nw-line); }
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  a.card { display: flex; align-items: center; gap: 14px; background: var(--nw-card); border: 1px solid transparent; border-radius: var(--nw-radius, 16px);
+    padding: 16px; text-decoration: none; color: var(--nw-ink); box-shadow: var(--nw-shadow); position: relative; transition: transform .15s, border-color .15s; }
+  a.card:hover { transform: translateY(-2px); border-color: var(--nw-line); }
+  a.card:active { transform: scale(.98); }
+  .icon { width: 48px; height: 48px; flex-shrink: 0; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 23px; }
+  .card-text { flex: 1; min-width: 0; }
+  .card-title { font-size: 15.5px; font-weight: 800; margin: 0 0 3px; }
+  .card-sub { font-size: 12.5px; line-height: 1.5; color: var(--nw-muted); margin: 0; }
+  .arrow, .open { display: none; }
+  a.card[data-tool="shift"]{--acc:#d97706} a.card[data-tool="tasks"]{--acc:#16a34a} a.card[data-tool="trip"]{--acc:#0d9488} a.card[data-tool="drivers"]{--acc:#0369a1} a.card[data-tool="housing"]{--acc:#7c3aed}
+  a.card[data-tool="violation"]{--acc:#dc2626} a.card[data-tool="accident"]{--acc:#ea580c} a.card[data-tool="evaluation"]{--acc:#ca8a04}
+  a.card[data-tool="performance"]{--acc:#7c3aed} a.card[data-tool="stats"]{--acc:#0284c7} a.card[data-tool="kpi"]{--acc:#db2777} a.card[data-tool="review"]{--acc:#0f766e}
+  .icon .nwi { color: var(--acc); }
+  @supports (background: color-mix(in srgb, red 10%, white)) {
+    .icon { background: color-mix(in srgb, var(--acc) 11%, var(--nw-card)) !important; }
+    html[data-theme="dark"] .icon { background: color-mix(in srgb, var(--acc) 20%, var(--nw-card)) !important; }
+  }
+  html[data-theme="dark"] .icon .nwi { filter: brightness(1.35); }
+  a.card::after { content: ""; position: absolute; inset-inline-start: 0; top: 18px; bottom: 18px; width: 3px; border-radius: 3px; background: var(--acc); opacity: 0; transition: opacity .15s; }
+  a.card:hover::after { opacity: 1; }
+  .card-title { letter-spacing: -.1px; }
+  .icon-eval { background: #EAF0FA; } .icon-trip { background: #E6F4EA; } .icon-viol { background: #FDECEC; } .icon-shift { background: #FFF4E0; }
+  .icon-perf { background: #EDE9FE; } .icon-stats { background: #E0F2FE; } .icon-kpi { background: #FCE7F3; } .icon-drv { background: #E0F2FE; }
+  .icon-acc { background: #FFEBE0; } .icon-task { background: #E3F2E8; }
+  html[data-theme="dark"] .icon-eval { background: #1e2a44; } html[data-theme="dark"] .icon-trip { background: #103430; } html[data-theme="dark"] .icon-viol { background: #3a1e22; }
+  html[data-theme="dark"] .icon-shift { background: #3a2a12; } html[data-theme="dark"] .icon-perf { background: #2a2150; } html[data-theme="dark"] .icon-stats { background: #0c2d48; }
+  html[data-theme="dark"] .icon-kpi { background: #3b1830; } html[data-theme="dark"] .icon-drv { background: #0c2d48; } html[data-theme="dark"] .icon-acc { background: #3a2216; }
+  html[data-theme="dark"] .icon-task { background: #12301f; }
+
+  /* تثبيت التطبيق + التذييل */
+  .install-banner { display: none; align-items: center; gap: 12px; margin-top: 22px; background: var(--nw-card); border: 1px dashed var(--nw-line);
+    border-radius: 14px; padding: 14px 16px; font-size: 13px; color: var(--nw-muted); }
+  .install-banner.show { display: flex; }
+  .install-banner p { margin: 0; flex: 1; line-height: 1.6; }
+  .install-btn { font: inherit; font-size: 13px; font-weight: 700; color: #fff; background: var(--nw-navy, #13274f); border: 0; border-radius: 10px; padding: 8px 14px; cursor: pointer; white-space: nowrap; }
+  .install-close { background: none; border: 0; font-size: 18px; color: var(--nw-muted); cursor: pointer; padding: 0 4px; }
+  .foot { text-align: center; color: var(--nw-muted); font-size: 12.5px; margin-top: 34px; padding-top: 18px; border-top: 1px solid var(--nw-line); }
+  #nw-user-slot { margin-inline-end: auto; }
+  .lang-bar { flex-wrap: wrap; min-width: 0; max-width: 100%; }
+  @media (max-width: 560px) { #set-btn span { display: none; } #set-btn { padding-inline: 11px; } #nw-user-slot { min-width: 0; max-width: 100%; } }
+
+  @media (max-width: 1180px) { .cards { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 900px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) {
+    body { padding: 12px 12px 30px; }
+    .top { flex-wrap: wrap; } .logo-wrap img { height: 40px; } h1 { font-size: 17px; } .brand-s { display: none; }
+    .hero { grid-template-columns: 1fr; padding: 18px; gap: 14px; } .hello { font-size: 22px; }
+    .cards { grid-template-columns: 1fr; gap: 10px; } a.card { padding: 13px 14px; }
+    .att { grid-template-columns: 1fr 1fr; } .att a { flex-wrap: wrap; gap: 4px 10px; padding: 10px 12px; } .att em { display: none; } .att b { font-size: 22px; }
+  }
+  @media (min-width: 1100px) { body { padding-top: 22px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <div class="logo-wrap">
+    <img src="logo.png?v=1" alt="Northwest Bus"/>
+      </div>
+      <div class="brand-t">
+        <h1 data-ar="أدوات التشغيل" data-en="Operations Tools">أدوات التشغيل</h1>
+        <div class="brand-s">Northwest Bus · <span data-ar="منصة العمليات" data-en="Operations platform">منصة العمليات</span></div>
+      </div>
+    </div>
+    <div class="lang-bar"><div id="nw-user-slot"></div><a class="lang-btn" id="set-btn" href="settings.html" hidden style="text-decoration:none">⚙️ <span data-ar="الإعدادات" data-en="Settings">الإعدادات</span></a><button class="lang-btn theme-btn" id="theme-btn" type="button" aria-label="الوضع الليلي">🌙</button><button class="lang-btn" id="lang-btn" type="button">English</button></div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-l">
+      <div class="hello" id="hello"></div>
+      <div class="hello-s" id="hello-s"></div>
+    </div>
+    <div class="shift-card">
+      <div class="sc-top"><span class="sc-label" data-ar="الوردية الحالية" data-en="Current shift">الوردية الحالية</span><span class="sc-clock" id="sc-clock"></span></div>
+      <div class="sc-name" id="sc-name"></div>
+      <div class="sc-bar"><i id="sc-fill"></i></div>
+      <div class="sc-foot" id="sc-foot"></div>
+    </div>
+  </section>
+
+  <div class="att" id="nw-att"></div>
+  <div id="nw-task-alert"></div>
+  <section class="nst-hub" id="nw-stats" data-tool="stats"></section>
+
+  <main class="groups">
+  <section class="grp" data-grp="ops">
+    <h2 class="grp-t"><span data-ar="التشغيل اليومي" data-en="Daily operations">التشغيل اليومي</span></h2>
+    <div class="cards">
+    <a class="card" href="https://hanode40-sketch.github.io/shift_handover/" data-tool="shift">
+      <div class="icon icon-shift">🔄</div>
+      <div class="card-text">
+        <p class="card-title" data-ar="تسليم واستلام الوردية" data-en="Shift Handover">تسليم واستلام الوردية</p>
+        <p class="card-sub" data-ar="تسليم الأجهزة والباصات للوردية القادمة" data-en="Hand over devices and buses to the next shift">تسليم الأجهزة والباصات للوردية القادمة</p>
+      </div>
+      <div class="arrow">‹</div>
+      <div class="open" data-ar="فتح البرنامج" data-en="Open">فتح البرنامج</div>
+    </a>
+    <a class="card" href="https://hanode40-sketch.github.io/tasks/" data-tool="tasks">
+      <div class="icon icon-task">📋</div>
+      <div class="card-text">
+        <p class="card-title" data-ar="المهام" data-en="Tasks">المهام</p>
+        <p class="card-sub" data-ar="مهامك اليومية وقائمة الوردية ومتابعة التكليفات" data-en="Your daily tasks, shift checklist and assignments">مهامك اليومية وقائمة الوردية ومتابعة التكليفات</p>
+      </div>
+      <div class="arrow">‹</div>
+      <div class="open" data-ar="فتح البرنامج" data-en="Open">فتح البرنامج</div>
+    </a>
+    <a class="card" href="https://hanode40-sketch.github.io/trip/" data-tool="trip">
+      <div class="icon icon-trip">🚌</div>
+      <div class="card-text">
+        <p class="card-title" data-ar="إرسال مسار الرحلة" data-en="Send Trip Route">إرسال مسار الرحلة</p>
+        <p class="card-sub" data-ar="إرسال تفاصيل الرحلة للسائق عبر واتساب" data-en="Send trip details to the driver via WhatsApp">إرسال تفاصيل الرحلة للسائق عبر واتساب</p>
+      </div>
+      <div class="arrow">‹</div>
+      <div class="open" data-ar="فتح البرنامج" data-en="Open">فتح البرنامج</div>
+    </a>
+    <a class="card" href="drivers.html" data-tool="drivers">
+      <div class="icon icon-drv">👨‍✈️</div>
+      <div class="card-text">
+        <p class="card-title" data-ar="إدارة السائقين" data-en="Drivers Management">إدارة السائقين</p>
+        <p class="card-sub" data-ar="حالات السائقين والإجازات والاستعداد لكل كراج" data-en="Driver statuses, leaves and standby for each depot">حالات السائقين والإجازات والاستعداد لكل كراج</p>
+      </div>
+      <div class="arrow">‹</div>
+      <div class="open" data-ar="فتح البرنامج" data-en="Open">فتح البرنامج</div>
+    </a>
+    <a class="card" href="housing.html" data-tool="housing">
+      <div class="icon icon-drv">🏠</div>
+      <div class="card-text">
+        <p class="card-title" data-ar="سكن السائقين" data-en="Drivers Housing">سكن السائقين</p>
+        <p class="card-sub" data-ar="غرف كل كراج والتسكين والنقل والإخلاء" data-en="Depot rooms, assigning, moving and vacating drivers">غرف كل كراج والتسكين والنقل والإخلاء</p>
+      </div>
+      <div class="arrow">‹</div>
+      <div class="open" data-ar="فتح البرنامج" data-en="Open">فتح البرنامج</div>
+    </a>
+    </div>
+  </section>
+  <section class="grp" data-grp="safety">
+    <h2 class="grp-t"><span data-ar="التقارير والسلامة" data-en="Reports & safety">التقارير والسلامة</span></h2>
+    <div class="cards">
+    <a class="card" href="https://hanode40-sketch.github.io/violation/" data-tool="violation">
+      <div class="icon icon-viol">📝</div>
+      <div class="card-text">
+        <p class="card-title" data-ar="محضر مخالفة" data-en="Violation Report">محضر مخالفة</p>
+        <p class="card-sub" data-ar="تسجيل مخالفة أو عدم اتباع التعليمات للسائق" data-en="Record a driver violation or non-compliance">تسجيل مخالفة أو عدم اتباع التعليمات للسائق</p>
+      </div>
+      <div class="arrow">‹</div>
+      <div class="open" data-ar="فتح البرنامج" data-en="Open">فتح البرنامج</div>
+    </a>
+    <a class="card" href="https://hanode40-sketch.github.io/fines/">
+      <div class="icon icon-viol">🚦</div>
+      <div class="card-text">
+        <p class="card-title" data-ar="نظام المخالفات المرورية" data-en="Traffic Violations System">نظام المخالفات المرورية</p>
+        <p class="card-sub" data-ar="استيراد المخالفات والتبصيم والإرسال للسائق عبر واتساب" data-en="Import violations, fingerprint and send to drivers via WhatsApp">استيراد المخالفات والتبصيم والإرسال للسائق عبر واتساب</p>
+      </div>
+      <div class="arrow">‹</div>
+      <div class="open" data-ar="فتح البرنامج" data-en="Open">فتح البرنامج</div>
+    </a>
+    <a class="card" href="https://hanode40-sketch.github.io/accident_report/" data-tool="accident">
+      <div class="icon icon-acc">🚨</div>
+      <div class="card-text">
+        <p class="card-title" data-ar="تقرير حادث" data-en="Accident Report">تقرير حادث</p>
+        <p class="card-sub" data-ar="تسجيل حادث حافلة وإرساله PDF عبر واتساب" data-en="Record a bus accident and send it as a PDF via WhatsApp">تسجيل حادث حافلة وإرساله PDF عبر واتساب</p>
+      </div>
+      <div class="arrow">‹</div>
+      <div class="open" data-ar="فتح البرنامج" data-en="Open">فتح البرنامج</div>
+    </a>
+    <a class="card" href="https://hanode40-sketch.github.io/OP/" data-tool="evaluation">
+      <div class="icon icon-eval">📋</div>
+      <div class="card-text">
+        <p class="card-title" data-ar="تقييم السائقين" data-en="Driver Evaluation">تقييم السائقين</p>
+        <p class="card-sub" data-ar="تعبئة تقييم يومي للسائق" data-en="Fill in a daily driver evaluation">تعبئة تقييم يومي للسائق</p>
+      </div>
+      <div class="arrow">‹</div>
+      <div class="open" data-ar="فتح البرنامج" data-en="Open">فتح البرنامج</div>
+    </a>
+    </div>
+  </section>
+  <section class="grp" data-grp="mgmt">
+    <h2 class="grp-t"><span data-ar="الإدارة والمتابعة" data-en="Management">الإدارة والمتابعة</span></h2>
+    <div class="cards">
+    <a class="card" href="performance.html" data-tool="performance">
+      <div class="icon icon-perf">📊</div>
+      <div class="card-text">
+        <p class="card-title" data-ar="أداء الموظفين" data-en="Staff Performance">أداء الموظفين</p>
+        <p class="card-sub" data-ar="متابعة نشاط وإنجاز كل موظف (للمدير والمشرف)" data-en="Track each employee's activity (managers & supervisors)">متابعة نشاط وإنجاز كل موظف (للمدير والمشرف)</p>
+      </div>
+      <div class="arrow">‹</div>
+      <div class="open" data-ar="فتح البرنامج" data-en="Open">فتح البرنامج</div>
+    </a>
+    <a class="card" href="stats.html" data-tool="stats">
+      <div class="icon icon-stats">📈</div>
+      <div class="card-text">
+        <p class="card-title" data-ar="إحصائيات العمل" data-en="Work Statistics">إحصائيات العمل</p>
+        <p class="card-sub" data-ar="أرقام ورسوم بيانية لكل البرامج والكراجات (للمدير والمشرف)" data-en="Charts and figures across all tools and garages (managers & supervisors)">أرقام ورسوم بيانية لكل البرامج والكراجات (للمدير والمشرف)</p>
+      </div>
+      <div class="arrow">‹</div>
+      <div class="open" data-ar="فتح البرنامج" data-en="Open">فتح البرنامج</div>
+    </a>
+    <a class="card" href="kpi.html" data-tool="kpi">
+      <div class="icon icon-kpi">🎯</div>
+      <div class="card-text">
+        <p class="card-title" data-ar="المؤشرات التشغيلية" data-en="Operational KPIs">المؤشرات التشغيلية</p>
+        <p class="card-sub" data-ar="مؤشرات الأداء مقابل الأهداف لكل كراج (للمدير والمشرف)" data-en="Performance against targets for each garage (managers & supervisors)">مؤشرات الأداء مقابل الأهداف لكل كراج (للمدير والمشرف)</p>
+      </div>
+      <div class="arrow">‹</div>
+      <div class="open" data-ar="فتح البرنامج" data-en="Open">فتح البرنامج</div>
+    </a>
+    <a class="card" href="review.html" data-tool="review">
+      <div class="icon icon-kpi">🔎</div>
+      <div class="card-text">
+        <p class="card-title" data-ar="مراجعة البيانات" data-en="Data Review">مراجعة البيانات</p>
+        <p class="card-sub" data-ar="سجلات كل البرامج في مكان واحد مع كشف النواقص وتصدير Excel" data-en="All programs' records in one place, with missing-data checks and Excel export">سجلات كل البرامج في مكان واحد مع كشف النواقص وتصدير Excel</p>
+      </div>
+      <div class="arrow">‹</div>
+      <div class="open" data-ar="فتح البرنامج" data-en="Open">فتح البرنامج</div>
+    </a>
+    </div>
+  </section>
+  </main>
+
+  <div class="install-banner" id="install-banner">
+    <p id="install-text" data-ar="ثبّت أدوات التشغيل كتطبيق على جوالك لفتحها بضغطة واحدة" data-en="Install Operations Tools as an app on your phone for one-tap access">ثبّت أدوات التشغيل كتطبيق على جوالك لفتحها بضغطة واحدة</p>
+    <button class="install-btn" id="install-btn" type="button" data-ar="تثبيت" data-en="Install">تثبيت</button>
+    <button class="install-close" id="install-close" type="button" aria-label="close">×</button>
+  </div>
+
+  <footer class="foot">© <span id="yr"></span> Northwest Bus · <span data-ar="أدوات التشغيل" data-en="Operations Tools">أدوات التشغيل</span></footer>
+</div>
+<script>
+(function(){
+  if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(function(){}); }
+  var banner=document.getElementById('install-banner'), btn=document.getElementById('install-btn'),
+      txt=document.getElementById('install-text'), deferred=null;
+  var standalone=window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+  var dismissed=false; try{ dismissed=localStorage.getItem('hubInstallHidden')==='1'; }catch(e){}
+  if(standalone || dismissed) return;
+  var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  if(isIOS){
+    txt.setAttribute('data-ar','لتثبيت التطبيق: اضغط زر المشاركة ⬆️ في سفاري ثم "إضافة إلى الشاشة الرئيسية"');
+    txt.setAttribute('data-en','To install: tap the Share button ⬆️ in Safari, then "Add to Home Screen"');
+    txt.textContent=txt.getAttribute(document.documentElement.lang==='en'?'data-en':'data-ar');
+    btn.style.display='none'; banner.classList.add('show');
+  }
+  window.addEventListener('beforeinstallprompt',function(e){ e.preventDefault(); deferred=e; banner.classList.add('show'); });
+  btn.addEventListener('click',function(){ if(!deferred) return; deferred.prompt(); deferred.userChoice.finally(function(){ deferred=null; banner.classList.remove('show'); }); });
+  window.addEventListener('appinstalled',function(){ banner.classList.remove('show'); });
+  document.getElementById('install-close').addEventListener('click',function(){
+    banner.classList.remove('show'); try{ localStorage.setItem('hubInstallHidden','1'); }catch(e){}
+  });
+})();
+</script>
+<script>try{ if(window.NWAuth&&NWAuth.role==='مدير') document.getElementById('set-btn').hidden=false; }catch(e){}</script>
+<script>
+(function(){
+  var btn=document.getElementById('lang-btn');
+  function apply(lang){
+    var en=lang==='en';
+    document.documentElement.lang=en?'en':'ar';
+    document.documentElement.dir=en?'ltr':'rtl';
+    document.title=en?'Northwest Bus - Operations Tools':'نورث ويست باص - أدوات التشغيل';
+    document.querySelectorAll('[data-ar]').forEach(function(el){ el.textContent=el.getAttribute(en?'data-en':'data-ar'); });
+    document.querySelectorAll('.arrow').forEach(function(a){ a.textContent=en?'›':'‹'; });
+    btn.textContent=en?'العربية':'English';
+    try{ localStorage.setItem('hubLang',lang); }catch(e){}
+  }
+  var saved='ar'; try{ saved=localStorage.getItem('hubLang')||'ar'; }catch(e){}
+  apply(saved);
+  btn.addEventListener('click',function(){ apply(document.documentElement.lang==='en'?'ar':'en'); });
+})();
+</script>
+<script>
+(function(){
+  var btn=document.getElementById('theme-btn'), root=document.documentElement;
+  var meta=document.querySelector('meta[name="theme-color"]');
+  function apply(t){
+    root.setAttribute('data-theme',t);
+    btn.textContent=t==='dark'?'☀️':'🌙';
+    btn.title=t==='dark'?'الوضع النهاري':'الوضع الليلي';
+    if(meta) meta.setAttribute('content',t==='dark'?'#0b1220':'#13274f');
+  }
+  apply(root.getAttribute('data-theme')||'light');
+  btn.addEventListener('click',function(){
+    var t=root.getAttribute('data-theme')==='dark'?'light':'dark';
+    apply(t); try{ localStorage.setItem('nwTheme',t); }catch(e){}
+  });
+})();
+</script>
+<script>
+/* الترحيب + الوردية الحالية + إخفاء المجموعات الفاضية */
+(function(){
+  var $=function(i){return document.getElementById(i)};
+  $('yr').textContent=new Date().getFullYear();
+  var ROLE_EN={'مدير':'Manager','مدير تنفيذي':'Executive Manager','جودة':'Quality','علاقات حكومية':'Government Relations','مشرف':'Supervisor','مرحّل':'Dispatcher','مرحل':'Dispatcher','موظف':'Employee'};
+  var G_EN={'الشميسي':'Al-Shumaisi','الرياض':'Riyadh','المدينة':'Madinah','تبوك':'Tabuk','حائل':'Hail','خميس مشيط':'Khamis Mushait','جازان':'Jazan','البشائر':'Al-Bashayer','بريدة':'Buraydah'};
+  function esc(x){return String(x==null?'':x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+  function upd(){
+    var en=document.documentElement.lang==='en', d=new Date(), h=d.getHours(), m=d.getMinutes();
+    var A=window.NWAuth||{}, name=String(A.name||'').trim(), first=name.split(/\s+/)[0]||'';
+    var greet=h<12?(en?'Good morning':'صباح الخير'):(en?'Good evening':'مساء الخير');
+    $('hello').innerHTML=esc(greet)+(first?(en?', ':'، ')+'<span dir="auto">'+esc(first)+'</span>':'');
+    var chips=[], date=d.toLocaleDateString(en?'en-GB':'ar-SA-u-ca-gregory-nu-latn',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    if(A.role) chips.push('<span class="chip">'+esc(en?(ROLE_EN[A.role]||A.role):A.role)+'</span>');
+    (A.garages||[]).slice(0,4).forEach(function(g){ chips.push('<span class="chip">'+esc(en?(G_EN[String(g).replace(/^كراج\s*/,'')]||g):g)+'</span>'); });
+    $('hello-s').innerHTML='<span style="display:inline-flex;align-items:center;gap:6px">'+(window.NWIcon?NWIcon('calendar',16):'📅')+esc(date)+'</span>'+chips.join('');
+    var sh=h<8?1:h<16?2:3, start=(sh-1)*8, mins=(h-start)*60+m, left=480-mins;
+    $('sc-clock').textContent=d.toLocaleTimeString(en?'en-GB':'ar-SA-u-nu-latn',{hour:'2-digit',minute:'2-digit'});
+    $('sc-name').textContent=(en?['','Shift 1','Shift 2','Shift 3']:['','الوردية الأولى','الوردية الثانية','الوردية الثالثة'])[sh];
+    $('sc-fill').style.width=Math.round(mins/480*100)+'%';
+    var pad=function(n){return String(n).padStart(2,'0')};
+    var rng=pad(start)+':00 – '+pad(start+8===24?24:start+8)+':00';
+    var lt=Math.floor(left/60)+(en?'h ':' س ')+(left%60)+(en?'m left':' د متبقية');
+    $('sc-foot').innerHTML='<span>'+rng+'</span><span>'+lt+'</span>';
+  }
+  /* أيقونات احترافية بدل الإيموجي */
+  var IK={shift:'shift',tasks:'tasks',trip:'trip',drivers:'drivers',housing:'housing',violation:'violation',accident:'accident',evaluation:'evaluation',performance:'performance',stats:'stats',kpi:'kpi',review:'review'};
+  function icons(){
+    if(!window.NWIcon) return;
+    document.querySelectorAll('a.card[data-tool]').forEach(function(a){ var k=IK[a.dataset.tool], ic=a.querySelector('.icon'); if(k&&ic&&!ic.querySelector('svg')) ic.innerHTML=NWIcon(k,24); });
+  }
+  function groups(){
+    document.querySelectorAll('.grp').forEach(function(g){
+      var any=[].some.call(g.querySelectorAll('a.card'),function(a){return a.style.display!=='none'});
+      g.style.display=any?'':'none';
+    });
+  }
+  /* يحتاج انتباهك: من آخر نسخة لبيانات السائقين محفوظة في الجهاز (تتحدث كل ما تنفتح صفحة إدارة السائقين) */
+  function att(){
+    var box=$('nw-att'); if(!box) return;
+    var A=window.NWAuth, en=document.documentElement.lang==='en';
+    if(!A||!A.can||!A.can('drivers')){ box.innerHTML=''; return; }
+    var c=null; try{ c=JSON.parse(localStorage.getItem('nwDrvCache1')||'null'); }catch(e){}
+    if(!c||!c.d||!c.d.length){ box.innerHTML=''; return; }
+    var pad=function(n){return String(n).padStart(2,'0')}, ymd=function(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())};
+    var now=new Date(), today=ymd(now), d3=new Date(now); d3.setDate(now.getDate()+3); var in3=ymd(d3), d30=new Date(now); d30.setDate(now.getDate()+30); var in30=ymd(d30);
+    var LV={'Annual Leave':1,'Emergency Leave':1,'Sick Leave':1}, gone={'Termination of services':1,'Absconding':1};
+    var exp=0, soon=0, late=0, due=0;
+    c.d.forEach(function(r){
+      var st=r[4], card=r[13]||'', to=r[9]||'';
+      if(card&&!gone[st]){ if(card<today) exp++; else if(card<=in30) soon++; }
+      if(LV[st]&&to){ if(to<today) late++; else if(to<=in3) due++; }
+    });
+    var T=function(ar,e){return en?e:ar}, items=[];
+    if(late) items.push(['#dc2626',late,T('متأخرين عن العودة','Overdue returns'),T('من الإجازة','From leave')]);
+    if(due) items.push(['#2563eb',due,T('راجعين خلال 3 أيام','Returning in 3 days'),T('جهّز جدولتهم','Plan their schedule')]);
+    if(exp) items.push(['#b45309',exp,T('كروت تشغيل منتهية','Expired cards'),T('تحتاج تجديد','Need renewal')]);
+    if(soon) items.push(['#d97706',soon,T('كروت تنتهي قريباً','Cards expiring soon'),T('خلال 30 يوم','Within 30 days')]);
+    box.innerHTML=items.map(function(x){ return '<a href="drivers.html" style="--c:'+x[0]+'"><b>'+x[1]+'</b><div><strong>'+esc(x[2])+'</strong><small>'+esc(x[3])+'</small></div><em>'+(en?'Open →':'فتح ←')+'</em></a>'; }).join('');
+  }
+  upd(); groups(); att(); icons(); setInterval(upd,20000);
+  var n=0, t=setInterval(function(){ upd(); groups(); att(); icons(); if(++n>20) clearInterval(t); },250);  // بعد ما يجهز auth.js
+  new MutationObserver(function(){ upd(); att(); }).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+})();
+</script>
+<script src="stats-widget.js"></script>
+<script src="tasks-alert.js"></script>
+</body>
+</html>

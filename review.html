@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<script>try{var t=localStorage.getItem('nwTheme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<script src="https://hanode40-sketch.github.io/all-op/auth.js" data-tool="review"></script>
+<script src="i18n.js"></script>
+<script src="i18n/common.js"></script>
+<script src="i18n/review.js"></script>
+<script src="stats-widget.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#13274f">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<title>مراجعة البيانات · أدوات التشغيل</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--nw-bg,#eef2f8);color:var(--nw-ink,#0f172a);font-family:var(--nw-font,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif);-webkit-font-smoothing:antialiased;padding:20px 14px 60px}
+  .wrap{max-width:none;margin:0 auto}
+  .top{position:sticky;top:0;z-index:50;margin:-20px -14px 18px;padding:14px 18px 12px;border-radius:0 0 16px 16px;background:var(--nw-hero,#13274f);color:#fff;box-shadow:0 8px 24px rgba(19,39,79,.18);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .top h1{margin:0;font-size:22px;display:flex;align-items:center;gap:10px}
+  .top .en{font-size:13px;opacity:.75}
+  .panel{background:var(--nw-card,#fff);border:1px solid var(--nw-line,#e5e7eb);border-radius:16px;box-shadow:var(--nw-shadow,0 1px 2px rgba(15,23,42,.06));padding:16px;margin-bottom:14px}
+  .muted{color:var(--nw-muted,#64748b)}
+  .btn{font:inherit;font-size:14px;font-weight:700;border:0;border-radius:10px;padding:10px 14px;cursor:pointer;background:var(--nw-navy,#13274f);color:#fff;white-space:nowrap}
+  html[data-theme="dark"] .btn{background:#2c5cc5}
+  .btn.light{background:var(--nw-soft,#f1f5f9);color:var(--nw-ink);border:1px solid var(--nw-line)}
+  .btn.sm{padding:6px 10px;font-size:13px}
+  .btn:disabled{opacity:.5;cursor:default}
+  .filters{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+  .f{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:var(--nw-muted)}
+  .f input,.f select{font:inherit;font-size:14px;padding:9px 11px;border-radius:10px;border:1px solid var(--nw-line,#d6d9de);background:var(--nw-card,#fff);color:var(--nw-ink);min-width:140px}
+  .f input[type=search]{min-width:230px}
+  .chk{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:700;padding:9px 12px;border:1px solid var(--nw-line);border-radius:10px;cursor:pointer;background:var(--nw-card)}
+  .chk input{width:17px;height:17px;accent-color:#dc2626}
+  .grow{flex:1}
+  .tools{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .tool{font:inherit;font-size:13.5px;font-weight:700;border:1px solid var(--nw-line);background:var(--nw-card);color:var(--nw-ink);border-radius:999px;padding:7px 13px;cursor:pointer;display:flex;align-items:center;gap:7px}
+  .tool i{font-style:normal;width:9px;height:9px;border-radius:50%;background:var(--c)}
+  .tool b{background:var(--nw-soft);border-radius:999px;padding:1px 8px;font-size:12px}
+  .tool .bad{background:#fee2e2;color:#b91c1c}
+  html[data-theme="dark"] .tool .bad{background:#4a1d1d;color:#fca5a5}
+  .tool.on{background:var(--nw-navy,#13274f);color:#fff;border-color:transparent}
+  html[data-theme="dark"] .tool.on{background:#2c5cc5}
+  .tool.on b{background:rgba(255,255,255,.18)}
+  .tool.err{border-color:#f59e0b}
+  .tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
+  .tile{background:var(--nw-card);border:1px solid var(--nw-line);border-radius:14px;padding:14px 16px;box-shadow:var(--nw-shadow);border-top:3px solid var(--c,#13274f)}
+  .tile b{display:block;font-size:26px}
+  .tile span{font-size:13px;color:var(--nw-muted);font-weight:700}
+  .tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  @media (max-width:800px){ .tabs button{flex:1 1 40%;padding:9px 8px} }
+  .tabs button{font:inherit;font-weight:800;font-size:14px;border:1px solid var(--nw-line);background:var(--nw-card);color:var(--nw-muted);padding:9px 16px;border-radius:10px;cursor:pointer}
+  .tabs button.on{background:var(--nw-navy,#13274f);color:#fff;border-color:transparent}
+  html[data-theme="dark"] .tabs button.on{background:#2c5cc5}
+  .tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+  .tbl th{text-align:start;padding:10px 8px;color:var(--nw-muted);font-size:12.5px;border-bottom:2px solid var(--nw-line);white-space:nowrap;position:sticky;top:0;background:var(--nw-card)}
+  .tbl td{padding:9px 8px;border-bottom:1px solid var(--nw-line);vertical-align:top}
+  .tbl tr.has td{background:color-mix(in srgb,#f59e0b 7%,transparent)}
+  .tbl .tn{display:inline-flex;align-items:center;gap:6px;font-weight:700;white-space:nowrap}
+  .tbl .tn i{width:8px;height:8px;border-radius:50%;background:var(--c)}
+  .iss{display:inline-block;font-size:12px;font-weight:700;background:#fee2e2;color:#b91c1c;border-radius:6px;padding:2px 7px;margin:1px 0 1px 4px;white-space:nowrap}
+  .iss.w{background:#fef3c7;color:#92400e}
+  html[data-theme="dark"] .iss{background:#4a1d1d;color:#fca5a5} html[data-theme="dark"] .iss.w{background:#45340f;color:#fcd34d}
+  .ok{color:#16a34a;font-weight:800}
+  .rh{margin:6px 0 8px;font-size:15px}.grid2r{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:900px){.grid2r{grid-template-columns:1fr}}
+  .sub{font-size:12px;color:var(--nw-muted)}
+  .scroll{overflow:auto;max-height:70vh;border-radius:10px}
+  .pager{display:flex;gap:8px;align-items:center;justify-content:center;margin-top:12px;font-size:13px}
+  .msg{padding:30px;text-align:center;color:var(--nw-muted)}
+  .warn{background:#fef3c7;color:#92400e;border-radius:10px;padding:10px 12px;font-size:13px;margin-top:12px}
+  html[data-theme="dark"] .warn{background:#45340f;color:#fcd34d}
+  a.lnk{color:#2563eb;font-weight:700;text-decoration:none;white-space:nowrap}
+  html[data-theme="dark"] a.lnk{color:#93b4ff}
+  .bar{height:7px;border-radius:9px;background:var(--nw-soft);overflow:hidden;min-width:80px}
+  .bar i{display:block;height:100%;background:#dc2626}
+  #flagM{position:fixed;inset:0;z-index:200;background:rgba(10,18,35,.55);display:flex;align-items:center;justify-content:center;padding:14px}
+  .mdl{background:var(--nw-card,#fff);color:var(--nw-ink);border-radius:16px;padding:18px;width:min(760px,100%);max-height:94vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+  .mdl-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:17px}
+  .tile small{font-size:11.5px;font-weight:600}
+  @media (max-width:800px){ .tiles{grid-template-columns:repeat(2,minmax(0,1fr))} .f input[type=search]{min-width:0;width:100%} .f{flex:1 1 140px} }
+  /* الجوال: لا شي يطلع برا عرض الشاشة — الجداول العريضة تنسحب جوّا إطارها */
+  html,body{overflow-x:clip;max-width:100%}
+  .wrap,.panel,#view{min-width:0;max-width:100%}
+  .grid2r>*{min-width:0}
+  .scroll{max-width:100%;overflow:auto;-webkit-overflow-scrolling:touch}
+  @media (max-width:800px){
+    body{padding:14px 10px 50px}
+    .top{margin:-14px -10px 14px;padding:12px 14px 10px}
+    .top h1{font-size:19px}
+    .panel{padding:12px;border-radius:14px}
+    .tbl{font-size:12.5px}
+    .tbl th,.tbl td{padding:8px 6px}
+    .bar{min-width:50px}
+    .f input,.f select{min-width:0;width:100%}
+    .tile{padding:12px}
+    .tile b{font-size:22px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><h1><span class="tIc">🔎</span> مراجعة البيانات</h1><div class="en">Data Review · كل البرامج في مكان واحد</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="filters">
+      <label class="f">من <input type="date" id="from"></label>
+      <label class="f">إلى <input type="date" id="to"></label>
+      <button class="btn" id="load">تحميل</button>
+      <label class="f">الكراج <select id="garage"><option value="">كل الكراجات</option></select></label>
+      <label class="f">الموظف <select id="emp"><option value="">كل الموظفين</option></select></label>
+      <label class="f grow">بحث <input type="search" id="q" placeholder="اسم، رقم إقامة، حافلة، رحلة، مرجع..."></label>
+      <label class="chk"><input type="checkbox" id="onlyIss"> النواقص فقط</label>
+      <button class="btn light" id="xls">⬇ تصدير Excel</button>
+    </div>
+    <div class="tools" id="tools"></div>
+    <div id="errs"></div>
+  </div>
+
+  <div class="tiles" id="tiles"></div>
+
+  <div class="panel">
+    <div class="tabs"><button data-v="rec" class="on">السجلات</button><button data-v="emp">ملخص الموظفين</button><button data-v="iss">أنواع النواقص</button><button data-v="trip">🚌 إرسال المسارات</button></div>
+    <div id="view"><div class="msg">اختر الفترة واضغط «تحميل»</div></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+const tok = () => (window.NWAuth && NWAuth.token()) || '';
+const H = 3600e3, DAY = 24 * H;
+
+/* يحوّل أي صيغة تاريخ للصيغة yyyy-mm-dd */
+function nd(v) {
+  if (!v) return '';
+  const s = String(v);
+  let m = s.match(/(\d{4})-(\d{1,2})-(\d{1,2})/); if (m) return m[1] + '-' + pad(m[2]) + '-' + pad(m[3]);
+  m = s.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/); if (m) return m[3] + '-' + pad(m[2]) + '-' + pad(m[1]);
+  const d = new Date(s); return isNaN(d) ? '' : ymd(d);
+}
+const age = v => { const d = new Date(v); return isNaN(d) ? 0 : Date.now() - d.getTime(); };
+const fmtT = v => { const d = new Date(v); return isNaN(d) ? String(v || '') : ymd(d) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+const blank = v => !String(v == null ? '' : v).trim() || /^[-—–]$/.test(String(v).trim());
+const gNorm = g => String(g || '').replace(/كراج/g, '').trim();
+
+/* ======================= البرامج =======================
+   كل برنامج: يجيب سجلاته من الـ Apps Script حقه بنفس الدخول، ويحوّلها لشكل موحد،
+   ويفحص كل سجل: issues = نواقص (أحمر) ، warns = تنبيهات (أصفر) */
+const TOOLS = [
+ { id:'shift', name:'تسليم الوردية', c:'#0891b2',
+   url:'https://script.google.com/macros/s/AKfycbwAFPU8FOcNkmXigGKbTW1vYMrJ0fykf_lnnsaXIvoEm41zTy4TcesTMiG33I0HBwuQbA/exec',
+   async load() { const j = await getJ(this.url, 'action=list'); return j.items || []; },
+   map(r) {
+     const I = [], W = [], br = r.broken || [];
+     if (r.status !== 'received' && age(r.sentAt) > 3 * H) I.push('لم يُستلم بعد أكثر من 3 ساعات');
+     if (blank(r.toName)) W.push('المستلم المقصود غير محدد');
+     if (!(r.ready || []).length && !(r.spare || []).length && !br.length) I.push('بدون باصات');
+     if (br.some(b => blank(b.fault))) I.push('باص متعطل بدون وصف العطل');
+     if (r.status === 'received' && r.sentAt && r.receivedAt && new Date(r.receivedAt) - new Date(r.sentAt) > 3 * H) W.push('الاستلام تأخر أكثر من 3 ساعات');
+     return { id:r.id, date:nd(r.date), time:r.time, garage:r.garage, by:r.fromName, subject:'وردية ' + (r.shift || '') + (r.toName ? ' ← ' + r.toName : ''),
+       status: r.status === 'received' ? 'مستلم: ' + (r.receivedName || '') : 'بانتظار الاستلام', I, W,
+       x:{ 'جاهز':(r.ready||[]).length, 'اسبير':(r.spare||[]).length, 'متعطل':br.length, 'وقت الإرسال':fmtT(r.sentAt), 'وقت الاستلام':r.receivedAt?fmtT(r.receivedAt):'', 'ملاحظات':r.notes||'' } };
+   } },
+ { id:'tasks', name:'المهام', c:'#7c3aed',
+   url:'https://script.google.com/macros/s/AKfycbzd8yDSxYL_Qt4JLaaTpqRG4IOAkhuGTx9mY98NevDqseiTyOmSWfZpIr9YOTxy51iVvQ/exec',
+   async load(months) {
+     const all = {}; for (const m of months) { const j = await getJ(this.url, 'action=boot&month=' + m); (j.tasks || []).forEach(t => all[t.id] = t); }
+     return Object.values(all);
+   },
+   map(t) {
+     const I = [], W = [], open = t.status === 'new' || t.status === 'doing';
+     if (open && t.due && new Date(t.due) < new Date()) I.push('متأخرة عن الموعد');
+     if (blank(t.due)) W.push('بدون موعد');
+     if (t.status === 'new' && age(t.created) > 2 * DAY) W.push('لم تبدأ من أكثر من يومين');
+     const ST = { new:'جديدة', doing:'قيد التنفيذ', done:'منتهية', cancel:'ملغاة' };
+     return { id:t.id, date:nd(t.created), time:'', garage:t.garage, by:t.byName, subject:(t.title || '') + ' ← ' + (t.toName || ''),
+       status: ST[t.status] || t.status, I, W, x:{ 'المكلّف':t.toName||'', 'الأولوية':t.prio==='high'?'عاجلة':'', 'الموعد':t.due?fmtT(t.due):'', 'انتهت':t.done?fmtT(t.done):'', 'ملاحظة':t.note||'' } };
+   } },
+ { id:'violation', name:'محضر المخالفة', c:'#dc2626',
+   url:'https://script.google.com/macros/s/AKfycbynHzaInTH3aul1LCv2_w6FkEZ0_r-24P9Tw5P8WuhNqgHI-8H5yuU8tOl1Uko3OVl4Ag/exec',
+   async load() { const j = await getJ(this.url, 'action=list'); return j.records || []; },
+   map(r) {
+     const I = [], W = [];
+     if (blank(r.driverId)) I.push('رقم الإقامة ناقص');
+     if (blank(r.empId)) W.push('الرقم الوظيفي ناقص');
+     if (blank(r.trip)) W.push('رقم الرحلة ناقص');
+     if (blank(r.busNo)) I.push('رقم الحافلة ناقص');
+     if (blank(r.driverSigned)) I.push('بدون توقيع السائق');
+     if (!Number(r.photoCount) && !r.photosUrl && !r.hasPhotos) W.push('بدون صور');
+     if (!r.pdfUrl && !r.hasPdf) I.push('بدون ملف PDF');
+     if ((r.status || 'معلّق') === 'معلّق' && age(nd(r.date)) > 3 * DAY) W.push('معلّق أكثر من 3 أيام');
+     return { id:r.id, date:nd(r.date), time:r.time, garage:r.depot, by:r.supervisor || r.by, subject:(r.driverName || '') + ' · ' + (r.violation || ''),
+       status:r.status || 'معلّق', I, W, link:r.pdfUrl, dupKey:[r.driverId, nd(r.date), r.violation].join('|'),
+       x:{ 'السائق':r.driverName||'', 'الإقامة':r.driverId||'', 'الرقم الوظيفي':r.empId||'', 'الرحلة':r.trip||'', 'الحافلة':r.busNo||'', 'المخالفة':r.violation||'', 'الوصف':r.description||'', 'الصور':r.photoCount||0 } };
+   } },
+ { id:'accident', name:'تقرير الحادث', c:'#ea580c',
+   url:'https://script.google.com/macros/s/AKfycbwoZi2ubMcKf6LvpZPpfMAdTnfctAJ7r2PxxqbSKLmZJD-vTt4zZH_WD5I37lPw7Gfyzg/exec',
+   async load() { const j = await getJ(this.url, 'action=list'); return j.reports || []; },
+   map(r) {
+     const I = [], W = [];
+     if (blank(r.bus)) I.push('رقم الحافلة ناقص');
+     if (blank(r.driverId)) I.push('رقم إقامة السائق ناقص');
+     if (blank(r.accDate)) I.push('تاريخ الحادث ناقص');
+     if (blank(r.garage)) W.push('الكراج ناقص');
+     if (!r.pdfUrl) I.push('بدون ملف PDF');
+     return { id:r.id, date:nd(r.accDate) || nd(r.updated), time:'', garage:r.garage, by:r.by, subject:'🚌 ' + (r.bus || '—') + ' · ' + (r.driver || ''),
+       status:r.status || '', I, W, link:r.pdfUrl, x:{ 'الحافلة':r.bus||'', 'السائق':r.driver||'', 'الإقامة':r.driverId||'', 'التكلفة':r.cost||'', 'على السائق':r.driverCost||'', 'آخر تحديث':r.updated||'' } };
+   } },
+ { id:'evaluation', name:'تقييم السائقين', c:'#ca8a04',
+   url:'https://script.google.com/macros/s/AKfycbwgJWwE8yuAgyb87kq52TDDL0hp22vOOpQ4HUXp7gglYdSv1Ats_tEjPQnfcuwpOURm/exec',
+   async load(months) { let out = []; for (const m of months) { const j = await getJ(this.url, 'action=list&month=' + m); out = out.concat(j.records || []); } return out; },
+   map(r) {
+     const I = [], W = [];
+     if (blank(r.iqama)) I.push('رقم الإقامة ناقص');
+     if (blank(r.trip)) W.push('رقم الرحلة ناقص');
+     if (!r.photo) W.push('بدون صورة');
+     if (Number(r.total) < 60) W.push('درجة منخفضة (' + r.total + ')');
+     return { id:r.id, date:nd(r.date), time:'', garage:r.garage, by:r.by, subject:(r.name || '') + ' · ' + (r.total != null ? r.total + '/100' : ''),
+       status:'', I, W, link:r.photo, dupKey:[r.iqama, nd(r.date)].join('|'),
+       x:{ 'السائق':r.name||'', 'الإقامة':r.iqama||'', 'الرحلة':r.trip||'', 'الدرجة':r.total, 'ملاحظات':r.notes||'' } };
+   } },
+ { id:'trip', name:'مسار الرحلة', c:'#16a34a', fromLog:'مسار الرحلة',
+   async load(months) {
+     let rows = []; for (const m of months) { const j = await NWStats.fetchMonth(m, true); if (j && j.ok === false) throw new Error(j.error || 'ERR'); rows = rows.concat((j && j.rows) || []); }
+     return rows.filter(r => /مسار|trip/i.test(String(r[3] || '')));
+   },
+   map(r) {
+     return { id:String(r[5] || '') + '|' + r[0], date:nd(r[0]), time:String(fmtT(r[0])).slice(11), garage:'', by:r[2], subject:(r[5] || '') + (r[6] ? ' · ' + r[6] : ''),
+       status:r[4] || '', I:[], W:[], dupKey:[r[5], nd(r[0]), r[4]].join('|'), x:{ 'العملية':r[4]||'', 'المرجع':r[5]||'', 'التفاصيل':r[6]||'' } };
+   } }
+];
+const TMAP = Object.fromEntries(TOOLS.map(t => [t.id, t]));
+
+async function getJ(url, q) {
+  // Google أحياناً يرجّع صفحة خطأ مؤقتة (ضغط أو حد التنفيذ المتزامن) بدل البيانات: نعيد المحاولة تلقائياً
+  let j = null, last = null;
+  for (let k = 0; k < 3; k++) {
+    try { const r = await fetch(url + '?' + q + '&authToken=' + encodeURIComponent(tok())); const t = await r.text(); j = JSON.parse(t); break; }
+    catch (e) { last = e; await new Promise(res => setTimeout(res, 800 * (k + 1))); }
+  }
+  if (!j) throw new Error('تعذّر الاتصال مؤقتاً — حدّث الصفحة' + (last && last.message ? ' (' + last.message.slice(0, 60) + ')' : ''));
+  if (j && j.error === 'AUTH') throw new Error('لا تملك صلاحية لهذا البرنامج');   // ما نطلّع المستخدم — بس نوضح
+  if (!j || j.ok === false) throw new Error((j && j.error) || 'ERR');
+  return j;
+}
+
+/* ======================= الحالة ======================= */
+let ALL = [], ERR = {}, CNT = {}, SEL = '', VIEW = 'rec', PAGE = 0;
+const PER = 100;
+
+function months(from, to) {
+  const out = []; let d = new Date(from.slice(0, 7) + '-01T00:00:00'); const end = new Date(to.slice(0, 7) + '-01T00:00:00');
+  while (d <= end && out.length < 13) { out.push(d.getFullYear() + '-' + pad(d.getMonth() + 1)); d.setMonth(d.getMonth() + 1); }
+  return out;
+}
+
+async function loadAll() {
+  const from = $('from').value, to = $('to').value;
+  if (!from || !to || to < from) return alert('اختر فترة صحيحة');
+  const ms = months(from, to);
+  $('load').disabled = true; ALL = []; ERR = {}; CNT = {}; TR = null;
+  $('view').innerHTML = '<div class="msg">جاري التحميل من البرامج...</div>';
+  TOOLS.forEach(t => CNT[t.id] = '…'); drawTools();
+  await Promise.all(TOOLS.map(async t => {
+    try {
+      const raw = await t.load(ms);
+      const recs = raw.map(r => { try { const o = t.map(r); o.tool = t.id; return o; } catch (e) { return null; } })
+        .filter(o => o && o.date && o.date >= from && o.date <= to);
+      // المكرر داخل نفس البرنامج
+      const seen = {};
+      recs.forEach(o => { if (!o.dupKey || /^\|/.test(o.dupKey)) return; if (seen[o.dupKey]) { o.W.push('مكرر محتمل'); seen[o.dupKey].W.includes('مكرر محتمل') || seen[o.dupKey].W.push('مكرر محتمل'); } else seen[o.dupKey] = o; });
+      ALL = ALL.concat(recs); CNT[t.id] = recs.length;
+    } catch (e) { ERR[t.id] = String(e.message || e); CNT[t.id] = '!'; }
+    drawTools();
+  }));
+  ALL.sort((a, b) => (b.date + (b.time || '')).localeCompare(a.date + (a.time || '')));
+  if (VIEW !== 'trip') fillSelects(); $('load').disabled = false; PAGE = 0; draw();
+}
+
+function fillSelects() {
+  const gs = [...new Set(ALL.map(o => gNorm(o.garage)).filter(Boolean))].sort();
+  const es = [...new Set(ALL.map(o => String(o.by || '').trim()).filter(Boolean))].sort();
+  const g0 = $('garage').value, e0 = $('emp').value;
+  $('garage').innerHTML = '<option value="">كل الكراجات</option>' + gs.map(g => `<option value="${esc(g)}"${g === g0 ? ' selected' : ''}>${esc(g)}</option>`).join('');
+  $('emp').innerHTML = '<option value="">كل الموظفين</option>' + es.map(g => `<option value="${esc(g)}"${g === e0 ? ' selected' : ''}>${esc(g)}</option>`).join('');
+}
+
+function filtered(ignoreTool) {
+  const g = $('garage').value, e = $('emp').value, q = $('q').value.trim().toLowerCase(), oi = $('onlyIss').checked;
+  return ALL.filter(o => (ignoreTool || !SEL || o.tool === SEL) && (!g || gNorm(o.garage) === g) && (!e || String(o.by || '').trim() === e)
+    && (!oi || o.I.length || o.W.length)
+    && (!q || [o.id, o.subject, o.by, o.garage, o.status, ...Object.values(o.x || {})].join(' ').toLowerCase().includes(q)));
+}
+
+function drawTools() {
+  const base = ALL.length ? filtered(true) : [];
+  const n = id => base.filter(o => o.tool === id), bad = L => L.filter(o => o.I.length).length;
+  $('tools').innerHTML = `<button class="tool${!SEL ? ' on' : ''}" data-t="">الكل <b>${base.length}</b>${bad(base) ? `<b class="bad">${bad(base)}</b>` : ''}</button>` +
+    TOOLS.map(t => { const L = n(t.id); return `<button class="tool${SEL === t.id ? ' on' : ''}${ERR[t.id] ? ' err' : ''}" data-t="${t.id}" style="--c:${t.c}"><i></i>${t.name} <b>${ALL.length || CNT[t.id] !== '…' ? (ERR[t.id] ? '!' : L.length) : '…'}</b>${bad(L) ? `<b class="bad">${bad(L)}</b>` : ''}</button>`; }).join('');
+  const E = Object.keys(ERR);
+  $('errs').innerHTML = E.length ? `<div class="warn">⚠️ ما قدرنا نجيب: ${E.map(k => `<b>${TMAP[k].name}</b> (${esc(ERR[k])})`).join(' · ')}</div>` : '';
+}
+
+function draw() {
+  drawTools();
+  $('tools').style.display = VIEW === 'trip' ? 'none' : '';
+  if (VIEW === 'trip') { drawTrip(); return; }
+  const L = filtered();
+  const withI = L.filter(o => o.I.length).length, withW = L.filter(o => !o.I.length && o.W.length).length;
+  const pct = L.length ? Math.round((L.length - withI) / L.length * 100) : 0;
+  $('tiles').innerHTML = [
+    ['#13274f', L.length, 'إجمالي السجلات'], ['#dc2626', withI, 'سجلات فيها نواقص'],
+    ['#f59e0b', withW, 'سجلات فيها تنبيهات'], ['#16a34a', pct + '%', 'نسبة السجلات السليمة']
+  ].map(([c, v, t]) => `<div class="tile" style="--c:${c}"><b>${v}</b><span>${t}</span></div>`).join('');
+  if (!ALL.length && !Object.keys(ERR).length) return;
+  if (VIEW === 'rec') drawRecs(L); else if (VIEW === 'emp') drawEmp(L); else drawIss(L);
+}
+
+const chips = o => o.I.map(s => `<span class="iss">${esc(s)}</span>`).join('') + o.W.map(s => `<span class="iss w">${esc(s)}</span>`).join('') || '<span class="ok">✓</span>';
+
+function drawRecs(L) {
+  if (!L.length) { $('view').innerHTML = '<div class="msg">لا توجد سجلات بهذه الفلاتر</div>'; return; }
+  const pages = Math.ceil(L.length / PER); PAGE = Math.min(PAGE, pages - 1);
+  const P = L.slice(PAGE * PER, PAGE * PER + PER);
+  $('view').innerHTML = `<div class="scroll"><table class="tbl"><thead><tr><th>البرنامج</th><th>التاريخ</th><th>الكراج</th><th>الموظف</th><th>السجل</th><th>الحالة</th><th>النواقص والتنبيهات</th><th></th></tr></thead><tbody>` +
+    P.map(o => `<tr class="${o.I.length ? 'has' : ''}"><td><span class="tn" style="--c:${TMAP[o.tool].c}"><i></i>${TMAP[o.tool].name}</span></td>
+      <td style="white-space:nowrap">${esc(o.date)}${o.time ? `<div class="sub">${esc(o.time)}</div>` : ''}</td><td>${esc(gNorm(o.garage))}</td><td>${esc(o.by)}</td>
+      <td>${esc(o.subject)}<div class="sub" dir="ltr" style="text-align:end">${esc(String(o.id).split('|')[0])}</div></td><td>${esc(o.status)}</td><td>${chips(o)}</td>
+      <td>${o.link ? `<a class="lnk" href="${esc(o.link)}" target="_blank" rel="noopener">فتح ↗</a>` : ''}</td></tr>`).join('') +
+    `</tbody></table></div>` + (pages > 1 ? `<div class="pager"><button class="btn light sm" data-p="-1" ${PAGE ? '' : 'disabled'}>السابق</button> صفحة ${PAGE + 1} من ${pages} <button class="btn light sm" data-p="1" ${PAGE < pages - 1 ? '' : 'disabled'}>التالي</button></div>` : '');
+}
+
+function empRows(L) {
+  const M = {};
+  L.forEach(o => { const k = String(o.by || '—').trim(); const m = M[k] = M[k] || { name:k, n:0, I:0, W:0, t:{} };
+    m.n++; if (o.I.length) m.I++; else if (o.W.length) m.W++; m.t[o.tool] = (m.t[o.tool] || 0) + 1; });
+  return Object.values(M).sort((a, b) => b.I - a.I || b.n - a.n);
+}
+function drawEmp(L) {
+  const R = empRows(L);
+  if (!R.length) { $('view').innerHTML = '<div class="msg">لا توجد بيانات</div>'; return; }
+  $('view').innerHTML = `<div class="scroll"><table class="tbl"><thead><tr><th>الموظف</th><th>السجلات</th>${TOOLS.map(t => `<th>${t.name}</th>`).join('')}<th>فيها نواقص</th><th>تنبيهات</th><th>نسبة النواقص</th></tr></thead><tbody>` +
+    R.map(m => { const p = Math.round(m.I / m.n * 100); return `<tr><td><b>${esc(m.name)}</b></td><td><b>${m.n}</b></td>${TOOLS.map(t => `<td>${m.t[t.id] || ''}</td>`).join('')}
+      <td>${m.I ? `<span class="iss">${m.I}</span>` : '<span class="ok">0</span>'}</td><td>${m.W || ''}</td>
+      <td><div style="display:flex;align-items:center;gap:8px"><div class="bar"><i style="width:${p}%"></i></div>${p}%</div></td></tr>`; }).join('') + '</tbody></table></div>';
+}
+function issRows(L) {
+  const M = {};
+  L.forEach(o => { o.I.forEach(s => { const k = o.tool + '|' + s; (M[k] = M[k] || { tool:o.tool, s, w:0, n:0, by:{} }).n++; M[k].by[o.by] = 1; });
+                   o.W.forEach(s => { const k = o.tool + '|' + s; (M[k] = M[k] || { tool:o.tool, s, w:1, n:0, by:{} }).n++; M[k].by[o.by] = 1; }); });
+  return Object.values(M).sort((a, b) => a.w - b.w || b.n - a.n);
+}
+function drawIss(L) {
+  const R = issRows(L);
+  if (!R.length) { $('view').innerHTML = '<div class="msg">✓ ما فيه نواقص بهذه الفلاتر</div>'; return; }
+  $('view').innerHTML = `<div class="scroll"><table class="tbl"><thead><tr><th>البرنامج</th><th>النوع</th><th>العدد</th><th>الموظفين</th></tr></thead><tbody>` +
+    R.map(r => `<tr><td><span class="tn" style="--c:${TMAP[r.tool].c}"><i></i>${TMAP[r.tool].name}</span></td><td><span class="iss${r.w ? ' w' : ''}">${esc(r.s)}</span></td><td><b>${r.n}</b></td><td class="sub">${esc(Object.keys(r.by).join('، '))}</td></tr>`).join('') + '</tbody></table></div>';
+}
+
+
+/* ======================= تقرير إرسال المسارات =======================
+   المطلوب: كل (رحلة × سائق) في الروستر لكل يوم — بعد التبديلات
+   المنفّذ: سجل النشاط «إرسال مسار رحلة» / «إرسال بطاقة جدول رحلة» (المرجع = رقم الرحلة، والتفاصيل فيها اسم السائق وتاريخ الرحلة) */
+const SEND_RE = /إرسال (مسار|بطاقة جدول) رحلة/;
+const DEPOTS = [[/shuma[iy]?s|jeddah|makkah|mecca|jarwal|yanbu|الشميسي|جدة|مكة|ينبع/i, 'الشميسي'], [/madinah|medina|rafha|المدينة|رفحاء/i, 'المدينة'], [/tabuk|haql|تبوك|حقل/i, 'تبوك'],
+  [/riyadh|dawadmi|الرياض|الدوادمي/i, 'الرياض'], [/jazan|jizan|جازان/i, 'جازان'], [/khamis|خميس/i, 'خميس مشيط'], [/bashayer|البشائر/i, 'البشائر'],
+  [/buraydah|qassim|بريدة|القصيم/i, 'بريدة'], [/hail|حائل/i, 'حائل']];
+const depotOf = st => { for (const [re, d] of DEPOTS) if (re.test(st || '')) return d; return ''; };
+const cN = c => String(c || '').toUpperCase().replace(/\s+/g, ' ').trim();
+const cParts = c => cN(c).split('+').map(x => x.trim()).filter(Boolean);
+const codeMatch = (a, b) => { if (!a || !b) return false; if (cN(a) === cN(b)) return true; const A = cParts(a), B = cParts(b); return A.some(x => B.includes(x)); };
+const nN = s => String(s || '').toLowerCase().replace(/[^a-z؀-ۿ0-9]+/g, ' ').trim();
+let TR = null, TRKEY = '', TRF = 'miss', TRDAY = '', OFF = new Set(), CANFLAG = false, TDATA = {};
+/* الرحلة غير مفعلة إذا رقمها كامل موقوف، أو كل أجزائها (للرحلات المدموجة A + B) موقوفة */
+const isOff = c => OFF.has(cN(c)) || (cParts(c).length > 1 && cParts(c).every(x => OFF.has(x)));
+
+async function tripData() {
+  try { const c = JSON.parse(localStorage.getItem('nwTripData2') || 'null'); if (c && Date.now() - c.at < 12 * H) return c.m; } catch (e) {}
+  const m = {};
+  try {
+    const tx = await (await fetch('https://hanode40-sketch.github.io/trip/', { cache:'no-cache' })).text();
+    const x = tx.match(/const TRIP_DATA=(\[[\s\S]*?\]);\s*\n/);
+    if (x) JSON.parse(x[1]).forEach(t => { const o = { code:cN(t[0]), from:t[1], to:(t[6] && t[6].end) || t[2], dep:t[3] }; m[cN(t[0])] = o; const f = cParts(t[0])[0]; if (f && !m[f]) m[f] = o; });
+    try { localStorage.setItem('nwTripData2', JSON.stringify({ at:Date.now(), m })); } catch (e) {}
+  } catch (e) {}
+  return m;
+}
+const tripInfo = (T, code) => T[cN(code)] || T[cParts(code)[0]] || null;
+
+async function loadTrips() {
+  const from = $('from').value, to = $('to').value;
+  if ((new Date(to) - new Date(from)) / DAY > 44) { $('view').innerHTML = '<div class="msg">تقرير المسارات: اختر فترة 45 يوم أو أقل</div>'; return null; }
+  const key = from + '|' + to; if (TR && TRKEY === key) return TR;
+  $('view').innerHTML = '<div class="msg">جاري تحميل الروستر وسجل الإرسال...</div>';
+  const [ro, dl, T, fl, logs, sch] = await Promise.all([
+    NWAuth.call('rosterRange', { from, to }).catch(e => ({ ok:false, error:String(e) })),
+    NWAuth.call('driversList', {}).catch(() => ({ ok:false })),
+    tripData(),
+    NWAuth.call('tripFlags', {}).catch(() => null),
+    Promise.all(months(from, to).map(m => NWStats.fetchMonth(m, true).catch(() => null))).then(A => A.flatMap(j => (j && j.rows) || [])),
+    NWAuth.call('scheduleGet', {}).catch(() => null)
+  ]);
+  // كراج الرحلة = كراج الإرسال (Dispatch) من جدول الرحلات — مثل لوحة التوزيع؛ وإلا: رحلات العودة (I) لكراج الوصول، والذهاب لكراج الانطلاق
+  const DISP = {}; [].concat((sch && sch.trips) || [], (sch && sch.prev && sch.prev.trips) || []).forEach(t => { const g = depotOf(t.disp); if (g && t.trip && !DISP[cN(t.trip)]) DISP[cN(t.trip)] = g; });
+  const garOfTrip = (code, info) => DISP[cN(code)] || DISP[cParts(code)[0]] || (info ? (/-I-/i.test(code) ? depotOf(info.to) || depotOf(info.from) : depotOf(info.from) || depotOf(info.to)) : '');
+  if (!ro || !ro.ok) { $('view').innerHTML = `<div class="msg">تعذّر تحميل الروستر (${esc((ro && ro.error) || '')})</div>`; return null; }
+  const NAME = {}; ((dl && dl.drivers) || []).forEach(r => NAME[String(r[0])] = r[2]);
+  TDATA = T; OFF = new Set(((fl && fl.off) || []).map(cN)); CANFLAG = !!(fl && fl.canEdit);
+  // الإرسالات
+  const S = logs.filter(r => SEND_RE.test(String(r[4] || ''))).map(r => {
+    const det = String(r[6] || ''), dm = det.match(/\d{4}-\d{2}-\d{2}/), im = det.match(/إقامة\s*(\d{5,15})/);
+    return { at:r[0], by:r[2], act:r[4], code:r[5], date:dm ? dm[0] : nd(r[0]), iq:im ? im[1] : '', name:det.split(' · ')[0] || '', used:false };
+  });
+  const items = [];
+  Object.keys(ro.days || {}).sort().forEach(D => {
+    if (D < from || D > to) return;
+    (ro.days[D] || []).forEach(row => {
+      const code = row[0], info = tripInfo(T, code);
+      [row[1], row[2]].forEach((iq, k) => {
+        if (!iq) return;
+        const nm = NAME[iq] || '';
+        const hits = S.filter(x => x.date === D && codeMatch(x.code, code) && (x.iq ? x.iq === iq : (nm && nN(x.name) === nN(nm))));
+        hits.forEach(h => h.used = true);
+        const other = !hits.length ? S.filter(x => x.date === D && codeMatch(x.code, code) && !(x.iq ? x.iq === iq : (nm && nN(x.name) === nN(nm)))) : [];
+        items.push({ date:D, code, iq, name:nm || iq, seat:k + 1, from:info ? info.from : '', to:info ? info.to : '', dep:info ? info.dep : '', garage:garOfTrip(code, info),
+          off:false, sent:!!hits.length, hit:hits.sort((a, b) => String(a.at).localeCompare(String(b.at)))[0] || null, other:other[0] || null });
+      });
+    });
+  });
+  const extra = S.filter(x => !x.used && x.date >= from && x.date <= to && !items.some(i => i.date === x.date && codeMatch(i.code, x.code)));
+  TR = { items, codes:[...new Set(items.map(i => cN(i.code)))], extra, days:Object.keys(ro.days || {}).filter(D => D >= from && D <= to).sort().reverse() }; TRKEY = key;
+  return TR;
+}
+
+/* موعد الإرسال: قبل المغادرة بـ 6 ساعات · الرحلة اللي ما حان موعدها ما تنحسب "لم يُرسل" */
+const SEND_H = 6;
+const tms = v => { if (v instanceof Date) return v.getTime(); const x = String(v || ''); if (!x) return NaN; if (/[zZ]|[+-]\d\d:?\d\d$/.test(x)) return Date.parse(x); return Date.parse(x.replace(' ', 'T') + '+03:00'); };
+const depAt = i => { const m = String(i.dep || '').match(/(\d{1,2}):(\d{2})/); return m ? Date.parse(i.date + 'T' + String(m[1]).padStart(2, '0') + ':' + m[2] + ':00+03:00') : Date.parse(i.date + 'T23:59:00+03:00'); };
+const hm = t => { const d = new Date(t); return isNaN(d) ? '' : ymd(d) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+function tripState(i, now) {
+  const dl = depAt(i) - SEND_H * H; i.deadline = dl;
+  if (i.sent) { const at = tms(i.hit.at); i.late = !isNaN(at) && at > dl; i.st = i.late ? 'late' : 'ok'; }
+  else i.st = now < dl ? 'wait' : 'miss';
+  return i;
+}
+const pc = (a, b) => b ? Math.round(a / b * 100) : 0;
+const pcol = p => p >= 95 ? '#16a34a' : p >= 80 ? '#f59e0b' : '#dc2626';
+const barH = p => `<div style="display:flex;align-items:center;gap:8px"><div class="bar"><i style="width:${p}%;background:${pcol(p)}"></i></div>${p}%</div>`;
+
+async function drawTrip() {
+  const R = await loadTrips(); if (!R || VIEW !== 'trip') return;
+  const g = $('garage').value, q = $('q').value.trim().toLowerCase(), now = Date.now();
+  R.items.forEach(i => { i.off = isOff(i.code); tripState(i, now); });
+  const offN = new Set(R.items.filter(i => i.off).map(i => i.date + '|' + cN(i.code))).size;
+  const all0 = R.items.filter(i => (!g || i.garage === g) && (!q || [i.code, i.name, i.iq, i.from, i.to, i.hit && i.hit.by].join(' ').toLowerCase().includes(q)));
+  const all = all0.filter(i => !i.off), due = all.filter(i => i.st !== 'wait');
+  const nOk = due.filter(i => i.st === 'ok').length, nLate = due.filter(i => i.st === 'late').length, nMiss = due.filter(i => i.st === 'miss').length, nWait = all.length - due.length;
+  const pct = pc(nOk + nLate, due.length), pOn = pc(nOk, due.length);
+  $('tiles').innerHTML = [['#16a34a', nOk, 'أُرسل في الموعد (قبل ' + SEND_H + ' ساعات)'], ['#f59e0b', nLate, 'أُرسل متأخر'], ['#dc2626', nMiss, 'لم يُرسل (فات موعده)'],
+    [pcol(pct), pct + '%', `نسبة الإرسال · في الموعد ${pOn}%` + (nWait ? ` · ${nWait} لم يحن موعدها` : '') + (offN ? ` · مستبعد ${offN} رحلة غير مفعلة` : '')]]
+    .map(([c, v, t]) => `<div class="tile" style="--c:${c}"><b>${v}</b><span>${t}</span></div>`).join('');
+  if (!R.days.length) { $('view').innerHTML = '<div class="msg">ما فيه روستر مرفوع لهذه الفترة</div>'; return; }
+  const byDay = R.days.map(D => { const L = all.filter(i => i.date === D), Ld = L.filter(i => i.st !== 'wait');
+    return { D, trips:new Set(L.map(i => cN(i.code))).size, n:L.length, due:Ld.length, ok:Ld.filter(i => i.st === 'ok').length, late:Ld.filter(i => i.st === 'late').length, miss:Ld.filter(i => i.st === 'miss').length, wait:L.length - Ld.length }; });
+  // حسب الكراج
+  const grp = (key) => { const m = {}; due.forEach(i => { const k = key(i); if (!k) return; const o = m[k] = m[k] || { k, n:0, ok:0, late:0, miss:0 }; o.n++; o[i.st]++; }); return Object.values(m); };
+  const byG = grp(i => i.garage || 'غير محدد').sort((a, b) => pc(a.ok + a.late, a.n) - pc(b.ok + b.late, b.n));
+  // حسب المرحّل (من أرسل)
+  const byS = {}; due.filter(i => i.sent).forEach(i => { const k = i.hit.by || '—'; const o = byS[k] = byS[k] || { k, n:0, ok:0, late:0, gs:new Set() }; o.n++; o[i.st]++; if (i.garage) o.gs.add(i.garage); });
+  const SL = Object.values(byS).sort((a, b) => pc(b.ok, b.n) - pc(a.ok, a.n) || b.n - a.n);
+  const day = TRDAY && R.days.includes(TRDAY) ? TRDAY : '';
+  let L = (TRF === 'off' ? all0.filter(i => i.off) : all).filter(i => (!day || i.date === day) && (TRF === 'all' || TRF === 'off' || (TRF === 'miss' ? i.st === 'miss' : TRF === 'late' ? i.st === 'late' : TRF === 'wait' ? i.st === 'wait' : i.sent)));
+  L.sort((a, b) => b.date.localeCompare(a.date) || String(a.dep).localeCompare(String(b.dep)) || cN(a.code).localeCompare(cN(b.code)));
+  const wd = D => new Date(D + 'T12:00:00').toLocaleDateString('ar-SA-u-ca-gregory', { weekday:'long' });
+  const stCell = i => i.off ? '<span class="iss w">غير مفعلة</span>'
+    : i.st === 'ok' ? `<span class="ok">✓ ${esc(i.hit.by)}</span><div class="sub">${esc(fmtT(i.hit.at))}${/بطاقة/.test(i.hit.act) ? ' · بطاقة جدول' : ''}</div>`
+    : i.st === 'late' ? `<span class="iss w">⚠ متأخر — ${esc(i.hit.by)}</span><div class="sub">${esc(fmtT(i.hit.at))} · الموعد ${esc(hm(i.deadline))}</div>`
+    : i.st === 'wait' ? `<span class="sub">⏳ لم يحن موعده — آخر موعد ${esc(hm(i.deadline))}</span>`
+    : `<span class="iss">✗ لم يُرسل</span><div class="sub">فات الموعد ${esc(hm(i.deadline))}</div>${i.other ? `<div><span class="iss w">أُرسل لسائق آخر: ${esc(i.other.name)}</span></div>` : ''}`;
+  $('view').innerHTML =
+    `<h3 class="rh">📅 حسب اليوم</h3><div class="scroll" style="max-height:none;margin-bottom:16px"><table class="tbl"><thead><tr><th>اليوم</th><th>الرحلات</th><th>السائقين</th><th>في الموعد</th><th>متأخر</th><th>لم يُرسل</th><th>النسبة</th><th></th></tr></thead><tbody>` +
+    byDay.map(d => `<tr class="${d.miss ? 'has' : ''}"><td><b>${d.D}</b> <span class="sub">${wd(d.D)}</span>${d.wait ? ` <span class="iss w" title="رحلات ما حان موعد إرسالها">⏳ جاري · ${d.wait}</span>` : ''}</td><td><b>${d.trips}</b></td><td>${d.n}</td><td class="ok">${d.ok}</td>
+      <td>${d.late ? `<span class="iss w">${d.late}</span>` : '0'}</td><td>${d.miss ? `<span class="iss">${d.miss}</span>` : '<span class="ok">0</span>'}</td>
+      <td>${d.due ? barH(pc(d.ok + d.late, d.due)) : '<span class="sub">لم يحن الموعد</span>'}</td>
+      <td><button class="btn light sm" data-day="${d.D}">${day === d.D ? '✓ معروض' : 'التفاصيل'}</button></td></tr>`).join('') + '</tbody></table></div>' +
+    `<div class="grid2r">
+      <div><h3 class="rh">🏢 حسب الكراج <span class="sub">(الأضعف أولاً)</span></h3><div class="scroll" style="max-height:340px"><table class="tbl"><thead><tr><th>الكراج</th><th>المطلوب</th><th>في الموعد</th><th>متأخر</th><th>لم يُرسل</th><th>النسبة</th></tr></thead><tbody>` +
+      (byG.map(x => `<tr class="${x.miss ? 'has' : ''}"><td><b>${esc(x.k)}</b></td><td>${x.n}</td><td class="ok">${x.ok}</td><td>${x.late ? `<span class="iss w">${x.late}</span>` : '0'}</td><td>${x.miss ? `<span class="iss">${x.miss}</span>` : '0'}</td><td>${barH(pc(x.ok + x.late, x.n))}</td></tr>`).join('') || '<tr><td colspan="6" class="sub">—</td></tr>') + `</tbody></table></div></div>
+      <div><h3 class="rh">👤 حسب المرحّل <span class="sub">(من أرسل · الالتزام بالموعد)</span></h3><div class="scroll" style="max-height:340px"><table class="tbl"><thead><tr><th>#</th><th>المرحّل</th><th>أرسل</th><th>في الموعد</th><th>متأخر</th><th>الالتزام</th></tr></thead><tbody>` +
+      (SL.map((x, k) => `<tr><td>${k + 1}</td><td><b>${esc(x.k)}</b><div class="sub">${esc([...x.gs].join('، '))}</div></td><td>${x.n}</td><td class="ok">${x.ok}</td><td>${x.late ? `<span class="iss w">${x.late}</span>` : '0'}</td><td>${barH(pc(x.ok, x.n))}</td></tr>`).join('') || '<tr><td colspan="6" class="sub">—</td></tr>') + `</tbody></table></div></div>
+    </div><p class="sub" style="margin:4px 0 16px">«لم يُرسل» = فات موعده (قبل المغادرة بـ ${SEND_H} ساعات) وما انرسل. «متأخر» = انرسل بعد الموعد. الرحلات اللي لسا ما حان موعدها ما تنحسب في النسبة.</p>` +
+    `<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px"><b>${day ? 'تفاصيل ' + day : 'تفاصيل كل الفترة'}</b>${day ? '<button class="btn light sm" data-day="">كل الأيام</button>' : ''}<span class="grow"></span>
+      ${[['miss', 'لم يُرسل'], ['late', 'متأخر'], ['wait', 'لم يحن موعده'], ['sent', 'تم الإرسال'], ['all', 'الكل المفعّل'], ['off', 'غير مفعلة']].map(([k, t]) => `<button class="tool${TRF === k ? ' on' : ''}" data-trf="${k}">${t}</button>`).join('')}<button class="btn light sm" id="flagBtn">⚙️ تفعيل الرحلات</button></div>` +
+    (L.length ? `<div class="scroll"><table class="tbl"><thead><tr><th>التاريخ</th><th>الرحلة</th><th>المسار</th><th>المغادرة</th><th>الكراج</th><th>السائق</th><th>الإرسال</th></tr></thead><tbody>` +
+      L.map(i => `<tr class="${i.st === 'miss' && !i.off ? 'has' : ''}"><td style="white-space:nowrap">${i.date}</td><td dir="ltr" style="text-align:end;white-space:nowrap"><b>${esc(i.code)}</b></td>
+        <td><bdi>${esc(i.from)}</bdi>${i.to ? ' ← <bdi>' + esc(i.to) + '</bdi>' : ''}</td><td>${esc(i.dep)}</td><td>${esc(i.garage)}</td>
+        <td>${esc(i.name)}<div class="sub">${esc(i.iq)}${i.seat === 2 ? ' · الكابتن الثاني' : ''}</div></td><td>${stCell(i)}</td></tr>`).join('') + '</tbody></table></div>'
+      : `<div class="msg">${TRF === 'miss' ? '✓ ما فيه مسارات فات موعدها بدون إرسال' : TRF === 'late' ? '✓ ما فيه إرسال متأخر' : TRF === 'off' ? 'ما فيه رحلات غير مفعلة في هذه الفترة' : 'لا توجد بيانات'}</div>`) +
+    (R.extra.length ? `<div class="warn">ℹ️ ${R.extra.length} إرسال لرحلات مو موجودة في روستر نفس اليوم (ممكن تاريخ الرحلة انكتب غلط في برنامج المسار): ${R.extra.slice(0, 8).map(x => esc(x.code) + ' · ' + esc(x.date)).join('، ')}${R.extra.length > 8 ? '…' : ''}</div>` : '');
+  const gs = [...new Set(R.items.map(i => i.garage).filter(Boolean))].sort(), g0 = $('garage').value;
+  $('garage').innerHTML = '<option value="">كل الكراجات</option>' + gs.map(x => `<option value="${esc(x)}"${x === g0 ? ' selected' : ''}>${esc(x)}</option>`).join('');
+}
+
+
+/* ===== نافذة تفعيل الرحلات ===== */
+function openFlags() {
+  const codes = [...new Set(Object.values(TDATA).map(o => o.code).filter(Boolean).concat((TR && TR.codes) || []))].sort();
+  const box = document.createElement('div'); box.id = 'flagM';
+  box.innerHTML = `<div class="mdl"><div class="mdl-h"><b>⚙️ تفعيل الرحلات</b><button class="btn light sm" data-x>✕</button></div>
+    <p class="sub" style="margin:0 0 10px">الرحلة <b>المفعّلة</b> لازم ينرسل مسارها للسائق وتنحسب في التقرير. <b>غير المفعّلة</b> تنستبعد من الحساب.${CANFLAG ? '' : '<br>⚠️ التعديل للمدير والمشرف فقط'}</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"><input type="search" id="flQ" placeholder="بحث برقم الرحلة أو المحطة..." style="flex:1;min-width:180px;font:inherit;padding:9px 11px;border-radius:10px;border:1px solid var(--nw-line);background:var(--nw-card);color:var(--nw-ink)">
+      <select id="flF" style="font:inherit;padding:9px;border-radius:10px;border:1px solid var(--nw-line);background:var(--nw-card);color:var(--nw-ink)"><option value="">الكل</option><option value="on">المفعّلة</option><option value="off">غير المفعّلة</option><option value="ro">في روستر الفترة</option></select>
+      ${CANFLAG ? '<button class="btn light sm" data-all="1">تحديد الظاهر</button><button class="btn light sm" data-all="0">إلغاء الظاهر</button>' : ''}</div>
+    <div class="scroll" style="max-height:52vh"><table class="tbl"><thead><tr><th style="width:60px">مفعّلة</th><th>الرحلة</th><th>المسار</th><th>المغادرة</th></tr></thead><tbody id="flB"></tbody></table></div>
+    <div style="display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:12px"><span class="sub" id="flN"></span>
+      <div>${CANFLAG ? '<button class="btn" id="flS">حفظ</button>' : ''} <button class="btn light" data-x>إغلاق</button></div></div></div>`;
+  document.body.appendChild(box);
+  const want = {}; codes.forEach(c => want[c] = !OFF.has(c));
+  const RO = new Set((TR && TR.codes) || []);
+  const rows = () => { const q = box.querySelector('#flQ').value.trim().toLowerCase(), f = box.querySelector('#flF').value;
+    return codes.filter(c => { const o = tripInfo(TDATA, c) || {}; return (!q || [c, o.from, o.to].join(' ').toLowerCase().includes(q)) && (!f || (f === 'on' ? want[c] : f === 'off' ? !want[c] : RO.has(c))); }); };
+  const changed = () => codes.filter(c => want[c] !== !OFF.has(c));
+  const paint = () => { const L = rows();
+    box.querySelector('#flB').innerHTML = L.map(c => { const o = tripInfo(TDATA, c) || {}; return `<tr class="${want[c] ? '' : 'has'}"><td><input type="checkbox" data-c="${esc(c)}" ${want[c] ? 'checked' : ''} ${CANFLAG ? '' : 'disabled'} style="width:18px;height:18px;accent-color:#16a34a"></td>
+      <td dir="ltr" style="text-align:end"><b>${esc(c)}</b>${RO.has(c) ? ' <span class="iss w" style="background:#dbeafe;color:#1e40af">في الروستر</span>' : ''}</td><td><bdi>${esc(o.from || '')}</bdi>${o.to ? ' ← <bdi>' + esc(o.to) + '</bdi>' : ''}</td><td>${esc(o.dep || '')}</td></tr>`; }).join('') || '<tr><td colspan="4" class="msg">لا توجد رحلات</td></tr>';
+    const off = codes.filter(c => !want[c]).length, ch = changed().length;
+    box.querySelector('#flN').textContent = `${codes.length} رحلة · ${codes.length - off} مفعّلة · ${off} غير مفعّلة${ch ? ' · ' + ch + ' تعديل لم يُحفظ' : ''}`; };
+  paint();
+  box.querySelector('#flQ').oninput = paint; box.querySelector('#flF').onchange = paint;
+  box.addEventListener('change', e => { const c = e.target.dataset && e.target.dataset.c; if (c) { want[c] = e.target.checked; paint(); } });
+  box.addEventListener('click', async e => {
+    if (e.target === box || e.target.closest('[data-x]')) { if (changed().length && !confirm('فيه تعديلات ما انحفظت — تقفل بدون حفظ؟')) return; box.remove(); return; }
+    const a = e.target.closest('[data-all]'); if (a) { rows().forEach(c => want[c] = a.dataset.all === '1'); paint(); return; }
+    if (e.target.id === 'flS') {
+      const ch = changed(); if (!ch.length) { box.remove(); return; }
+      e.target.disabled = true; e.target.textContent = 'جاري الحفظ...';
+      try {
+        const on = ch.filter(c => want[c]), off = ch.filter(c => !want[c]); let j;
+        if (on.length) j = await NWAuth.call('tripFlagSave', { codes:on, active:true });
+        if (off.length && (!j || j.ok)) j = await NWAuth.call('tripFlagSave', { codes:off, active:false });
+        if (!j || !j.ok) throw new Error((j && j.error) || 'ERR');
+        OFF = new Set((j.off || []).map(cN)); box.remove(); draw();
+      } catch (err) { alert('ما انحفظ: ' + (err.message || err)); e.target.disabled = false; e.target.textContent = 'حفظ'; }
+    }
+  });
+}
+
+async function exportTrip() {
+  const R = await loadTrips(); if (!R) return;
+  if (!window.ExcelJS) return alert('مكتبة Excel ما تحمّلت — تأكد من الإنترنت');
+  const now = Date.now(); R.items.forEach(i => { i.off = isOff(i.code); tripState(i, now); });
+  const g = $('garage').value, all = R.items.filter(i => (!g || i.garage === g) && !i.off);
+  const ST_AR = { ok:'في الموعد', late:'متأخر', miss:'لم يُرسل', wait:'لم يحن موعده' };
+  const wb = new ExcelJS.Workbook();
+  const head = ws => { ws.views = [{ rightToLeft:true, state:'frozen', ySplit:1 }]; const r = ws.getRow(1); r.font = { bold:true, color:{ argb:'FFFFFFFF' } }; r.fill = { type:'pattern', pattern:'solid', fgColor:{ argb:'FF13274F' } }; ws.autoFilter = { from:{ row:1, column:1 }, to:{ row:1, column:ws.columnCount } }; };
+  const red = { type:'pattern', pattern:'solid', fgColor:{ argb:'FFFDE2E2' } };
+  const s1 = wb.addWorksheet('ملخص يومي');
+  s1.columns = [{ header:'اليوم', width:13 }, { header:'الرحلات المطلوبة', width:16 }, { header:'السائقين', width:11 }, { header:'في الموعد', width:12 }, { header:'متأخر', width:10 }, { header:'لم يُرسل', width:11 }, { header:'لم يحن موعده', width:13 }, { header:'النسبة %', width:10 }];
+  R.days.forEach(D => { const L = all.filter(i => i.date === D), c = k => L.filter(i => i.st === k).length, dueN = L.length - c('wait');
+    const row = s1.addRow([D, new Set(L.map(i => cN(i.code))).size, L.length, c('ok'), c('late'), c('miss'), c('wait'), dueN ? Math.round((c('ok') + c('late')) / dueN * 100) : '']); if (c('miss')) row.getCell(6).fill = red; });
+  head(s1);
+  const s2 = wb.addWorksheet('التفاصيل');
+  s2.columns = [{ header:'التاريخ', width:12 }, { header:'الرحلة', width:22 }, { header:'من', width:24 }, { header:'إلى', width:24 }, { header:'المغادرة', width:10 }, { header:'الكراج', width:12 }, { header:'السائق', width:28 }, { header:'الإقامة', width:13 }, { header:'الحالة', width:12 }, { header:'أرسله', width:22 }, { header:'وقت الإرسال', width:17 }, { header:'ملاحظة', width:30 }];
+  all.slice().sort((a, b) => a.date.localeCompare(b.date) || String(a.dep).localeCompare(String(b.dep))).forEach(i => {
+    const row = s2.addRow([i.date, i.code, i.from, i.to, i.dep, i.garage, i.name, i.iq, ST_AR[i.st], i.hit ? i.hit.by : '', i.hit ? fmtT(i.hit.at) : '', !i.sent && i.other ? 'أُرسل لسائق آخر: ' + i.other.name : '']);
+    if (i.st === 'miss') row.getCell(9).fill = red;
+  });
+  head(s2);
+  const buf = await wb.xlsx.writeBuffer();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([buf])); a.download = 'إرسال_المسارات_' + $('from').value + '_' + $('to').value + '.xlsx'; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+
+/* ======================= Excel ======================= */
+async function exportXls() {
+  const L = filtered();
+  if (!L.length) return alert('ما فيه سجلات للتصدير');
+  if (!window.ExcelJS) return alert('مكتبة Excel ما تحمّلت — تأكد من الإنترنت');
+  const wb = new ExcelJS.Workbook();
+  const head = ws => { ws.views = [{ rightToLeft:true, state:'frozen', ySplit:1 }]; const r = ws.getRow(1); r.font = { bold:true, color:{ argb:'FFFFFFFF' } }; r.fill = { type:'pattern', pattern:'solid', fgColor:{ argb:'FF13274F' } }; ws.autoFilter = { from:{ row:1, column:1 }, to:{ row:1, column:ws.columnCount } }; };
+  const red = { type:'pattern', pattern:'solid', fgColor:{ argb:'FFFDE2E2' } }, yel = { type:'pattern', pattern:'solid', fgColor:{ argb:'FFFEF3C7' } };
+  // ملخص الموظفين
+  const se = wb.addWorksheet('ملخص الموظفين');
+  se.columns = [{ header:'الموظف', width:28 }, { header:'السجلات', width:10 }].concat(TOOLS.map(t => ({ header:t.name, width:14 }))).concat([{ header:'فيها نواقص', width:12 }, { header:'تنبيهات', width:10 }, { header:'نسبة النواقص %', width:14 }]);
+  empRows(L).forEach(m => se.addRow([m.name, m.n].concat(TOOLS.map(t => m.t[t.id] || 0)).concat([m.I, m.W, Math.round(m.I / m.n * 100)])));
+  head(se);
+  // أنواع النواقص
+  const si = wb.addWorksheet('أنواع النواقص');
+  si.columns = [{ header:'البرنامج', width:16 }, { header:'النوع', width:34 }, { header:'المستوى', width:10 }, { header:'العدد', width:9 }, { header:'الموظفين', width:60 }];
+  issRows(L).forEach(r => { const row = si.addRow([TMAP[r.tool].name, r.s, r.w ? 'تنبيه' : 'نقص', r.n, Object.keys(r.by).join('، ')]); row.getCell(3).fill = r.w ? yel : red; });
+  head(si);
+  // ورقة لكل برنامج
+  TOOLS.forEach(t => {
+    const R = L.filter(o => o.tool === t.id); if (!R.length) return;
+    const keys = [...new Set(R.flatMap(o => Object.keys(o.x || {})))];
+    const ws = wb.addWorksheet(t.name);
+    ws.columns = [{ header:'التاريخ', width:12 }, { header:'الوقت', width:8 }, { header:'الكراج', width:14 }, { header:'الموظف', width:24 }, { header:'السجل', width:40 }, { header:'الحالة', width:18 }]
+      .concat(keys.map(k => ({ header:k, width:16 }))).concat([{ header:'النواقص', width:40 }, { header:'التنبيهات', width:36 }, { header:'المرجع', width:18 }, { header:'الرابط', width:10 }]);
+    R.forEach(o => {
+      const row = ws.addRow([o.date, o.time || '', gNorm(o.garage), o.by || '', o.subject, o.status].concat(keys.map(k => (o.x || {})[k] ?? '')).concat([o.I.join(' · '), o.W.join(' · '), String(o.id).split('|')[0], o.link ? { text:'فتح', hyperlink:o.link } : '']));
+      if (o.I.length) row.getCell(7 + keys.length).fill = red;
+      if (o.W.length) row.getCell(8 + keys.length).fill = yel;
+    });
+    head(ws);
+  });
+  const buf = await wb.xlsx.writeBuffer();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([buf])); a.download = 'مراجعة_البيانات_' + $('from').value + '_' + $('to').value + '.xlsx'; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  try { NWAuth.log && NWAuth.log('تصدير مراجعة البيانات', '', $('from').value + ' → ' + $('to').value + ' · ' + L.length + ' سجل', 'review'); } catch (e) {}
+}
+
+/* ======================= الأحداث ======================= */
+(function init() {
+  const now = new Date(); $('to').value = ymd(now); $('from').value = ymd(new Date(now.getFullYear(), now.getMonth(), 1));
+  try { if (window.NWIcon) document.querySelectorAll('.tIc').forEach(e => e.innerHTML = NWIcon('review', 26)); } catch (e) {}
+  $('load').onclick = loadAll;
+  ['garage', 'emp', 'onlyIss'].forEach(id => $(id).onchange = () => { PAGE = 0; draw(); });
+  let tm; $('q').oninput = () => { clearTimeout(tm); tm = setTimeout(() => { PAGE = 0; draw(); }, 200); };
+  $('tools').onclick = e => { const b = e.target.closest('[data-t]'); if (!b) return; SEL = b.dataset.t; PAGE = 0; draw(); };
+  document.querySelector('.tabs').onclick = e => { const b = e.target.closest('[data-v]'); if (!b) return; VIEW = b.dataset.v; document.querySelectorAll('.tabs button').forEach(x => x.classList.toggle('on', x === b)); if (VIEW !== 'trip' && ALL.length) fillSelects(); PAGE = 0; draw(); };
+  $('view').addEventListener('click', e => { const d = e.target.closest('[data-day]'), f = e.target.closest('[data-trf]');
+    if (d) { TRDAY = d.dataset.day; draw(); } else if (f) { TRF = f.dataset.trf; draw(); } else if (e.target.id === 'flagBtn') openFlags(); });
+  $('view').onclick = e => { const b = e.target.closest('[data-p]'); if (!b) return; PAGE += Number(b.dataset.p); draw(); window.scrollTo({ top:$('view').offsetTop - 80, behavior:'smooth' }); };
+  $('xls').onclick = () => VIEW === 'trip' ? exportTrip() : exportXls();
+  drawTools(); draw();
+  if (window.NWAuth) loadAll();
+})();
+</script>
+</body>
+</html>

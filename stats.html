@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<script>try{var t=localStorage.getItem('nwTheme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<script src="https://hanode40-sketch.github.io/all-op/auth.js" data-tool="stats"></script>
+<script src="stats-widget.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2c4a7a">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<title data-i="pageTitle">إحصائيات العمل · أدوات التشغيل</title>
+<style>
+  :root{
+    --navy:#1f3f7a; --ink:#0f172a; --muted:#64748b; --line:#e5e7eb; --soft:#f8fafc;
+    --ok:#15803d; --okbg:#e7f5ed; --bad:#b91c1c; --badbg:#fdecea; --warn:#b45309; --warnbg:#fef3c7; --radius:16px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Tahoma,Arial,sans-serif;color:var(--ink);
+    background:#2c4a7a;position:relative;min-height:100vh;padding:20px 14px 90px}
+  .wrap{max-width:none;margin:0 auto}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#fff;margin-bottom:18px}
+  .top h1{margin:0;font-size:22px;text-shadow:0 2px 8px rgba(0,0,0,.45)}
+  .top .en{font-size:13px;opacity:.8;text-shadow:0 2px 8px rgba(0,0,0,.45)}
+  .back{color:#fff;text-decoration:none;font-size:14px;background:rgba(255,255,255,.15);padding:8px 14px;border-radius:999px;white-space:nowrap}
+  .panel{background:#fff;border-radius:var(--radius);border:1px solid rgba(15,23,42,.06);box-shadow:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(10,25,55,.16)}
+  .filters{padding:14px;display:grid;grid-template-columns:repeat(3,1fr) auto;gap:10px;align-items:end}
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600}
+  select{width:100%;font:inherit;font-size:15px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink)}
+  .btns{display:flex;gap:8px}
+  .btn{font:inherit;font-size:14px;font-weight:700;border:0;border-radius:10px;padding:11px 14px;cursor:pointer;background:var(--navy);color:#fff;white-space:nowrap}
+  .btn.light{background:#eef2f7;color:var(--navy)}
+  .sec{margin:22px 4px 10px;color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;gap:10px;text-shadow:0 2px 6px rgba(0,0,0,.4)}
+  .sec::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.25)}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .kpi{padding:16px;position:relative;overflow:hidden}
+  .kpi::before{content:"";position:absolute;inset-inline:0;top:0;height:4px;background:var(--acc,var(--navy))}
+  .kpi .lb{font-size:13px;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:6px}
+  .kpi b{display:block;font-size:30px;color:var(--ink);line-height:1.15;margin:6px 0 4px}
+  .kpi .sub{font-size:12px;color:var(--muted)}
+  .delta{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:999px;background:#eef2f7;color:var(--muted)}
+  .delta.up{background:var(--okbg);color:var(--ok)} .delta.down{background:var(--badbg);color:var(--bad)}
+  .delta.up.neg{background:var(--badbg);color:var(--bad)} .delta.down.neg{background:var(--okbg);color:var(--ok)}
+  .ring{display:flex;align-items:center;gap:12px}
+  .ring svg{flex-shrink:0}
+  #opsKpis{grid-template-columns:repeat(3,1fr)}
+  .grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:12px;margin-top:12px}
+  .grid2b{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+  .card{padding:16px;min-width:0}
+  .grid2>*,.grid2b>*{min-width:0}
+  .card h2{margin:0 0 14px;font-size:16px;color:var(--navy);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .card h2 small{font-size:12px;color:var(--muted);font-weight:500}
+  .msg{text-align:center;padding:28px 10px;color:var(--muted)}
+  .msg.err{color:var(--bad);font-weight:700}
+  .chart{width:100%;overflow-x:auto}
+  .chart svg{display:block}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:12px;color:var(--muted)}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-inline-end:5px;vertical-align:-1px}
+  .hbar{display:grid;grid-template-columns:120px 1fr 42px;align-items:center;gap:10px;margin:9px 0;font-size:14px}
+  .hbar .tr{height:12px;background:#eef2f7;border-radius:6px;overflow:hidden}
+  .hbar .tr i{display:block;height:100%;border-radius:6px}
+  .hbar b{text-align:end}
+  .hbar .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:start;white-space:nowrap}
+  th{font-size:12px;color:var(--muted);font-weight:700;background:var(--soft)}
+  td.num,th.num{text-align:center}
+  .heat{display:grid;gap:3px;font-size:11px;color:var(--muted)}
+  .heat .c{height:22px;border-radius:4px;background:#eef2f7}
+  .heat .h{text-align:center}
+  .heat .d{display:flex;align-items:center;white-space:nowrap}
+  .tip{font-size:12px;color:var(--muted);margin-top:10px}
+  .insights{list-style:none;margin:0;padding:0}
+  .insights li{padding:10px 12px;border-radius:10px;background:var(--soft);margin:7px 0;font-size:14px;line-height:1.6}
+  .muted{color:var(--muted)}
+  [data-nst]{cursor:pointer}
+  .hbar[data-nst]{border-radius:8px;padding:2px 4px;margin-inline:-4px}.hbar[data-nst]:hover{background:var(--soft)}
+  tr[data-nst]:hover td{background:var(--soft)}
+  rect[data-nst]:hover{opacity:.75}
+  .heat .c[data-nst]:hover{outline:2px solid #f28c28}
+  .clickhint{font-size:12px;color:rgba(255,255,255,.85);margin:8px 4px 0;text-shadow:0 1px 4px rgba(0,0,0,.4)}
+  .stamp{color:rgba(255,255,255,.8);font-size:12px;text-align:center;margin-top:18px}
+
+  html[data-theme="dark"]{--ink:#e5e7eb;--muted:#9aa6b8;--line:#263042;--soft:#0f1624;--okbg:#12301f;--badbg:#3a1e22;--warnbg:#3a2e12}
+  html[data-theme="dark"] body{background:#0b1220}
+  
+  html[data-theme="dark"] .panel{background:#151c2b;border-color:var(--line)}
+  html[data-theme="dark"] .card h2{color:#9ec1ff}
+  html[data-theme="dark"] .btn.light,html[data-theme="dark"] .delta{background:#1e2a44;color:#c7d7f5}
+  html[data-theme="dark"] .hbar .tr,html[data-theme="dark"] .heat .c{background:#1e2a44}
+
+  @media (max-width:900px){ .grid2,.grid2b{grid-template-columns:1fr} }
+  @media (max-width:700px){
+    .filters{grid-template-columns:1fr 1fr}
+    .btns{grid-column:span 2}.btns .btn{flex:1}
+    .kpis,#opsKpis{grid-template-columns:1fr 1fr}
+    .kpi b{font-size:24px}
+    .top h1{font-size:18px}
+    .hbar{grid-template-columns:92px 1fr 36px}
+  }
+  @media print{
+    body{background:#fff!important;padding:0}
+    body::before,.filters,.back,.nws{display:none!important}
+    .top,.sec,.stamp{color:#0f172a;text-shadow:none}
+    .sec::after{background:#cbd5e1}
+    .panel{box-shadow:none;border:1px solid #e5e7eb;break-inside:avoid}
+  }
+
+  /* شريط العنوان ثابت أعلى الصفحة عند النزول */
+  .top{position:sticky;top:0;z-index:50;margin:-20px -14px 18px;padding:14px 14px 12px;border-radius:0 0 16px 16px;
+    background:rgba(31,63,122,.88);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 6px 20px rgba(0,0,0,.18)}
+  html[data-theme="dark"] .top{background:rgba(11,18,32,.88);border-bottom:1px solid #263042}
+  @media print{ .top{position:static;background:none;box-shadow:none;margin:0 0 18px;padding:0} }
+
+  /* ===== التصميم الموحد (ألوان auth.js --nw-*) ===== */
+  :root,html[data-theme="dark"]{--ink:var(--nw-ink,#0f172a);--muted:var(--nw-muted,#64748b);--line:var(--nw-line,#e5e7eb);--soft:var(--nw-soft,#f8fafc)}
+  body{background:var(--nw-bg,#eef2f8)!important;color:var(--nw-ink,#0f172a);font-family:var(--nw-font,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif);-webkit-font-smoothing:antialiased}
+  .top{background:var(--nw-hero,#13274f)!important;border-bottom:0!important;box-shadow:0 8px 24px rgba(19,39,79,.18)!important}
+  .top h1,.top .en{text-shadow:none!important}
+  .panel,.kpi,.md{background:var(--nw-card,#fff)!important;border:1px solid var(--nw-line,#e5e7eb)!important;box-shadow:var(--nw-shadow)!important}
+  .kpi::before{height:3px!important;opacity:.85}
+  .sec{color:var(--nw-muted,#64748b)!important;text-shadow:none!important;font-size:14px;font-weight:800}
+  .sec::after{background:var(--nw-line,#e2e8f0)!important}
+  .note,.clickhint{color:var(--nw-muted,#64748b)!important;text-shadow:none!important}
+  .btn{background:var(--nw-navy,#13274f)} .btn.light{background:var(--nw-soft,#eef2f7);color:var(--nw-ink,#13274f);border:1px solid var(--nw-line,#e2e8f0)}
+  html[data-theme="dark"] .btn.light{background:#1b2540;color:#dbe5f7;border-color:#24304a}
+  .card h2{color:var(--nw-ink,#13274f)}
+  select,input{background:var(--nw-card,#fff);color:var(--nw-ink,#0f172a)}
+  .seg,.tabs{background:var(--nw-card,#fff)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><h1 style="display:flex;align-items:center;gap:10px"><span class="tIc">📈</span> <span data-i="title">إحصائيات العمل</span></h1><div class="en" data-i="subtitle">Work Statistics</div></div>
+    <a class="back" href="./" data-i="back">← أدوات التشغيل</a>
+  </div>
+
+  <div class="panel filters">
+    <div><label data-i="lMonth">الفترة</label><select id="fMonth"></select></div>
+    <div><label data-i="lGarage">الكراج</label><select id="fGarage"><option value="" data-i="allGarages">كل الكراجات</option></select></div>
+    <div><label data-i="lTool">البرنامج</label><select id="fTool"><option value="" data-i="allTools">كل البرامج</option></select></div>
+    <div class="btns"><button class="btn light" onclick="load(true)" data-i="refresh">↻ تحديث</button><button class="btn light" onclick="exportCsv()" data-i="export">Excel</button><button class="btn" onclick="window.print()" data-i="print">طباعة / PDF</button></div>
+  </div>
+
+  <div class="sec" data-i="secSummary">الملخص</div>
+  <div class="kpis" id="kpis"></div>
+
+  <div class="sec" data-i="secOps">مؤشرات التشغيل</div>
+  <div class="kpis" id="opsKpis"></div>
+  <div class="clickhint" data-i="clickHint">👆 اضغط على أي مؤشر أو عمود أو صف لعرض التفاصيل</div>
+
+  <div class="grid2">
+    <div class="panel card"><h2><span data-i="dailyTitle">النشاط اليومي</span> <small id="dailyHint"></small></h2><div class="chart" id="daily"><div class="msg" data-i="loading">جاري التحميل...</div></div><div class="legend" id="dailyLeg"></div></div>
+    <div class="panel card"><h2 data-i="toolTitle">توزيع العمل حسب البرنامج</h2><div id="byTool"><div class="msg" data-i="loading">جاري التحميل...</div></div></div>
+  </div>
+
+  <div class="grid2b">
+    <div class="panel card"><h2><span data-i="heatTitle">أوقات ضغط العمل</span> <small data-i="heatHint">اليوم × الساعة</small></h2><div id="heat"><div class="msg" data-i="loading">جاري التحميل...</div></div></div>
+    <div class="panel card"><h2 data-i="insTitle">ملاحظات سريعة</h2><ul class="insights" id="insights"><li data-i="loading">جاري التحميل...</li></ul></div>
+  </div>
+
+  <div class="grid2b">
+    <div class="panel card"><h2 data-i="actTitle">أكثر العمليات</h2><div id="topActs"><div class="msg" data-i="loading">جاري التحميل...</div></div></div>
+    <div class="panel card"><h2 data-i="garTitle">المقارنة بين الكراجات</h2><div id="byGarage"><div class="msg" data-i="loading">جاري التحميل...</div></div></div>
+  </div>
+
+  <div class="stamp" id="stamp"></div>
+</div>
+
+<script>
+  /* ====== الإعدادات: نفس رابط الدخول (سجل النشاط) ====== */
+  const AUTH_URL = 'https://script.google.com/macros/s/AKfycbweMNQs14aIiDJ-yH9yu3KXubnfsrtFnuC58eIryvWUwLe6kB_-cA_p6a6TRazK--Ft/exec';
+  const LOGIN_TOOL = 'الدخول';
+
+  /* ألوان البرامج (نفس ألوان بطاقات الصفحة الرئيسية) */
+  const TOOLS = {
+    'تسليم الوردية':  { c:'#f59e0b', en:'Shift Handover' },
+    'المهام':         { c:'#16a34a', en:'Tasks' },
+    'مسار الرحلة':    { c:'#0d9488', en:'Trip Route' },
+    'محضر المخالفة':  { c:'#dc2626', en:'Violation Report' },
+    'تقرير الحوادث':  { c:'#ea580c', en:'Accident Report' },
+    'تقييم السائقين': { c:'#2563eb', en:'Driver Evaluation' },
+    'استلام الزي':    { c:'#7c3aed', en:'Uniform Receipt' },
+    'لوحة السائقين':  { c:'#0891b2', en:'Drivers Dashboard' }
+  };
+  const EXTRA_COLORS = ['#64748b','#db2777','#65a30d','#9333ea','#0284c7'];
+  const OP_EN = { 'تسليم وردية':'Shift handover', 'تعديل تسليم':'Edit handover', 'استلام وردية':'Shift received', 'حذف تسليم':'Delete handover',
+    'تقرير حادث':'Accident report', 'تقييم سائق':'Driver evaluation', 'حذف تقييم':'Delete evaluation', 'تكليف مهمة':'Assign task', 'بدء مهمة':'Start task',
+    'إنجاز مهمة':'Complete task', 'إلغاء مهمة':'Cancel task', 'بند القائمة اليومية':'Checklist item', 'إرسال مسار رحلة':'Send trip route',
+    'إرسال بطاقة جدول رحلة':'Send duty card', 'محضر مخالفة':'Violation report' };
+
+  /* ====== اللغة: تتبع اختيار الصفحة الرئيسية ====== */
+  let LANG = (() => { try { return localStorage.getItem('hubLang') === 'en' ? 'en' : 'ar'; } catch (e) { return 'ar'; } })();
+  const I18N = {
+    ar: { pageTitle:'إحصائيات العمل · أدوات التشغيل', title:'إحصائيات العمل', subtitle:'Work Statistics', back:'← أدوات التشغيل',
+      lMonth:'الفترة', lGarage:'الكراج', lTool:'البرنامج', allGarages:'كل الكراجات', allTools:'كل البرامج', allMonths:'كل الفترات',
+      refresh:'↻ تحديث', export:'Excel', print:'طباعة / PDF', loading:'جاري التحميل...', secSummary:'الملخص', secOps:'مؤشرات التشغيل',
+      kTotal:'إجمالي العمليات', kAvg:'متوسط يومي', kUsers:'موظف نشط', kPeak:'أكثر يوم عمل', perDay:'عملية / يوم', ofUsers:'من أصل', ops:'عملية',
+      vsPrev:'عن الشهر السابق', vsPrevP:'عن نفس الفترة من الشهر السابق', noPrev:'لا توجد مقارنة',
+      oAcc:'الحوادث', oViol:'المخالفات', oEval:'تقييمات السائقين', oTrip:'رسائل الرحلات', oTasks:'إنجاز المهام', oShift:'تأكيد استلام الورديات',
+      done:'منجزة', of:'من', received:'مستلمة', assignedNone:'لا توجد مهام مكلّفة', handNone:'لا توجد ورديات مسلّمة',
+      dailyTitle:'النشاط اليومي', toolTitle:'توزيع العمل حسب البرنامج', heatTitle:'أوقات ضغط العمل', heatHint:'اليوم × الساعة',
+      heatTip:'كل ما كان المربع أغمق، كان العمل في هذا الوقت أكثر.', insTitle:'ملاحظات سريعة', actTitle:'أكثر العمليات', garTitle:'المقارنة بين الكراجات',
+      hAct:'العملية', hTool:'البرنامج', hCount:'العدد', hGarage:'الكراج', hUsers:'الموظفين', hPerUser:'لكل موظف',
+      noData:'لا توجد بيانات لهذه الفترة', noGarage:'الكراجات غير محددة للموظفين في شيت المستخدمين', unassigned:'غير محدد',
+      eNet:'تعذّر الاتصال — تأكد من الإنترنت', eAuth:'انتهت مدة الدخول — سجّل دخول ثم اضغط تحديث', eForbidden:'هذه الصفحة للمدير والمشرف فقط', eErr:'خطأ: ',
+      days:['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'],
+      iBusy:(d,h)=>`أكثر وقت ضغط: يوم <b>${d}</b> حوالي الساعة <b>${h}</b>.`,
+      iTop:(t,p)=>`<b>${t}</b> أكثر برنامج استخداماً (${p}% من العمل).`,
+      iUp:(p)=>`العمل <b>زاد ${p}%</b> عن الشهر السابق.`, iDown:(p)=>`العمل <b>نقص ${p}%</b> عن الشهر السابق.`,
+      iAccUp:(a,b)=>`⚠️ الحوادث زادت: <b>${a}</b> مقابل ${b} في الشهر السابق.`, iAccDown:(a,b)=>`✅ الحوادث نقصت: <b>${a}</b> مقابل ${b} في الشهر السابق.`,
+      iTasks:(p)=>`نسبة إنجاز المهام <b>${p}%</b>${p<70?' — تحتاج متابعة.':'.'}`,
+      iShift:(n)=>`فيه <b>${n}</b> وردية مسلّمة ما تأكد استلامها.`,
+      iIdle:(n)=>`<b>${n}</b> موظف ما سجّل أي عملية في هذه الفترة.`,
+      iNone:'لا توجد ملاحظات لهذه الفترة.',
+      csvName:'إحصائيات_العمل', clickHint:'👆 اضغط على أي مؤشر أو عمود أو صف لعرض التفاصيل', generated:'آخر تحديث: ' },
+    en: { pageTitle:'Work Statistics · Operations Tools', title:'Work Statistics', subtitle:'إحصائيات العمل', back:'← Operations Tools',
+      lMonth:'Period', lGarage:'Garage', lTool:'Tool', allGarages:'All garages', allTools:'All tools', allMonths:'All periods',
+      refresh:'↻ Refresh', export:'Excel', print:'Print / PDF', loading:'Loading...', secSummary:'Summary', secOps:'Operations indicators',
+      kTotal:'Total operations', kAvg:'Daily average', kUsers:'Active employees', kPeak:'Busiest day', perDay:'ops / day', ofUsers:'of', ops:'ops',
+      vsPrev:'vs previous month', vsPrevP:'vs same period last month', noPrev:'No comparison',
+      oAcc:'Accidents', oViol:'Violations', oEval:'Driver evaluations', oTrip:'Trip messages', oTasks:'Task completion', oShift:'Shift receipt confirmed',
+      done:'done', of:'of', received:'received', assignedNone:'No tasks assigned', handNone:'No shifts handed over',
+      dailyTitle:'Daily activity', toolTitle:'Workload by tool', heatTitle:'Peak work times', heatHint:'day × hour',
+      heatTip:'Darker squares mean more work at that time.', insTitle:'Quick insights', actTitle:'Top operations', garTitle:'Garage comparison',
+      hAct:'Operation', hTool:'Tool', hCount:'Count', hGarage:'Garage', hUsers:'Employees', hPerUser:'Per employee',
+      noData:'No data for this period', noGarage:'Garages are not set for users in the users sheet', unassigned:'Unassigned',
+      eNet:'Connection failed — check your internet', eAuth:'Session expired — sign in, then tap Refresh', eForbidden:'This page is for managers and supervisors only', eErr:'Error: ',
+      days:['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
+      iBusy:(d,h)=>`Busiest time: <b>${d}</b> around <b>${h}</b>.`,
+      iTop:(t,p)=>`<b>${t}</b> is the most used tool (${p}% of the work).`,
+      iUp:(p)=>`Work is <b>up ${p}%</b> from last month.`, iDown:(p)=>`Work is <b>down ${p}%</b> from last month.`,
+      iAccUp:(a,b)=>`⚠️ Accidents rose: <b>${a}</b> vs ${b} last month.`, iAccDown:(a,b)=>`✅ Accidents fell: <b>${a}</b> vs ${b} last month.`,
+      iTasks:(p)=>`Task completion is <b>${p}%</b>${p<70?' — needs follow-up.':'.'}`,
+      iShift:(n)=>`<b>${n}</b> handed-over shifts are not confirmed as received.`,
+      iIdle:(n)=>`<b>${n}</b> employees recorded no operations this period.`,
+      iNone:'No insights for this period.',
+      csvName:'work_statistics', clickHint:'👆 Tap any indicator, bar or row to see its details', generated:'Last updated: ' }
+  };
+  const t_ = k => (I18N[LANG][k] ?? I18N.ar[k] ?? k);
+  const MONTHS_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const MONTHS_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const pad = n => String(n).padStart(2,'0');
+  const nf = n => Number(n).toLocaleString('en-US');
+  const thisMonth = () => { const d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1); };
+  const prevMonth = m => { let [y,mm]=m.split('-').map(Number); mm--; if(!mm){mm=12;y--;} return y+'-'+pad(mm); };
+  const monthLabel = m => { const [y,mm]=m.split('-'); return ((LANG==='en'?MONTHS_EN:MONTHS_AR)[+mm-1]||mm)+' '+y; };
+  const toolName = x => LANG==='en' ? ((TOOLS[x]||{}).en || x) : x;
+  const opName = x => LANG==='en' ? (OP_EN[String(x).trim()] || x) : x;
+  const colorMap = {}; let extraI = 0;
+  const toolColor = x => TOOLS[x] ? TOOLS[x].c : (colorMap[x] ||= EXTRA_COLORS[extraI++ % EXTRA_COLORS.length]);
+  const hourLabel = h => LANG==='en' ? (h%12||12)+(h<12?' AM':' PM') : (h%12||12)+(h<12?' ص':' م');
+
+  function applyLang() {
+    const h = document.documentElement; h.lang = LANG; h.dir = LANG==='en' ? 'ltr' : 'rtl';
+    document.querySelectorAll('[data-i]').forEach(e => { const v=t_(e.dataset.i); if (typeof v==='string') e.textContent = v; });
+  }
+
+  let CUR = null, PREV = null, USERS = [];
+
+  async function fetchMonth(month) {
+    const r = await fetch(AUTH_URL, { method:'POST', body: JSON.stringify({ action:'activity', token: NWAuth.token(), month }) });
+    return r.json();
+  }
+
+  async function load(force) {
+    const month = $('fMonth').value || thisMonth();
+    ['daily','byTool','heat','topActs','byGarage'].forEach(id => $(id).innerHTML = `<div class="msg">${t_('loading')}</div>`);
+    let a, b = null;
+    try {
+      [a, b] = await Promise.all([NWStats.fetchMonth(month, !!force), month==='all' ? Promise.resolve(null) : NWStats.fetchMonth(prevMonth(month), !!force).catch(()=>null)]);
+    } catch (e) { return fail(t_('eNet')); }
+    if (a.error === 'AUTH') { NWAuth.relogin(); return fail(t_('eAuth')); }
+    if (a.error === 'FORBIDDEN') return fail(t_('eForbidden'));
+    if (!a.ok) return fail(t_('eErr') + (a.message || a.error));
+    CUR = a; PREV = (b && b.ok) ? b : null; USERS = a.users || []; NWStats.setUsers(USERS);
+    fillMonths(a.months || [], month);
+    fillFilters();
+    render();
+    $('stamp').textContent = t_('generated') + new Date().toLocaleString(LANG==='en'?'en-GB':'ar-SA-u-ca-gregory-nu-latn');
+  }
+  function fail(m) {
+    ['daily','byTool','heat','topActs','byGarage'].forEach(id => $(id).innerHTML = `<div class="msg err">${esc(m)}</div>`);
+    $('kpis').innerHTML = $('opsKpis').innerHTML = ''; $('insights').innerHTML = '';
+  }
+
+  function fillMonths(list, cur) {
+    const set = new Set(list); set.add(thisMonth()); if (cur !== 'all') set.add(cur);
+    $('fMonth').innerHTML = [...set].sort().reverse().map(m => `<option value="${m}">${monthLabel(m)}</option>`).join('') + `<option value="all">${t_('allMonths')}</option>`;
+    $('fMonth').value = cur;
+  }
+
+  /* كراجات الموظف: من شيت المستخدمين (g) إن وُجدت */
+  const userGarages = u => { const x = USERS.find(v => v.u === u); const g = x && (x.g || x.garages || x.garage || x.gr || x.depot || x['الكراج']); return Array.isArray(g) ? g : (g ? String(g).split(/[,،]/).map(s=>s.trim()).filter(Boolean) : []); };
+  function allGarages() { const s = new Set(); USERS.forEach(x => userGarages(x.u).forEach(g => s.add(g))); return [...s].sort(); }
+
+  function fillFilters() {
+    const g = $('fGarage').value, t = $('fTool').value;
+    const gs = allGarages();
+    $('fGarage').innerHTML = `<option value="">${t_('allGarages')}</option>` + gs.map(x => `<option value="${esc(x)}">${esc(NWStats.garageName(x))}</option>`).join('');
+    $('fGarage').value = gs.includes(g) ? g : '';
+    $('fGarage').disabled = !gs.length;
+    const tools = [...new Set((CUR.rows||[]).map(r => r[3]).filter(x => x && x !== LOGIN_TOOL))].sort();
+    $('fTool').innerHTML = `<option value="">${t_('allTools')}</option>` + tools.map(x => `<option value="${esc(x)}">${esc(toolName(x))}</option>`).join('');
+    $('fTool').value = tools.includes(t) ? t : '';
+  }
+
+  function ops(data) {
+    if (!data) return [];
+    const g = $('fGarage').value, t = $('fTool').value;
+    return NWStats.dedupe(data.rows || []).filter(r => r[3] && r[3] !== LOGIN_TOOL && !NWStats.isRemoved(r) && (!t || r[3] === t) && (!g || userGarages(r[1]).includes(g)));
+  }
+  const cnt = (rows, act) => rows.filter(r => String(r[4]).trim() === act).length;
+  const cntTool = (rows, tool, ex) => rows.filter(r => r[3] === tool && !/حذف|delete/i.test(r[4]) && (!ex || !ex.includes(String(r[4]).trim()))).length;
+
+  function deltaHtml(a, b, negGood) {
+    if (b == null || PREV == null) return `<span class="delta">${t_('noPrev')}</span>`;
+    if (!b) return a ? `<span class="delta up ${negGood?'neg':''}">▲ ${t_('vsPrev')}</span>` : `<span class="delta">—</span>`;
+    const p = Math.round((a - b) / b * 100);
+    if (!p) return `<span class="delta">0% ${t_('vsPrev')}</span>`;
+    return `<span class="delta ${p>0?'up':'down'} ${negGood?'neg':''}">${p>0?'▲':'▼'} ${Math.abs(p)}% ${t_('vsPrev')}</span>`;
+  }
+  function ring(p, color) {
+    const r = 22, c = 2*Math.PI*r, v = Math.max(0, Math.min(100, p));
+    return `<svg width="58" height="58" viewBox="0 0 58 58"><circle cx="29" cy="29" r="${r}" fill="none" stroke="currentColor" stroke-opacity=".12" stroke-width="7"/>
+      <circle cx="29" cy="29" r="${r}" fill="none" stroke="${color}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${c*v/100} ${c}" transform="rotate(-90 29 29)"/>
+      <text x="29" y="33" text-anchor="middle" font-size="12" font-weight="700" fill="currentColor">${v}%</text></svg>`;
+  }
+
+  function daysInPeriod(rows, month) {
+    if (month !== 'all') { const [y,m] = month.split('-').map(Number); const full = new Date(y, m, 0).getDate();
+      const now = new Date(); return (y===now.getFullYear() && m===now.getMonth()+1) ? now.getDate() : full; }
+    const ds = new Set(rows.map(r => String(r[0]).slice(0,10))); return Math.max(1, ds.size);
+  }
+
+  function render() {
+    if (!CUR) return;
+    const month = $('fMonth').value;
+    const rows = ops(CUR);
+    /* الشهر الحالي لم يكتمل: نقارن بنفس عدد الأيام من الشهر السابق */
+    const partial = month === thisMonth(), today = new Date().getDate();
+    const prev = PREV ? ops(PREV).filter(r => !partial || new Date(r[0]).getDate() <= today) : null;
+
+    /* ----- الملخص ----- */
+    const days = daysInPeriod(rows, month);
+    const active = new Set(rows.map(r => r[1])).size;
+    const totalUsers = USERS.filter(x => x.active !== false && (!$('fGarage').value || userGarages(x.u).includes($('fGarage').value))).length;
+    const byDay = {}; rows.forEach(r => { const d = new Date(r[0]); const k = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); byDay[k] = (byDay[k]||0)+1; });
+    const peak = Object.entries(byDay).sort((a,b)=>b[1]-a[1])[0];
+    const peakLbl = peak ? new Date(peak[0]+'T12:00').toLocaleDateString(LANG==='en'?'en-GB':'ar-SA-u-ca-gregory-nu-latn',{weekday:'long',day:'numeric',month:'short'}) : '—';
+    const KP = NWStats.kpis(rows, prev, { days, totalUsers, vs: partial ? t_('vsPrevP') : t_('vsPrev') });
+    $('kpis').innerHTML = KP.filter(k => k.grp === 'sum').map(k => NWStats.tileHtml(k)).join('');
+
+    /* ----- مؤشرات التشغيل ----- */
+    const acc = cnt(rows,'تقرير حادث'), accP = prev && cnt(prev,'تقرير حادث');
+    const viol = cntTool(rows,'محضر المخالفة'), violP = prev && cntTool(prev,'محضر المخالفة');
+    const ev = cnt(rows,'تقييم سائق'), evP = prev && cnt(prev,'تقييم سائق');
+    const trip = cntTool(rows,'مسار الرحلة'), tripP = prev && cntTool(prev,'مسار الرحلة');
+    const tAss = cnt(rows,'تكليف مهمة'), tDone = cnt(rows,'إنجاز مهمة');
+    const sH = cnt(rows,'تسليم وردية'), sR = cnt(rows,'استلام وردية');
+    const tP = tAss ? Math.round(Math.min(tDone,tAss)/tAss*100) : 0, sP = sH ? Math.round(Math.min(sR,sH)/sH*100) : 0;
+    $('opsKpis').innerHTML = KP.filter(k => k.grp === 'ops').map(k => NWStats.tileHtml(k)).join('');
+
+    if (!rows.length) {
+      ['daily','byTool','heat','topActs','byGarage'].forEach(id => $(id).innerHTML = `<div class="msg">${t_('noData')}</div>`);
+      $('dailyLeg').innerHTML = ''; $('insights').innerHTML = `<li>${t_('iNone')}</li>`; return;
+    }
+
+    const D = (lb, ic, c, rs, sub) => NWStats.reg({ lb, ic, c, rows: rs, sub });
+    const dayOf = r => { const d = new Date(r[0]); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); };
+
+    /* ----- توزيع حسب البرنامج ----- */
+    const byTool = {}; rows.forEach(r => byTool[r[3]] = (byTool[r[3]]||0)+1);
+    const toolList = Object.entries(byTool).sort((a,b)=>b[1]-a[1]);
+    const tMax = toolList[0][1];
+    $('byTool').innerHTML = toolList.map(([k,v]) => `<div class="hbar" data-nst="${D(toolName(k),'🧩',toolColor(k),rows.filter(r=>r[3]===k))}"><span class="nm" title="${esc(toolName(k))}">${esc(toolName(k))}</span>
+      <span class="tr"><i style="width:${Math.max(3,v/tMax*100)}%;background:${toolColor(k)}"></i></span><b>${nf(v)}</b></div>`).join('');
+
+    /* ----- النشاط اليومي (أعمدة مكدّسة) ----- */
+    let keys;
+    if (month !== 'all') { const [y,m] = month.split('-').map(Number); const n = new Date(y,m,0).getDate(); keys = Array.from({length:n},(_,i)=>`${month}-${pad(i+1)}`); $('dailyHint').textContent = monthLabel(month); }
+    else { keys = Object.keys(byDay).sort(); $('dailyHint').textContent = ''; }
+    const stack = {}; rows.forEach(r => { const d = new Date(r[0]); const k = d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); (stack[k] ||= {})[r[3]] = ((stack[k]||{})[r[3]]||0)+1; });
+    const order = toolList.map(x => x[0]);
+    const dMax = Math.max(1, ...keys.map(k => byDay[k]||0));
+    const W = month==='all' ? Math.max(640, keys.length*14) : 640, H = 220, padL = 34, padB = 26, padT = 10, bw = (W-padL-8)/keys.length;
+    const raw = dMax/4, mag = Math.pow(10, Math.floor(Math.log10(raw||1))); const nice = [1,2,5,10].map(x=>x*mag).find(x=>x>=raw) || mag*10; const yMax = Math.max(4, nice*4);
+    let svg = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" style="width:100%;height:auto;${W>640?`min-width:${W}px;`:''}direction:ltr;color:var(--muted)">`;
+    for (let i=0;i<=4;i++){ const v = Math.round(yMax*i/4), y = H-padB-(H-padB-padT)*i/4;
+      svg += `<line x1="${padL}" x2="${W-4}" y1="${y}" y2="${y}" stroke="currentColor" stroke-opacity=".15"/><text x="${padL-6}" y="${y+4}" font-size="10" text-anchor="end" fill="currentColor">${v}</text>`; }
+    const rev = LANG !== 'en';
+    keys.forEach((k,i) => { const idx = rev ? keys.length-1-i : i; const x = padL + idx*bw + bw*0.15; let y = H-padB; const w = bw*0.7;
+      order.forEach(t => { const v = (stack[k]||{})[t]||0; if (!v) return; const h = (H-padB-padT)*v/yMax; y -= h;
+        svg += `<rect data-nst="${D(toolName(t),'📅',toolColor(t),rows.filter(r=>r[3]===t&&dayOf(r)===k),k)}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" fill="${toolColor(t)}" rx="2"><title>${esc(k)} · ${esc(toolName(t))}: ${v}</title></rect>`; });
+      const dd = +k.slice(8,10);
+      if (month==='all' ? (i%Math.ceil(keys.length/12)===0) : (dd===1||dd%5===0)) svg += `<text x="${(x+w/2).toFixed(1)}" y="${H-8}" font-size="10" text-anchor="middle" fill="currentColor">${month==='all'?k.slice(5):dd}</text>`;
+    });
+    $('daily').innerHTML = svg + '</svg>';
+    $('dailyLeg').innerHTML = order.map(t => `<span><i style="background:${toolColor(t)}"></i>${esc(toolName(t))}</span>`).join('');
+
+    /* ----- أوقات ضغط العمل ----- */
+    const HRS = 24, heat = Array.from({length:7},()=>Array(HRS).fill(0));
+    rows.forEach(r => { const d = new Date(r[0]); if (!isNaN(d)) heat[d.getDay()][d.getHours()]++; });
+    const hMax = Math.max(1, ...heat.flat());
+    const cols = [0,3,6,9,12,15,18,21];
+    let hh = `<div class="heat" style="grid-template-columns:72px repeat(${HRS},1fr);direction:${LANG==='en'?'ltr':'rtl'}">`;
+    const dayOrder = [0,1,2,3,4,5,6];
+    dayOrder.forEach(di => { hh += `<div class="d" style="direction:${LANG==='en'?'ltr':'rtl'}">${t_('days')[di]}</div>`;
+      for (let h=0; h<HRS; h++){ const v = heat[di][h], a = v ? (0.15 + 0.85*v/hMax) : 0;
+        hh += `<div class="c" ${v?`data-nst="${D(t_('days')[di]+' · '+hourLabel(h),'🕒','#1f3f7a',rows.filter(r=>{const d=new Date(r[0]);return d.getDay()===di&&d.getHours()===h;}))}"`:''} title="${t_('days')[di]} ${hourLabel(h)}: ${v}" style="${v?`background:rgba(31,63,122,${a.toFixed(2)})`:''}"></div>`; } });
+    hh += `<div></div>` + Array.from({length:HRS},(_,h)=>`<div class="h">${cols.includes(h)?h:''}</div>`).join('') + '</div>';
+    $('heat').innerHTML = hh + `<div class="tip">${t_('heatTip')}</div>`;
+    let best = [0,0,0]; heat.forEach((row,d)=>row.forEach((v,h)=>{ if (v>best[2]) best=[d,h,v]; }));
+
+    /* ----- أكثر العمليات ----- */
+    const acts = {}; rows.forEach(r => { const k = r[3]+'|'+String(r[4]).trim(); acts[k]=(acts[k]||0)+1; });
+    const actList = Object.entries(acts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    $('topActs').innerHTML = `<table><thead><tr><th>${t_('hAct')}</th><th>${t_('hTool')}</th><th class="num">${t_('hCount')}</th></tr></thead><tbody>` +
+      actList.map(([k,v]) => { const [tl,a] = k.split('|'); return `<tr data-nst="${D(opName(a),'⚙️',toolColor(tl),rows.filter(r=>r[3]===tl&&String(r[4]).trim()===a),toolName(tl))}"><td><b>${esc(opName(a))}</b></td><td><span style="color:${toolColor(tl)};font-weight:700">●</span> ${esc(toolName(tl))}</td><td class="num">${nf(v)}</td></tr>`; }).join('') + '</tbody></table>';
+
+    /* ----- المقارنة بين الكراجات ----- */
+    const gs = allGarages();
+    if (!gs.length) $('byGarage').innerHTML = `<div class="msg">${t_('noGarage')}</div>`;
+    else {
+      const gStat = {}; const add = (g,u) => { const o = gStat[g] ||= { n:0, users:new Set() }; o.n++; o.users.add(u); };
+      rows.forEach(r => { const ug = userGarages(r[1]); (ug.length ? ug : [t_('unassigned')]).forEach(g => add(g, r[1])); });
+      const gl = Object.entries(gStat).sort((a,b)=>b[1].n-a[1].n);
+      $('byGarage').innerHTML = `<table><thead><tr><th>${t_('hGarage')}</th><th class="num">${t_('kTotal')}</th><th class="num">${t_('hUsers')}</th><th class="num">${t_('hPerUser')}</th></tr></thead><tbody>` +
+        gl.map(([g,o]) => `<tr data-nst="${D(NWStats.garageName(g),'🏢','#64748b',rows.filter(r=>{const ug=userGarages(r[1]);return ug.length?ug.includes(g):g===t_('unassigned');}))}"><td><b>${esc(NWStats.garageName(g))}</b></td><td class="num">${nf(o.n)}</td><td class="num">${o.users.size}</td><td class="num">${(o.n/o.users.size).toFixed(1)}</td></tr>`).join('') + '</tbody></table>';
+    }
+
+    /* ----- ملاحظات سريعة ----- */
+    const ins = [];
+    if (prev && prev.length) { const p = Math.round((rows.length-prev.length)/prev.length*100); if (p>=5) ins.push(t_('iUp')(p)); else if (p<=-5) ins.push(t_('iDown')(-p)); }
+    ins.push(t_('iTop')(esc(toolName(toolList[0][0])), Math.round(toolList[0][1]/rows.length*100)));
+    if (best[2]) ins.push(t_('iBusy')(t_('days')[best[0]], hourLabel(best[1])));
+    if (prev && accP != null && acc !== accP) ins.push(acc > accP ? t_('iAccUp')(acc, accP) : t_('iAccDown')(acc, accP));
+    if (tAss) ins.push(t_('iTasks')(tP));
+    if (sH > sR) ins.push(t_('iShift')(sH - sR));
+    if (totalUsers && totalUsers > active) ins.push(t_('iIdle')(totalUsers - active));
+    $('insights').innerHTML = (ins.length ? ins : [t_('iNone')]).map(x => `<li>${x}</li>`).join('');
+  }
+
+  function exportCsv() {
+    if (!CUR) return;
+    const rows = ops(CUR);
+    const head = LANG==='en' ? ['Date','Time','Employee','Tool','Operation','Reference','Details'] : ['التاريخ','الوقت','الموظف','البرنامج','العملية','المرجع','تفاصيل'];
+    const out = rows.map(r => { const d = new Date(r[0]); return [d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()), pad(d.getHours())+':'+pad(d.getMinutes()), r[2]||r[1], toolName(r[3]), opName(r[4]), r[5], r[6]]; });
+    const csv = '﻿' + [head, ...out].map(r => r.map(v => `"${String(v ?? '').replace(/"/g,'""')}"`).join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type:'text/csv;charset=utf-8' }));
+    a.download = `${t_('csvName')}_${$('fMonth').value}.csv`; a.click();
+  }
+
+  $('fMonth').addEventListener('change', load);
+  $('fGarage').addEventListener('change', render);
+  $('fTool').addEventListener('change', render);
+  $('fMonth').innerHTML = `<option value="${thisMonth()}">${monthLabel(thisMonth())}</option>`;
+  applyLang();
+  window.addEventListener('storage', e => { if (e.key === 'hubLang') { LANG = e.newValue === 'en' ? 'en' : 'ar'; applyLang(); if (CUR) { fillMonths(CUR.months||[], $('fMonth').value); fillFilters(); render(); } } });
+  if (window.NWAuth) load();
+</script>
+<script>try{if(window.NWIcon)document.querySelectorAll(".tIc").forEach(function(e){e.innerHTML=NWIcon("stats",26)})}catch(e){}</script>
+</body>
+</html>

@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<script>try{var t=localStorage.getItem('nwTheme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<script src="https://hanode40-sketch.github.io/all-op/auth.js" data-tool="housing"></script>
+<script src="i18n.js"></script>
+<script src="i18n/common.js"></script>
+<script src="i18n/housing.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2c4a7a">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<title>سكن السائقين · أدوات التشغيل</title>
+<style>
+  :root{ --navy:#1f3f7a; --ink:#0f172a; --muted:#64748b; --line:#e5e7eb; --soft:#f8fafc; --card:#fff;
+    --g:#15803d; --gbg:#e7f5ed; --y:#b45309; --ybg:#fef3c7; --r:#b91c1c; --rbg:#fdecea; --b:#1d4ed8; --bbg:#dbeafe; --n:#475569; --nbg:#f1f5f9; }
+  html[data-theme="dark"]{--ink:#e5e7eb;--muted:#9aa6b8;--line:#263042;--soft:#0f1624;--card:#151c2b;--gbg:#12301f;--g:#4ade80;--ybg:#3a2e12;--y:#fbbf24;--rbg:#3a1e22;--r:#f87171;--bbg:#172554;--b:#93c5fd;--nbg:#1e2a44;--navy:#9ec1ff}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:var(--nw-font,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif);color:var(--ink);background:#2c4a7a;min-height:100vh;padding:20px 14px 90px}
+  html[data-theme="dark"] body{background:#0b1220}
+  .wrap{max-width:none;margin:0 auto}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#fff;position:sticky;top:0;z-index:50;margin:-20px -14px 18px;
+    padding:14px 14px 12px;border-radius:0 0 16px 16px;background:rgba(31,63,122,.88);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 6px 20px rgba(0,0,0,.18)}
+  html[data-theme="dark"] .top{background:rgba(11,18,32,.88);border-bottom:1px solid #263042}
+  .top h1{margin:0;font-size:22px} .top .en{font-size:13px;opacity:.8}
+  .back{color:#fff;text-decoration:none;font-size:14px;background:rgba(255,255,255,.15);padding:8px 14px;border-radius:999px;white-space:nowrap}
+  .panel{background:var(--card);border-radius:16px;border:1px solid rgba(15,23,42,.06);box-shadow:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(10,25,55,.16)}
+  html[data-theme="dark"] .panel{border-color:var(--line)}
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600}
+  select,input,textarea{width:100%;font:inherit;font-size:15px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--ink)}
+  .btn{font:inherit;font-size:14px;font-weight:700;border:0;border-radius:10px;padding:10px 14px;cursor:pointer;background:#1f3f7a;color:#fff;white-space:nowrap}
+  .btn.light{background:#eef2f7;color:#1f3f7a} html[data-theme="dark"] .btn.light{background:#1e2a44;color:#c7d7f5}
+  .btn.green{background:#15803d} .btn.red{background:#b91c1c} .btn.sm{padding:6px 10px;font-size:12.5px} .btn:disabled{opacity:.6;cursor:wait}
+  .sec{margin:22px 4px 10px;color:#fff;font-size:15px;font-weight:700;display:flex;align-items:center;gap:10px;text-shadow:0 2px 6px rgba(0,0,0,.4)}
+  .sec::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.25)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .gch{font:inherit;font-size:14px;font-weight:700;border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:8px 14px;cursor:pointer;background:rgba(255,255,255,.12);color:#fff}
+  .gch small{font-weight:600;opacity:.8;margin-inline-start:4px} .gch.on{background:#fff;color:#1f3f7a;border-color:#fff}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+  .tile{all:unset;box-sizing:border-box;cursor:pointer;background:var(--card);border-radius:16px;padding:14px 16px;position:relative;overflow:hidden;color:var(--ink);
+    border:1px solid rgba(15,23,42,.06);box-shadow:0 1px 2px rgba(15,23,42,.06),0 8px 24px rgba(10,25,55,.16);transition:transform .15s}
+  html[data-theme="dark"] .tile{border-color:var(--line)}
+  .tile:hover{transform:translateY(-3px)} .tile::before{content:"";position:absolute;inset-inline:0;top:0;height:4px;background:var(--acc)}
+  .tile .lb{font-size:13px;color:var(--muted);font-weight:600} .tile b{display:block;font-size:28px;margin-top:6px} .tile small{font-size:12px;color:var(--muted)}
+  .meter{height:7px;border-radius:5px;background:var(--nbg);margin-top:8px;overflow:hidden} .meter i{display:block;height:100%;background:var(--acc)}
+  .alerts{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .alert{padding:11px 16px;border-radius:14px;background:#fff7ed;border:1px solid #fdba74;color:#7c2d12;font-weight:700;cursor:pointer}
+  .alert.red{background:#fdecea;border-color:#f87171;color:#991b1b} .alert.blue{background:#eff6ff;border-color:#93c5fd;color:#1e3a8a}
+  html[data-theme="dark"] .alert{background:#2a1a0e;border-color:#9a3412;color:#fed7aa}
+  html[data-theme="dark"] .alert.red{background:#3a1e22;border-color:#b91c1c;color:#fecaca}
+  html[data-theme="dark"] .alert.blue{background:#172554;border-color:#1d4ed8;color:#bfdbfe}
+  .tabs{display:flex;gap:6px;padding:10px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .tab{font:inherit;font-size:14px;font-weight:700;border:0;border-radius:10px;padding:9px 14px;cursor:pointer;background:transparent;color:var(--muted)}
+  .tab.on{background:#1f3f7a;color:#fff} .tab b{font-size:12px;background:var(--nbg);color:var(--ink);border-radius:999px;padding:1px 8px;margin-inline-start:4px} .tab.on b{background:rgba(255,255,255,.2);color:#fff}
+  .tools{display:flex;gap:8px;padding:12px;flex-wrap:wrap;align-items:center} .tools input,.tools select{width:auto;flex:1;min-width:160px;padding:9px 10px;font-size:14px}
+  .tools .sp{flex:1}
+  .fchips{display:flex;gap:6px;flex-wrap:wrap;padding:0 12px 10px} .fch{font:inherit;font-size:13px;font-weight:700;border:1px solid var(--line);border-radius:999px;padding:6px 12px;cursor:pointer;background:var(--soft);color:var(--ink)}
+  .fch b{font-size:12px;margin-inline-start:4px;opacity:.75} .fch.on{background:#1f3f7a;border-color:#1f3f7a;color:#fff}
+  .bld{margin:6px 12px 4px;font-size:13px;font-weight:800;color:var(--muted);display:flex;align-items:center;gap:8px}
+  .bld::after{content:"";flex:1;height:1px;background:var(--line)}
+  .rooms{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;padding:6px 12px 14px}
+  .room{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--card);border-top:4px solid var(--rc)}
+  .room .rh{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:9px 12px;background:var(--soft)}
+  .room .rh b{font-size:15px} .room .rh small{color:var(--muted);font-size:12px}
+  .room .rh .cnt{font-size:12px;font-weight:800;padding:2px 9px;border-radius:999px;background:var(--rbgc);color:var(--rc)}
+  .room .ed{all:unset;cursor:pointer;color:var(--muted);font-size:13px;padding:0 4px}
+  .bed{display:flex;align-items:center;gap:8px;padding:7px 12px;border-top:1px solid var(--line);font-size:13px;cursor:pointer;min-height:36px}
+  .bed:hover{background:var(--soft)} .bed .n{width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:11.5px;font-weight:800;background:var(--nbg);color:var(--muted);flex:none}
+  .bed.full .n{background:#1f3f7a;color:#fff} .bed .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+  .bed.empty .nm{color:var(--muted);font-weight:500} .bed .add{color:var(--g);font-weight:800;font-size:12px}
+  .bed .dot{width:8px;height:8px;border-radius:50%;flex:none}
+  .room.maint .bed{cursor:default} .room .mt{padding:10px 12px;font-size:12.5px;color:var(--y);font-weight:700;border-top:1px solid var(--line)}
+  .hl{outline:3px solid #f97316;outline-offset:-3px}
+  .room.tr{border-style:dashed;border-top-style:solid} .tbadge{font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;background:#ede9fe;color:#6d28d9;margin-inline-start:6px}
+  html[data-theme="dark"] .tbadge{background:#2e1f4f;color:#c4b5fd} .bed .out{font-size:11px;color:var(--muted);white-space:nowrap} .bed .out.now{color:var(--y);font-weight:800}
+  .bed.full.trb .n{background:#6d28d9} h4.sub{margin:14px 12px 4px;font-size:14px;color:var(--navy)}
+  table{width:100%;border-collapse:collapse;font-size:13.5px}
+  th,td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:start;white-space:nowrap}
+  th{font-size:12px;color:var(--muted);background:var(--soft);position:sticky;top:0}
+  tbody tr:hover td{background:var(--soft)} .tw{overflow:auto;max-height:70vh}
+  .chip{display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap}
+  .s-active{background:var(--gbg);color:var(--g)} .s-leave{background:var(--bbg);color:var(--b)} .s-warn{background:var(--ybg);color:var(--y)} .s-out{background:var(--rbg);color:var(--r)}
+  .msg{text-align:center;padding:28px;color:var(--muted)} .msg.err{color:var(--r);font-weight:700}
+  .mono{font-variant-numeric:tabular-nums} .mut{color:var(--muted);font-size:12px}
+  .ov{position:fixed;inset:0;z-index:100000;background:rgba(8,15,30,.55);display:none;align-items:flex-start;justify-content:center;padding:6vh 12px;overflow:auto}
+  .ov.on{display:flex}
+  .md{background:var(--card);color:var(--ink);border-radius:18px;width:min(520px,100%);box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden}
+  .md .mh{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line)} .md .mh h3{margin:0;font-size:17px}
+  .md .mh button{all:unset;cursor:pointer;font-size:22px;color:var(--muted);padding:0 4px}
+  .md .mb{padding:16px 18px;display:grid;gap:12px} .md .mf{display:flex;gap:8px;justify-content:flex-start;padding:12px 18px;border-top:1px solid var(--line);flex-wrap:wrap}
+  .md .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px} .md .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  .info{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13.5px;line-height:1.7}
+  .warnbox{background:var(--ybg);color:var(--y);border-radius:12px;padding:10px 12px;font-size:13px;font-weight:700}
+  .errbox{background:var(--rbg);color:var(--r);border-radius:12px;padding:10px 12px;font-size:13px;font-weight:700;display:none} .errbox.on{display:block}
+  .sw{position:relative} .sug{display:none;position:absolute;top:100%;inset-inline:0;z-index:60;background:var(--card);border:1px solid var(--line);border-radius:0 0 10px 10px;max-height:260px;overflow-y:auto;box-shadow:0 10px 24px rgba(0,0,0,.18)}
+  .sug.on{display:block} .sug div{padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--line);font-size:13px} .sug div:hover,.sug div.act{background:var(--soft)}
+  .sug b{display:block;font-size:14px} .sug small{color:var(--muted)}
+  .toast{position:fixed;bottom:22px;inset-inline:0;margin:auto;width:max-content;max-width:90vw;background:#0f172a;color:#fff;padding:11px 18px;border-radius:12px;font-weight:700;z-index:100001;display:none}
+  .toast.on{display:block}
+  @media (max-width:640px){ .md .row2,.md .row3{grid-template-columns:1fr} .top h1{font-size:18px} }
+  @media print{ body{background:#fff;padding:0} .top,.tabs,.tools,.alerts,#chips,.tiles,.sec{display:none!important} .panel{box-shadow:none;border:0} .tw{max-height:none;overflow:visible} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><h1>🏠 سكن السائقين</h1><div class="en">Drivers Housing</div></div>
+    <a class="back" href="./">‹ الرئيسية</a>
+  </div>
+
+  <div class="chips" id="chips"></div>
+  <div class="sec">نظرة عامة</div>
+  <div class="tiles" id="tiles"></div>
+  <div class="alerts" id="alerts"></div>
+
+  <div class="sec">التفاصيل</div>
+  <div class="panel">
+    <div class="tabs" id="tabs"></div>
+    <div id="view"><div class="msg">جاري التحميل…</div></div>
+  </div>
+</div>
+
+<div class="ov" id="ov"><div class="md" id="md"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const DEP = { 'Shumaysi':'الشميسي','Madinah':'المدينة','Tabuk':'تبوك','Riyadh':'الرياض','Jazan':'جازان','Khamis Mushait':'خميس مشيط','Al Bashayer':'البشائر','Buraydah':'بريدة','Hail':'حائل','Unassigned':'غير محدد' };
+const ST = {
+  'operation':{ar:'على رأس العمل',c:'s-active'}, 'Annual Leave':{ar:'إجازة سنوية',c:'s-leave'}, 'Emergency Leave':{ar:'إجازة اضطرارية',c:'s-leave'}, 'Sick Leave':{ar:'إجازة مرضية',c:'s-leave'},
+  'Not Returned':{ar:'لم يعد من الإجازة',c:'s-warn'}, 'Suspended':{ar:'موقوف عن العمل',c:'s-warn'}, 'Absconding':{ar:'هروب',c:'s-out'}, 'Termination of services':{ar:'إنهاء خدمات',c:'s-out'}
+};
+const OUT = ['Absconding', 'Termination of services'], WARN = ['Not Returned', 'Suspended'], LEAVE = ['Annual Leave', 'Emergency Leave', 'Sick Leave'];
+const NEEDS_HOUSE = ['operation', 'Annual Leave', 'Emergency Leave', 'Sick Leave'];
+const ERR = { FORBIDDEN:'ما عندك صلاحية لهذي العملية', ROOM_NOT_EMPTY:'الغرفة فيها ساكنين — انقلهم أو أخلهم أول', DUP_ROOM:'الغرفة موجودة بنفس الرقم في نفس الكراج والمبنى',
+  BEDS_IN_USE:'فيه سائق على سرير رقمه أكبر من العدد الجديد', BAD_ROOM:'اكتب الكراج ورقم الغرفة وعدد الأسرّة', ROOM_MAINT:'الغرفة تحت صيانة', BAD_BED:'اختر السرير',
+  BED_TAKEN:'السرير مشغول', NO_DRIVER:'السائق مو موجود في إدارة السائقين', SAME_BED:'السائق ساكن في نفس السرير', NOT_HOUSED:'السائق مو ساكن', BAD_IQAMA:'اختر السائق',
+  NOT_FOUND:'ما لقيت الغرفة', ROOM_TRANSIT:'هذي غرفة ترانزيت — للتسكين الدائم اختر غرفة سكن دائم', ROOM_NOT_TRANSIT:'هذي غرفة سكن دائم مو ترانزيت', AUTH:'انتهت الجلسة — سجّل دخول من جديد', NO_URL:'تعذر الاتصال' };
+const RC = { iq:0, name:1, st:2, dep:3, mob:4, nat:5, emp:6, sb:7 };
+
+let D = null, G = 'all', TAB = 'rooms', Q = '', F = 'all', HL = '';
+let ROOM = {}, OCC = {}, BYROOM = {}, DRV = {}, TRN = {}, TBY = {};
+/* الراحة حسب الروستر: آخر رحلة نفّذها السائق تحدد كراج راحته (نفس منطق إدارة السائقين) */
+let TRIP_END = {}, RS = { ok:false, last:{}, today:{}, usual:{}, trips:{} };
+const END_DEPOT = [[/jeddah|makkah|mecca|jarwal|yanbu|جدة|مكة|ينبع/i, 'Shumaysi'], [/madinah|medina|rafha|المدينة|رفحاء/i, 'Madinah'], [/tabuk|haql|تبوك|حقل/i, 'Tabuk'],
+  [/riyadh|dawadmi|الرياض|الدوادمي/i, 'Riyadh'], [/jazan|jizan|جازان/i, 'Jazan'], [/khamis|خميس/i, 'Khamis Mushait'], [/bashayer|البشائر/i, 'Al Bashayer'],
+  [/buraydah|qassim|بريدة|القصيم/i, 'Buraydah'], [/hail|حائل/i, 'Hail']];
+const endDepot = st => { for (const [re, d] of END_DEPOT) if (re.test(st || '')) return d; return ''; };
+function tripEnd(code) {
+  code = String(code || '').toUpperCase().replace(/\s+/g, ' ').trim(); if (!code) return '';
+  if (TRIP_END[code]) return TRIP_END[code];
+  const parts = code.split('+').map(x => x.trim()).filter(Boolean); return TRIP_END[parts[parts.length - 1]] || '';
+}
+async function loadTrips() {
+  try { const c = JSON.parse(localStorage.getItem('nwTripEnd') || 'null'); if (c && Date.now() - c.at < 12 * 3600e3) { TRIP_END = c.m; return; } } catch (e) {}
+  try {
+    const tx = await (await fetch('https://hanode40-sketch.github.io/trip/', { cache: 'no-cache' })).text();
+    const m = tx.match(/const TRIP_DATA=(\[[\s\S]*?\]);\s*\n/);
+    if (m) JSON.parse(m[1]).forEach(t => {
+      const end = t[6] && t[6].end ? t[6].end : t[2];
+      TRIP_END[String(t[0]).toUpperCase().replace(/\s+/g, ' ').trim()] = end;
+      const first = String(t[0]).split('+')[0].trim().toUpperCase(); if (!TRIP_END[first]) TRIP_END[first] = t[2];
+      if (t[6] && t[6].code) TRIP_END[String(t[6].code).toUpperCase()] = t[6].end;
+    });
+    if (Object.keys(TRIP_END).length) try { localStorage.setItem('nwTripEnd', JSON.stringify({ at: Date.now(), m: TRIP_END })); } catch (e) {}
+  } catch (e) {}
+}
+const addD = (d, n) => { const x = new Date(d + 'T12:00:00'); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
+/* نفس حساب «إدارة السائقين»: بدون رحلة يومين متتاليين أو أقل = راحة، أكثر = استعداد — والمعتذر/المستبدل اليوم = استعداد — والراحة اليدوية تبقى راحة.
+   مكانه الليلة (راحة أو استعداد) = كراج وصول آخر رحلة قبل اليوم، وإذا ما له رحلات = كراجه في إدارة السائقين */
+async function loadRest(today) {
+  await loadTrips();
+  const r = await NWAuth.call('rosterRange', { from: addD(today, -30), to: addD(today, 6) });
+  if (!r || !r.ok) return;
+  const days = r.days || {}, SETS = {}, trips = {}, last = {}, cnt = {};
+  Object.keys(days).filter(k => (days[k] || []).length).forEach(k => {
+    const set = {}; days[k].forEach(x => [x[1], x[2]].forEach(iq => { iq = String(iq || '').trim(); if (!iq) return; set[iq] = String(x[0]); (trips[iq] = trips[iq] || []).push([k, String(x[0])]); }));
+    SETS[k] = set;
+  });
+  Object.values(trips).forEach(t => t.sort((a, b) => a[0] < b[0] ? -1 : 1));
+  Object.keys(SETS).filter(k => k < today).sort().forEach(k => Object.keys(SETS[k]).forEach(iq => {
+    const g = endDepot(tripEnd(SETS[k][iq])); last[iq] = { date: k, code: SETS[k][iq], g };
+    if (g) { cnt[iq] = cnt[iq] || {}; cnt[iq][g] = (cnt[iq][g] || 0) + 1; }
+  }));
+  const usual = {}; Object.keys(cnt).forEach(iq => { const e = Object.entries(cnt[iq]).sort((a, b) => b[1] - a[1])[0]; usual[iq] = { g: e[0], n: e[1] }; });
+  const onToday = SETS[today] || {}, rosterN = (days[today] || []).length;
+  const out = {}; (r.subs || []).filter(x => x.date === today).forEach(x => { out[x.orig] = x; });
+  const restm = {}; (r.marks || []).filter(x => x.date === today && x.mark === 'rest').forEach(x => { restm[x.iqama] = 1; });
+  const state = {};   // iq → 'rest' | 'sb'
+  D.drivers.forEach(x => {
+    const iq = x[0]; if (x[RC.st] !== 'operation' || onToday[iq]) return;
+    if (restm[iq]) { state[iq] = 'rest'; return; }
+    if (out[iq] || x[RC.sb] === 'نعم') { state[iq] = 'sb'; return; }
+    if (!rosterN) return;
+    let n = 1; for (let k = 1; k <= 30; k++) { const s = SETS[addD(today, -k)]; if (!s || s[iq]) break; n++; }
+    for (let k = 1; k <= 6; k++) { const s = SETS[addD(today, k)]; if (!s || s[iq]) break; n++; }
+    state[iq] = n <= 2 ? 'rest' : 'sb';
+  });
+  RS = { ok: true, last, today: onToday, usual, trips, state, out };
+}
+const usualG = iq => (RS.usual[iq] || {}).g || '';
+const homeG = iq => usualG(iq) || (DRV[iq] || [])[3] || '';
+const nextTrip = (iq, after) => (RS.trips[iq] || []).find(x => x[0] > after) || null;
+/** مكانه الليلة (للترانزيت) — ما عنده رحلة اليوم:
+    استعداد (من إدارة السائقين): كراج وصول آخر رحلة له مهما كان تاريخها، وإذا ما له رحلات = كراجه
+    راحة: آخر رحلة له خلال آخر 3 أيام — كراج الراحة = مدينة وصولها */
+function restToday(iq) {
+  if (!RS.ok || !RS.state[iq]) return '';
+  const l = RS.last[iq]; return (l && l.g) || (DRV[iq] || [])[RC.dep] || '';
+}
+const whyRest = iq => RS.state[iq] === 'sb' ? '<span class="chip s-leave">استعداد' + (RS.out[iq] ? ' · ' + esc(RS.out[iq].reason || 'اعتذار') : '') + '</span>' : '<span class="chip s-active">راحة</span>';
+
+function toast(t, ms) { const e = $('toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => e.classList.remove('on'), ms || 2600); }
+function call(action, data) {
+  return NWAuth.call(action, data || {}).then(r => {
+    if (!r || !r.ok) { if (NWAuth.isAuthError(r)) NWAuth.relogin(); const e = new Error(ERR[r && r.error] || ('خطأ: ' + ((r && r.error) || 'غير معروف'))); e.res = r; throw e; }
+    return r;
+  });
+}
+function load() {
+  return call('housingGet').then(r => { set(r); loadRest(r.today).then(() => D && render()).catch(() => {}); }).catch(e => { $('view').innerHTML = '<div class="msg err">' + esc(e.message) + '</div>'; });
+}
+function set(r) {
+  D = r; ROOM = {}; OCC = {}; BYROOM = {}; DRV = {};
+  r.drivers.forEach(x => DRV[x[0]] = x);
+  r.rooms.forEach(x => { ROOM[x[0]] = { id:x[0], garage:x[1], bld:x[2], no:x[3], beds:+x[4] || 0, state:x[5], note:x[6], type:x[9] === 'ترانزيت' ? 'ترانزيت' : 'دائم' }; BYROOM[x[0]] = {}; });
+  r.occ.forEach(x => { const o = { iq:x[0], name:x[1], room:x[2], bed:+x[3], date:x[4], note:x[5], by:x[6] }; OCC[x[0]] = o; if (BYROOM[x[2]]) BYROOM[x[2]][o.bed] = o; });
+  TRN = {}; (r.transit || []).forEach(x => { const o = { iq:x[0], name:x[1], room:x[2], bed:+x[3], date:x[4], at:x[5], note:x[6], by:x[7], tr:1 }; TRN[x[0]] = o; if (BYROOM[x[2]]) BYROOM[x[2]][o.bed] = o; });
+  if (G !== 'all' && !scopeGarages().includes(G)) G = 'all';
+  render();
+}
+const canEdit = () => D && D.perms.edit, canRooms = () => D && D.perms.rooms;
+const scopeGarages = () => D.perms.garages.length ? D.perms.garages : D.garages;
+const inG = g => G === 'all' ? scopeGarages().includes(g) : g === G;
+const roomsIn = () => Object.values(ROOM).filter(r => inG(r.garage));
+const drvSt = iq => (DRV[iq] || [])[RC.st] || '';
+const stChip = s => s ? '<span class="chip ' + ((ST[s] || {}).c || 's-warn') + '">' + esc((ST[s] || {}).ar || s) + '</span>' : '<span class="chip s-out">مو موجود بالقائمة</span>';
+const rLabel = r => r ? ((r.bld ? r.bld + ' · ' : '') + 'غرفة ' + r.no) : '—';
+const natSort = (a, b) => String(a).localeCompare(String(b), 'ar', { numeric:true });
+function freeBeds(r) { const o = BYROOM[r.id] || {}; const f = []; for (let i = 1; i <= r.beds; i++) if (!o[i]) f.push(i); return f; }
+function stats(rooms) {
+  let beds = 0, used = 0, maint = 0; rooms = rooms.filter(r => r.type !== 'ترانزيت');
+  rooms.forEach(r => { const n = Object.keys(BYROOM[r.id] || {}).length; used += n; if (r.state === 'صيانة') maint += r.beds; beds += r.beds; });
+  return { rooms: rooms.length, beds, used, free: Math.max(0, beds - used - maint), maint };
+}
+function residents() { return Object.values(OCC).filter(o => ROOM[o.room] && inG(ROOM[o.room].garage)); }
+function transits() { return Object.values(TRN).filter(o => ROOM[o.room] && inG(ROOM[o.room].garage)); }
+/** يحتاج ترانزيت: على رأس العمل، يرتاح اليوم في كراج غير كراج سكنه الدائم، ومو في ترانزيت */
+function needTransit() {
+  if (!RS.ok) return [];
+  return D.drivers.filter(x => {
+    if (x[RC.st] !== 'operation' || TRN[x[0]]) return false;
+    const g = restToday(x[0]); if (!g || !inG(g)) return false;
+    const h = OCC[x[0]] && ROOM[OCC[x[0]].room] ? ROOM[OCC[x[0]].room].garage : '';
+    if (!h) return false;                          // ما عنده سكن دائم: يظل في «بدون سكن» لين يتسكّن
+    return h !== g;
+  });
+}
+function unhoused() {
+  return D.drivers.filter(x => NEEDS_HOUSE.includes(x[RC.st]) && !OCC[x[0]] && inG(homeG(x[0])));
+}
+function trStats() { const rs = roomsIn().filter(r => r.type === 'ترانزيت' && r.state !== 'صيانة'); let beds = 0; rs.forEach(r => beds += r.beds); return { beds, used: transits().length }; }
+
+function render() {
+  const gs = scopeGarages(), all = Object.values(ROOM);
+  if (gs.length === 1) G = gs[0];
+  $('chips').innerHTML = (gs.length > 1 ? '<button class="gch' + (G === 'all' ? ' on' : '') + '" data-g="all">كل الكراجات</button>' : '') +
+    gs.map(g => { const n = all.filter(r => r.garage === g).length; return '<button class="gch' + (G === g ? ' on' : '') + '" data-g="' + g + '">' + esc(DEP[g] || g) + (n ? '<small>' + n + ' غرفة</small>' : '') + '</button>'; }).join('');
+  const s = stats(roomsIn()), res = residents(), un = unhoused(), ts = trStats(), nt = needTransit();
+  const out = res.filter(o => OUT.includes(drvSt(o.iq)) || !DRV[o.iq]), warn = res.filter(o => WARN.includes(drvSt(o.iq))), lv = res.filter(o => LEAVE.includes(drvSt(o.iq)));
+  const pct = s.beds ? Math.round(s.used / s.beds * 100) : 0;
+  const tile = (acc, lb, v, sub, go, meter) => '<button class="tile" style="--acc:' + acc + '" data-go="' + go + '"><div class="lb">' + lb + '</div><b class="mono">' + v + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + (meter != null ? '<div class="meter"><i style="width:' + meter + '%"></i></div>' : '') + '</button>';
+  $('tiles').innerHTML =
+    tile('#1f3f7a', 'غرف السكن', s.rooms, s.maint ? 'منها تحت صيانة: ' + Math.round(s.maint) + ' سرير' : '', 'rooms:all') +
+    tile('#0369a1', 'الأسرّة', s.beds, '', 'rooms:all') +
+    tile('#15803d', 'مشغول', s.used, 'نسبة الإشغال ' + pct + '%', 'res', pct) +
+    tile('#0d9488', 'فاضي', s.free, 'جاهز للتسكين', 'rooms:free') +
+    tile('#7c3aed', 'ترانزيت الليلة', ts.used + (ts.beds ? ' / ' + ts.beds : ''), nt.length ? 'يحتاجون ترانزيت: ' + nt.length + ' (استعداد ' + nt.filter(x => RS.state[x[0]] === 'sb').length + ')' : (ts.beds ? 'أسرّة الترانزيت' : 'ما في غرف ترانزيت'), 'tr') +
+    tile('#d97706', 'بدون سكن', un.length, RS.ok ? 'استعداد ' + un.filter(x => dayKey(x) === 'sb').length + ' · راحة ' + un.filter(x => dayKey(x) === 'rest').length + ' · رحلة ' + un.filter(x => dayKey(x) === 'trip').length + ' · إجازة ' + un.filter(x => dayKey(x) === 'leave').length : 'على رأس العمل أو في إجازة', 'un') +
+    tile('#dc2626', 'يحتاج إخلاء', out.length, 'هروب أو إنهاء خدمات', 'res:out');
+  let al = '';
+  if (out.length) al += '<div class="alert red" data-go="res:out">⚠️ ' + out.length + ' ساكن حالتهم هروب أو إنهاء خدمات — أسرّتهم محجوزة ويحتاجون إخلاء</div>';
+  if (warn.length) al += '<div class="alert" data-go="res:warn">⏳ ' + warn.length + ' ساكن موقوفين أو لم يعودوا من الإجازة — راجع حالتهم</div>';
+  if (lv.length) al += '<div class="alert blue" data-go="res:leave">🧳 ' + lv.length + ' ساكن في إجازة الحين (السرير محجوز لهم وفاضي فعلياً)</div>';
+  if (nt.length && canEdit()) al += '<div class="alert" style="border-color:#c4b5fd" data-go="tr">🛏️ ' + nt.length + ' سائق (راحة أو استعداد) الليلة في كراج غير كراج سكنهم — يحتاجون ترانزيت</div>';
+  if (!all.length && canRooms()) al += '<div class="alert blue" data-go="bulk">🏗️ ابدأ بإضافة غرف الكراج — اضغط هنا لإضافة مجموعة غرف مرة وحدة</div>';
+  if (RS.ok) {   // نفس أرقام «إدارة السائقين»: كل سائقين الكراج الليلة حسب آخر رحلة — ساكنين أو لا
+    const off = D.drivers.filter(x => RS.state[x[0]] && inG(restToday(x[0])));
+    al = '<div class="alert blue" style="cursor:default">📍 الليلة في ' + (G === 'all' ? 'كل الكراجات' : esc(DEP[G] || G)) + ' (نفس أرقام إدارة السائقين): 🟣 استعداد <b>' + off.filter(x => RS.state[x[0]] === 'sb').length +
+      '</b> · 🟢 راحة <b>' + off.filter(x => RS.state[x[0]] === 'rest').length + '</b> <span style="font-weight:500;opacity:.8">— أرقام «بدون سكن» أقل لأنها تحسب اللي ما لهم سكن بس، حسب كراج راحتهم المعتاد</span></div>' + al;
+  }
+  $('alerts').innerHTML = al;
+  const T = [['rooms', 'الغرف', roomsIn().length], ['res', 'الساكنين', res.length], ['tr', 'الترانزيت', ts.used], ['un', 'بدون سكن', un.length], ['log', 'السجل', '']];
+  $('tabs').innerHTML = T.map(t => '<button class="tab' + (TAB === t[0] ? ' on' : '') + '" data-tab="' + t[0] + '">' + t[1] + (t[2] !== '' ? '<b>' + t[2] + '</b>' : '') + '</button>').join('');
+  view();
+}
+
+function view() {
+  const v = $('view');
+  if (TAB === 'rooms') return v.innerHTML = vRooms();
+  if (TAB === 'res') return v.innerHTML = vRes();
+  if (TAB === 'un') return v.innerHTML = vUn();
+  if (TAB === 'tr') return v.innerHTML = vTr();
+  v.innerHTML = vLog();
+}
+function toolsBar(ph, filters, extra) {
+  return '<div class="tools"><input id="q" placeholder="' + ph + '" value="' + esc(Q) + '">' +
+    (filters ? '<select id="f">' + filters.map(f => '<option value="' + f[0] + '"' + (F === f[0] ? ' selected' : '') + '>' + f[1] + '</option>').join('') + '</select>' : '') +
+    '<span class="sp"></span>' + (extra || '') + '</div>';
+}
+const qm = (...xs) => { const q = Q.trim().toLowerCase(); return !q || xs.some(x => String(x || '').toLowerCase().includes(q)); };
+
+function vRooms() {
+  const add = canRooms() ? '<button class="btn light" data-act="room">＋ غرفة</button><button class="btn" data-act="bulk">＋ مجموعة غرف</button>' : '';
+  let h = toolsBar('ابحث برقم الغرفة أو اسم السائق أو الإقامة', [['all', 'كل الغرف'], ['perm', 'سكن دائم'], ['trn', 'ترانزيت'], ['free', 'فيها مكان'], ['full', 'ممتلئة'], ['empty', 'فاضية بالكامل'], ['maint', 'تحت صيانة']], add);
+  let rooms = roomsIn().filter(r => {
+    const occ = Object.values(BYROOM[r.id]), n = occ.length;
+    if (F === 'free' && (r.state === 'صيانة' || n >= r.beds)) return false;
+    if (F === 'full' && n < r.beds) return false;
+    if (F === 'empty' && n) return false;
+    if (F === 'maint' && r.state !== 'صيانة') return false;
+    if (F === 'perm' && r.type === 'ترانزيت') return false;
+    if (F === 'trn' && r.type !== 'ترانزيت') return false;
+    return qm(r.no, r.bld, ...occ.map(o => o.name), ...occ.map(o => o.iq));
+  });
+  if (!rooms.length) return h + '<div class="msg">' + (Object.keys(ROOM).length ? 'ما في غرف تطابق البحث' : 'ما في غرف مضافة لهذا الكراج بعد') + '</div>';
+  const groups = {};
+  rooms.forEach(r => { const k = (G === 'all' ? (DEP[r.garage] || r.garage) + (r.bld ? ' · ' : '') : '') + (r.bld || (G === 'all' ? '' : 'بدون مبنى')); (groups[k] = groups[k] || []).push(r); });
+  Object.keys(groups).sort(natSort).forEach(k => {
+    h += '<div class="bld">' + esc(k || 'بدون مبنى') + ' <span class="mut">(' + groups[k].length + ' غرفة)</span></div><div class="rooms">' +
+      groups[k].sort((a, b) => natSort(a.no, b.no)).map(roomCard).join('') + '</div>';
+  });
+  return h;
+}
+function roomCard(r) {
+  const o = BYROOM[r.id] || {}, n = Object.keys(o).length, mt = r.state === 'صيانة';
+  const c = mt ? ['#b45309', 'var(--ybg)'] : n >= r.beds ? ['#b91c1c', 'var(--rbg)'] : n ? ['#1d4ed8', 'var(--bbg)'] : ['#15803d', 'var(--gbg)'];
+  let beds = '';
+  for (let i = 1; i <= r.beds; i++) {
+    const x = o[i];
+    if (x && x.tr) {
+      const nx = nextTrip(x.iq, x.date), now = nx && nx[0] <= D.today;
+      beds += '<div class="bed full trb' + (HL === x.iq ? ' hl' : '') + '" data-trn="' + esc(x.iq) + '"><span class="n">' + i + '</span><span class="nm">' + esc(x.name) + '</span><span class="out' + (now ? ' now' : '') + '">' + (nx ? (now ? 'يطلع اليوم' : 'يطلع ' + nx[0].slice(5)) : 'دخل ' + x.date.slice(5)) + '</span></div>';
+    } else if (x) {
+      const s = drvSt(x.iq), dc = OUT.includes(s) || !DRV[x.iq] ? '#dc2626' : WARN.includes(s) ? '#d97706' : LEAVE.includes(s) ? '#2563eb' : '#16a34a';
+      beds += '<div class="bed full' + (HL === x.iq ? ' hl' : '') + '" data-occ="' + esc(x.iq) + '" title="' + esc((ST[s] || {}).ar || '') + '"><span class="n">' + i + '</span><span class="nm">' + esc(x.name) + '</span><span class="dot" style="background:' + dc + '"></span></div>';
+    } else beds += '<div class="bed empty"' + (!mt && canEdit() ? ' data-bed="' + r.id + ':' + i + '"' : '') + '><span class="n">' + i + '</span><span class="nm">فاضي</span>' + (!mt && canEdit() ? '<span class="add">＋ تسكين</span>' : '') + '</div>';
+  }
+  const tr = r.type === 'ترانزيت';
+  return '<div class="room' + (mt ? ' maint' : '') + (tr ? ' tr' : '') + '" style="--rc:' + c[0] + ';--rbgc:' + c[1] + '"><div class="rh"><div><b>غرفة ' + esc(r.no) + '</b>' + (tr ? '<span class="tbadge">ترانزيت</span>' : '') + (r.note ? ' <small>· ' + esc(r.note) + '</small>' : '') + '</div>' +
+    '<div style="display:flex;align-items:center;gap:4px"><span class="cnt mono">' + n + '/' + r.beds + '</span>' + (canRooms() ? '<button class="ed" data-room="' + r.id + '" title="تعديل الغرفة">✎</button>' : '') + '</div></div>' +
+    (mt ? '<div class="mt">🛠️ تحت صيانة — ما يقبل تسكين</div>' : '') + beds + '</div>';
+}
+
+function vRes() {
+  let list = residents().filter(o => {
+    const s = drvSt(o.iq);
+    if (F === 'out' && !(OUT.includes(s) || !DRV[o.iq])) return false;
+    if (F === 'warn' && !WARN.includes(s)) return false;
+    if (F === 'leave' && !LEAVE.includes(s)) return false;
+    if (F === 'active' && s !== 'operation') return false;
+    const r = ROOM[o.room]; return qm(o.name, o.iq, r.no, r.bld, (DRV[o.iq] || [])[RC.mob]);
+  }).sort((a, b) => natSort(ROOM[a.room].garage + ROOM[a.room].bld + ROOM[a.room].no.padStart(6, '0') + a.bed, ROOM[b.room].garage + ROOM[b.room].bld + ROOM[b.room].no.padStart(6, '0') + b.bed));
+  let h = toolsBar('ابحث بالاسم أو الإقامة أو الجوال أو الغرفة', [['all', 'كل الساكنين'], ['active', 'على رأس العمل'], ['leave', 'في إجازة'], ['warn', 'موقوف / لم يعد'], ['out', 'يحتاج إخلاء']],
+    '<button class="btn light" data-act="csv">⬇️ تصدير Excel</button><button class="btn light" data-act="print">🖨️ طباعة</button>');
+  if (!list.length) return h + '<div class="msg">ما في ساكنين يطابقون البحث</div>';
+  return h + '<div class="tw"><table><thead><tr><th>السائق</th><th>الإقامة</th><th>الجوال</th><th>الحالة</th>' + (G === 'all' ? '<th>الكراج</th>' : '') + '<th>الغرفة</th><th>السرير</th><th>تاريخ السكن</th><th></th></tr></thead><tbody>' +
+    list.map(o => { const r = ROOM[o.room], d = DRV[o.iq] || [];
+      return '<tr><td><b>' + esc(o.name) + '</b></td><td class="mono">' + esc(o.iq) + '</td><td class="mono">' + esc(d[RC.mob] || '') + '</td><td>' + stChip(d[RC.st]) +
+        (usualG(o.iq) && usualG(o.iq) !== r.garage ? ' <span class="chip s-warn" title="أكثر كراج يرتاح فيه خلال آخر 30 يوم">راحته غالباً: ' + esc(DEP[usualG(o.iq)] || usualG(o.iq)) + '</span>' : '') +
+        (TRN[o.iq] ? ' <span class="tbadge">ترانزيت: ' + esc(DEP[ROOM[TRN[o.iq].room].garage] || '') + '</span>' : '') + '</td>' +
+        (G === 'all' ? '<td>' + esc(DEP[r.garage] || r.garage) + '</td>' : '') + '<td>' + esc(rLabel(r)) + '</td><td class="mono">' + o.bed + '</td><td class="mono">' + esc(o.date) + '</td>' +
+        '<td><button class="btn light sm" data-occ="' + esc(o.iq) + '">فتح</button></td></tr>'; }).join('') + '</tbody></table></div>';
+}
+
+/** وضع السائق اليوم: على رحلة / راحة / استعداد / إجازة */
+function dayKey(x) { if (LEAVE.includes(x[RC.st])) return 'leave'; if (!RS.ok) return ''; if (RS.today[x[0]]) return 'trip'; return RS.state[x[0]] || ''; }
+function dayChip(x) {
+  const k = dayKey(x);
+  if (k === 'trip') return '<span class="chip s-leave" style="background:#ccfbf1;color:#0f766e">على رحلة · ' + esc(RS.today[x[0]]) + '</span>';
+  if (k === 'sb' || k === 'rest') return whyRest(x[0]);
+  if (k === 'leave') return stChip(x[RC.st]);
+  return '<span class="mut">—</span>';
+}
+let UNLIST = [];
+function vUn() {
+  const all = unhoused(), cnt = k => all.filter(x => dayKey(x) === k).length;
+  const list = UNLIST = all.filter(x => (F === 'all' || dayKey(x) === F) && qm(x[RC.name], x[0], x[RC.mob], x[RC.emp])).sort((a, b) => natSort(homeG(a[0]) + a[RC.name], homeG(b[0]) + b[RC.name]));
+  let h = toolsBar('ابحث بالاسم أو الإقامة', null,
+    canEdit() && list.length ? '<button class="btn green" data-act="auto">🪄 تسكين تلقائي' + (F === 'all' ? ' حسب الراحة' : ' للقائمة المعروضة (' + list.length + ')') + '</button>' : '');
+  h += '<div class="fchips"><span class="mut" style="align-self:center">حالة اليوم:</span>' + [['all', 'الكل', all.length], ['sb', '🟣 استعداد', cnt('sb')], ['rest', '🟢 راحة', cnt('rest')], ['trip', '🚌 على رحلة', cnt('trip')], ['leave', '🧳 إجازة', cnt('leave')]]
+    .map(f => '<button class="fch' + (F === f[0] ? ' on' : '') + '" data-f="' + f[0] + '">' + f[1] + '<b>' + f[2] + '</b></button>').join('') + '</div>';
+  h += '<div class="tools" style="padding-top:0"><span class="mut">السائقين اللي حالتهم «على رأس العمل» أو «إجازة» وما لهم سرير دائم — كل سائق يطلع في كراج راحته المعتاد (أكثر كراج وصل له خلال آخر 30 يوم حسب الروستر)، واللي ما له رحلات يطلع في كراجه بإدارة السائقين' + (RS.ok ? '' : ' — <b>جاري تحميل الروستر…</b>') + '</span></div>';
+  if (!list.length) return h + '<div class="msg">✅ كل السائقين مسكّنين</div>';
+  return h + '<div class="tw"><table><thead><tr><th>السائق</th><th>الإقامة</th><th>الرقم الوظيفي</th><th>الجوال</th><th>اليوم</th><th>مكانه الليلة</th><th>كراج الراحة المعتاد</th><th>كراجه بالإدارة</th><th></th></tr></thead><tbody>' +
+    list.map(x => '<tr><td><b>' + esc(x[RC.name]) + '</b></td><td class="mono">' + esc(x[0]) + '</td><td class="mono">' + esc(x[RC.emp]) + '</td><td class="mono">' + esc(x[RC.mob]) + '</td><td>' + dayChip(x) + '</td><td>' + (restToday(x[0]) ? esc(DEP[restToday(x[0])] || restToday(x[0])) : '<span class="mut">—</span>') + '</td>' +
+      '<td>' + (RS.usual[x[0]] ? '<b>' + esc(DEP[RS.usual[x[0]].g] || RS.usual[x[0]].g) + '</b> <span class="mut">(' + RS.usual[x[0]].n + ' رحلة)</span>' : '<span class="mut">ما له رحلات</span>') + '</td><td>' + esc(DEP[x[RC.dep]] || x[RC.dep]) + '</td>' +
+      '<td>' + (canEdit() ? '<button class="btn green sm" data-assign="' + esc(x[0]) + '">＋ تسكين</button>' : '') + '</td></tr>').join('') + '</tbody></table></div>';
+}
+
+function vTr() {
+  const cur = transits().filter(o => qm(o.name, o.iq, ROOM[o.room].no)).sort((a, b) => natSort(ROOM[a.room].garage + ROOM[a.room].no.padStart(6, '0') + a.bed, ROOM[b.room].garage + ROOM[b.room].no.padStart(6, '0') + b.bed));
+  const nt = needTransit().filter(x => qm(x[RC.name], x[0]));
+  const hasTr = roomsIn().some(r => r.type === 'ترانزيت');
+  let h = toolsBar('ابحث بالاسم أو الإقامة', null, canEdit() ? '<button class="btn light" data-act="tin">＋ دخول ترانزيت</button>' : '');
+  if (!hasTr) h += '<div class="tools" style="padding-top:0"><div class="warnbox" style="flex:1">ما في غرف ترانزيت ' + (G === 'all' ? '' : 'في ' + esc(DEP[G] || G)) + ' — أضف غرفة واختر نوعها «ترانزيت»' + (canRooms() ? ' من تبويب الغرف' : ' (المدير أو المشرف)') + '</div></div>';
+  const allOff = RS.ok ? D.drivers.filter(x => RS.state[x[0]] && inG(restToday(x[0]))) : [];
+  h += '<h4 class="sub">🛏️ راحة أو استعداد اليوم ويحتاجون ترانزيت <span class="mut">(' + nt.length + ')</span></h4>';
+  if (RS.ok) h += '<div class="tools" style="padding-top:0"><span class="chip s-active">راحة الليلة' + (G === 'all' ? '' : ' في ' + esc(DEP[G] || G)) + ': ' + allOff.filter(x => RS.state[x[0]] === 'rest').length + '</span><span class="chip s-leave">استعداد: ' + allOff.filter(x => RS.state[x[0]] === 'sb').length + '</span>' +
+    '<span class="mut">— الباقين (' + (allOff.length - nt.length) + ') ساكنين بنفس الكراج أو في الترانزيت أو بدون سكن</span></div>';
+  h += '<div class="tools" style="padding-top:0"><span class="mut">ساكنين سكن دائم، وما عندهم رحلة اليوم (راحة أو استعداد)، ومكانهم الليلة حسب آخر رحلة كراج غير كراج سكنهم — اللي ما لهم سكن دائم تلقاهم في «بدون سكن»</span><span class="sp"></span>' +
+    (canEdit() && nt.length && hasTr ? '<button class="btn green" data-act="trall">🪄 دخّل الكل الترانزيت</button>' : '') + '</div>';
+  if (!RS.ok) h += '<div class="msg">جاري تحميل الروستر…</div>';
+  else if (!nt.length) h += '<div class="msg">✅ ما في أحد يحتاج ترانزيت اليوم</div>';
+  else h += '<div class="tw" style="max-height:40vh"><table><thead><tr><th>السائق</th><th>الإقامة</th><th>الحالة</th><th>مكانه الليلة</th><th>آخر رحلة</th><th>رحلته الجاية</th><th>سكنه الدائم</th><th></th></tr></thead><tbody>' +
+    nt.map(x => { const l = RS.last[x[0]], nx = nextTrip(x[0], D.today), o = OCC[x[0]];
+      return '<tr><td><b>' + esc(x[RC.name]) + '</b></td><td class="mono">' + esc(x[0]) + '</td><td>' + whyRest(x[0]) + '</td><td><b>' + esc(DEP[restToday(x[0])] || '') + '</b></td><td class="mono">' + (l ? esc(l.code) + ' <span class="mut">' + esc(l.date.slice(5)) + '</span>' : '<span class="mut">—</span>') + '</td>' +
+        '<td class="mono">' + (nx ? esc(nx[1]) + ' <span class="mut">' + esc(nx[0].slice(5)) + '</span>' : '<span class="mut">—</span>') + '</td><td>' + (o ? esc(DEP[ROOM[o.room].garage] || '') + ' · ' + esc(rLabel(ROOM[o.room])) : '<span class="mut">ما عنده</span>') + '</td>' +
+        '<td>' + (canEdit() ? '<button class="btn green sm" data-tin="' + esc(x[0]) + '">دخول</button>' : '') + '</td></tr>'; }).join('') + '</tbody></table></div>';
+  h += '<h4 class="sub">🏨 الموجودين في الترانزيت الحين <span class="mut">(' + cur.length + ')</span></h4>';
+  h += '<div class="tools" style="padding-top:0"><span class="mut">يطلعون تلقائياً بعد تاريخ رحلتهم الجاية في الروستر — أو اضغط «خروج»</span></div>';
+  if (!cur.length) return h + '<div class="msg">ما في أحد في الترانزيت</div>';
+  return h + '<div class="tw"><table><thead><tr><th>السائق</th><th>الإقامة</th>' + (G === 'all' ? '<th>الكراج</th>' : '') + '<th>الغرفة</th><th>السرير</th><th>دخل</th><th>رحلته الجاية</th><th></th></tr></thead><tbody>' +
+    cur.map(o => { const r = ROOM[o.room], nx = nextTrip(o.iq, o.date), now = nx && nx[0] <= D.today;
+      return '<tr><td><b>' + esc(o.name) + '</b></td><td class="mono">' + esc(o.iq) + '</td>' + (G === 'all' ? '<td>' + esc(DEP[r.garage] || r.garage) + '</td>' : '') + '<td>' + esc(rLabel(r)) + '</td><td class="mono">' + o.bed + '</td><td class="mono">' + esc(o.at || o.date) + '</td>' +
+        '<td>' + (nx ? '<span class="chip ' + (now ? 's-warn' : 's-leave') + '">' + esc(nx[1]) + ' · ' + (now ? 'اليوم' : esc(nx[0])) + '</span>' : '<span class="mut">ما في رحلة بالروستر</span>') + '</td>' +
+        '<td>' + (canEdit() ? '<button class="btn light sm" data-tout="' + esc(o.iq) + '">خروج</button>' : '') + '</td></tr>'; }).join('') + '</tbody></table></div>';
+}
+
+/** أول سرير فاضي في كراج حسب النوع — يعبّي الغرف المشغولة جزئياً أول (عشان تظل غرف كاملة فاضية) */
+function pickBed(garage, type, used) {
+  const rs = Object.values(ROOM).filter(r => r.garage === garage && r.type === type && r.state !== 'صيانة')
+    .map(r => ({ r, f: freeBeds(r).filter(b => !used[r.id + ':' + b]) })).filter(x => x.f.length)
+    .sort((a, b) => (a.f.length === a.r.beds) - (b.f.length === b.r.beds) || natSort(a.r.bld + '|' + a.r.no.padStart(6, '0'), b.r.bld + '|' + b.r.no.padStart(6, '0')));
+  if (!rs.length) return null;
+  used[rs[0].r.id + ':' + rs[0].f[0]] = 1; return { room: rs[0].r, bed: rs[0].f[0] };
+}
+function planDlg(kind, drivers) {
+  const used = {}, ok = [], no = [], type = kind === 'tr' ? 'ترانزيت' : 'دائم';
+  drivers.forEach(x => { const g = kind === 'tr' ? restToday(x[0]) : homeG(x[0]); const p = g && scopeGarages().includes(g) ? pickBed(g, type, used) : null; p ? ok.push([x, p]) : no.push([x, g]); });
+  modal(kind === 'tr' ? 'دخول الترانزيت للكل' : 'تسكين تلقائي حسب الراحة',
+    '<div class="info">' + (kind === 'tr' ? 'كل سائق ينحط في غرفة ترانزيت بكراج راحته اليوم.' : 'كل سائق ينحط في سرير دائم بكراج راحته المعتاد. الغرف المشغولة جزئياً تتعبّى أول.') + ' راجع القائمة قبل التأكيد.</div>' +
+    (ok.length ? '<div class="tw" style="max-height:45vh"><table><thead><tr><th>السائق</th><th>الكراج</th><th>الغرفة</th><th>السرير</th></tr></thead><tbody>' +
+      ok.map(([x, p]) => '<tr><td><b>' + esc(x[RC.name]) + '</b></td><td>' + esc(DEP[p.room.garage] || '') + '</td><td>' + esc(rLabel(p.room)) + '</td><td class="mono">' + p.bed + '</td></tr>').join('') + '</tbody></table></div>' : '') +
+    (no.length ? '<div class="warnbox">ما لقيت سرير فاضي لـ ' + no.length + ' سائق: ' + Object.entries(no.reduce((m, [x, g]) => (m[g] = (m[g] || 0) + 1, m), {})).map(([g, n]) => esc(DEP[g] || g || 'كراج غير معروف') + ' (' + n + ')').join('، ') + ' — أضف ' + (kind === 'tr' ? 'غرف ترانزيت' : 'غرف') + ' هناك</div>' : ''),
+    ok.length ? '<button class="btn green" id="psave">تأكيد (' + ok.length + ' سائق)</button>' : '');
+  if (!ok.length) return;
+  $('psave').onclick = e => {
+    const list = ok.map(([x, p]) => ({ iqama: x[0], room: p.room.id, bed: p.bed }));
+    busy(e.target, call(kind === 'tr' ? 'housingTransitIn' : 'housingAssign', { list, date: D.today })).then(r => {
+      if (!r) return; toast('تم ' + (kind === 'tr' ? 'دخول ' : 'تسكين ') + r.done + ' سائق ✅' + (r.fails && r.fails.length ? ' — تعذّر ' + r.fails.length : ''), 4000);
+    });
+  };
+}
+function transitDlg(iq, roomId, bed) {
+  const cur = iq && TRN[iq];
+  const g0 = roomId ? ROOM[roomId].garage : (iq && restToday(iq) && scopeGarages().includes(restToday(iq)) ? restToday(iq) : (G !== 'all' ? G : scopeGarages()[0]));
+  modal(cur ? 'نقل داخل الترانزيت' : 'دخول ترانزيت',
+    '<div class="sw"><label>السائق</label><input id="ts" autocomplete="off" placeholder="اكتب الاسم أو رقم الإقامة"' + (iq ? ' value="' + esc((DRV[iq] || [])[RC.name] || '') + '"' + (cur ? ' disabled' : '') : '') + '><div class="sug" id="tsg"></div></div><div id="tcur"></div>' +
+    '<div class="row3"><div><label>الكراج</label><select id="tg">' + gOpts(g0) + '</select></div><div><label>غرفة الترانزيت</label><select id="tr"></select></div><div><label>السرير</label><select id="tb"></select></div></div>' +
+    '<div><label>ملاحظة (اختياري)</label><input id="tn"></div>', '<button class="btn green" id="tsave">' + (cur ? 'نقل' : 'دخول') + '</button>');
+  let IQ = iq || '';
+  const showCur = () => { const nx = IQ && nextTrip(IQ, D.today), o = IQ && OCC[IQ];
+    $('tcur').innerHTML = IQ ? '<div class="info">' + (o ? 'سكنه الدائم: ' + esc(DEP[ROOM[o.room].garage] || '') + ' · ' + esc(rLabel(ROOM[o.room])) + '<br>' : '') + 'رحلته الجاية: ' + (nx ? '<b class="mono">' + esc(nx[1]) + '</b> · ' + esc(nx[0]) + ' — يطلع تلقائياً بعدها' : 'ما في رحلة بالروستر — يطلع يدوي') + '</div>' : ''; };
+  const fillRooms = keep => {
+    const list = Object.values(ROOM).filter(r => r.garage === $('tg').value && r.type === 'ترانزيت' && r.state !== 'صيانة' && freeBeds(r).length).sort((a, b) => natSort(a.no, b.no));
+    $('tr').innerHTML = list.length ? list.map(r => '<option value="' + r.id + '"' + (r.id === keep ? ' selected' : '') + '>' + esc(rLabel(r)) + ' (' + freeBeds(r).length + ' فاضي)</option>').join('') : '<option value="">ما في غرف ترانزيت فاضية</option>';
+    const rr = ROOM[$('tr').value]; $('tb').innerHTML = rr ? freeBeds(rr).map(i => '<option' + (i == bed ? ' selected' : '') + '>' + i + '</option>').join('') : '';
+  };
+  $('tg').onchange = () => fillRooms(); $('tr').onchange = () => { const rr = ROOM[$('tr').value]; $('tb').innerHTML = rr ? freeBeds(rr).map(i => '<option>' + i + '</option>').join('') : ''; };
+  fillRooms(roomId); showCur();
+  if (!cur) driverSearch($('ts'), $('tsg'), x => { IQ = x[0]; $('ts').value = x[RC.name]; showCur(); const g = restToday(x[0]); if (!roomId && g && scopeGarages().includes(g) && $('tg').value !== g) { $('tg').value = g; fillRooms(); } });
+  $('tsave').onclick = e => {
+    if (!IQ) return mErr('اختر السائق من القائمة');
+    if (!$('tr').value || !$('tb').value) return mErr('اختر غرفة الترانزيت والسرير');
+    HL = IQ; busy(e.target, call('housingTransitIn', { iqama: IQ, room: $('tr').value, bed: $('tb').value, note: $('tn').value.trim() })).then(r => r && toast('تم الدخول ✅'));
+  };
+  if (!iq) setTimeout(() => $('ts').focus(), 50);
+}
+function trnDlg(iq) {
+  const o = TRN[iq], r = ROOM[o.room], nx = nextTrip(iq, o.date), d = DRV[iq] || [];
+  modal('ترانزيت — ' + esc(o.name),
+    '<div class="info"><b>' + esc(DEP[r.garage] || r.garage) + ' · ' + esc(rLabel(r)) + ' · سرير ' + o.bed + '</b><br>دخل: <span class="mono">' + esc(o.at || o.date) + '</span> — بواسطة ' + esc(o.by) +
+    '<br>رحلته الجاية: ' + (nx ? '<b class="mono">' + esc(nx[1]) + '</b> · ' + esc(nx[0]) : 'ما في رحلة بالروستر') + (d[RC.mob] ? '<br>الجوال: <span class="mono">' + esc(d[RC.mob]) + '</span>' : '') +
+    (OCC[iq] ? '<br>سكنه الدائم: ' + esc(DEP[ROOM[OCC[iq].room].garage] || '') + ' · ' + esc(rLabel(ROOM[OCC[iq].room])) : '') + '</div>' + histHtml(iq),
+    canEdit() ? '<button class="btn" id="tmv">🔁 نقل</button><button class="btn red" id="tout">🚪 خروج</button>' : '');
+  if ($('tmv')) { $('tmv').onclick = () => transitDlg(iq); $('tout').onclick = e => tOut(e.target, iq); }
+}
+function tOut(btn, iq) { busy(btn, call('housingTransitOut', { iqama: iq, reason: 'خروج يدوي' })).then(r => r && toast('تم الخروج ✅')); }
+
+function vLog() {
+  const gsAr = G === 'all' ? null : G;
+  const list = D.log.filter(r => (!gsAr || (r[4] + ' ' + r[5]).includes(gsAr)) && qm(r[1], r[2], r[3], r[4], r[5], r[7], r[8]));
+  let h = toolsBar('ابحث في السجل', null, '');
+  if (!list.length) return h + '<div class="msg">ما في عمليات مسجّلة</div>';
+  const cl = { 'تسكين':'s-active', 'نقل':'s-leave', 'إخلاء':'s-out', 'دخول ترانزيت':'s-active', 'خروج ترانزيت':'s-warn', 'نقل ترانزيت':'s-leave' };
+  return h + '<div class="tw"><table><thead><tr><th>الوقت</th><th>العملية</th><th>السائق</th><th>من</th><th>إلى</th><th>التاريخ</th><th>السبب / ملاحظة</th><th>بواسطة</th></tr></thead><tbody>' +
+    list.map(r => '<tr><td class="mono">' + esc(r[0]) + '</td><td><span class="chip ' + (cl[r[3]] || '') + '">' + esc(r[3]) + '</span></td><td><b>' + esc(r[2]) + '</b><div class="mut mono">' + esc(r[1]) + '</div></td>' +
+      '<td>' + esc(gTxt(r[4])) + '</td><td>' + esc(gTxt(r[5])) + '</td><td class="mono">' + esc(r[6]) + '</td><td style="white-space:normal;min-width:160px">' + esc(r[7]) + '</td><td>' + esc(r[8]) + '</td></tr>').join('') + '</tbody></table></div>';
+}
+const gTxt = s => String(s || '').replace(/^([A-Za-z ]+) · /, (m, g) => (DEP[g] || g) + ' · ');
+
+/* ===== النوافذ ===== */
+function modal(title, body, foot) {
+  $('md').innerHTML = '<div class="mh"><h3>' + title + '</h3><button data-x="1" aria-label="إغلاق">×</button></div><div class="mb">' + body + '<div class="errbox" id="merr"></div></div><div class="mf">' + (foot || '') + '<button class="btn light" data-x="1">إغلاق</button></div>';
+  $('ov').classList.add('on');
+}
+function closeM() { $('ov').classList.remove('on'); }
+function mErr(t) { const e = $('merr'); if (e) { e.textContent = t; e.classList.add('on'); } }
+function busy(btn, p) {
+  btn.disabled = true; const t = btn.textContent; btn.textContent = '…جاري الحفظ';
+  return p.then(r => { set(r); closeM(); return r; }).catch(e => { const m = e.message + (e.res && e.res.who ? ' — ' + e.res.who : ''); $('ov').classList.contains('on') ? mErr(m) : toast(m, 4000); }).finally(() => { btn.disabled = false; btn.textContent = t; });
+}
+const gOpts = sel => scopeGarages().map(g => '<option value="' + g + '"' + (g === sel ? ' selected' : '') + '>' + esc(DEP[g] || g) + '</option>').join('');
+const blds = g => [...new Set(Object.values(ROOM).filter(r => !g || r.garage === g).map(r => r.bld).filter(String))].sort(natSort);
+
+function roomDlg(id) {
+  const r = ROOM[id] || { garage: G !== 'all' ? G : scopeGarages()[0], bld:'', no:'', beds:4, state:'متاحة', note:'', type:'دائم' };
+  const n = id ? Object.keys(BYROOM[id]).length : 0;
+  modal(id ? 'تعديل غرفة ' + esc(r.no) : 'إضافة غرفة',
+    '<div class="row2"><div><label>الكراج</label><select id="rg"' + (n ? ' disabled' : '') + '>' + gOpts(r.garage) + '</select></div><div><label>المبنى / الجناح (اختياري)</label><input id="rb" list="bl" value="' + esc(r.bld) + '" placeholder="مثال: مبنى A"><datalist id="bl">' + blds().map(b => '<option value="' + esc(b) + '">').join('') + '</datalist></div></div>' +
+    '<div class="row3"><div><label>رقم الغرفة</label><input id="rn" value="' + esc(r.no) + '"></div><div><label>عدد الأسرّة</label><input id="rc" type="number" min="1" max="30" value="' + r.beds + '"></div>' +
+    '<div><label>الحالة</label><select id="rs">' + D.states.map(s => '<option value="' + s + '"' + (s === r.state ? ' selected' : '') + '>' + s + '</option>').join('') + '</select></div></div>' +
+    '<div class="row2"><div><label>نوع الغرفة</label><select id="ry"' + (n ? ' disabled' : '') + '>' + D.types.map(t => '<option value="' + t + '"' + (t === (r.type || 'دائم') ? ' selected' : '') + '>' + t + '</option>').join('') + '</select></div>' +
+    '<div><label>ملاحظة</label><input id="rt" value="' + esc(r.note) + '" placeholder="مثال: مكيف يحتاج صيانة"></div></div>' + (n ? '<div class="info">في الغرفة ' + n + ' ساكن — ما تقدر تغيّر الكراج أو تحذفها إلا بعد نقلهم أو إخلائهم.</div>' : ''),
+    '<button class="btn" id="rsave">حفظ</button>' + (id && !n ? '<button class="btn red" id="rdel">حذف الغرفة</button>' : ''));
+  $('rsave').onclick = e => busy(e.target, call('housingRoomSave', { room: { id: id || '', garage: $('rg').value, building: $('rb').value.trim(), no: $('rn').value.trim(), beds: $('rc').value, state: $('rs').value, note: $('rt').value.trim(), type: $('ry').value } })).then(r => r && toast('تم الحفظ ✅'));
+  if ($('rdel')) $('rdel').onclick = e => { if (confirm('حذف غرفة ' + r.no + '؟')) busy(e.target, call('housingRoomSave', { del: id })).then(r => r && toast('تم حذف الغرفة')); };
+}
+function bulkDlg() {
+  modal('إضافة مجموعة غرف',
+    '<div class="info">تضيف غرف متتالية بنفس عدد الأسرّة مرة وحدة — مثلاً من 101 إلى 120. الغرف الموجودة قبل ما تتكرر.</div>' +
+    '<div class="row2"><div><label>الكراج</label><select id="bg">' + gOpts(G !== 'all' ? G : '') + '</select></div><div><label>المبنى / الجناح (اختياري)</label><input id="bb" list="bl2" placeholder="مثال: مبنى A"><datalist id="bl2">' + blds().map(b => '<option value="' + esc(b) + '">').join('') + '</datalist></div></div>' +
+    '<div class="row3"><div><label>من رقم</label><input id="bf" type="number" value="1"></div><div><label>إلى رقم</label><input id="bt" type="number" value="10"></div><div><label>أسرّة كل غرفة</label><input id="bc" type="number" min="1" max="30" value="4"></div></div>' +
+    '<div><label>نوع الغرف</label><select id="by">' + D.types.map(t => '<option value="' + t + '">' + t + '</option>').join('') + '</select></div><div class="info" id="bp"></div>', '<button class="btn" id="bsave">إضافة</button>');
+  const pv = () => { const f = +$('bf').value, t = +$('bt').value, c = +$('bc').value, n = t >= f ? t - f + 1 : 0; $('bp').innerHTML = n ? 'سيتم إضافة <b>' + n + '</b> غرفة (' + (n * c) + ' سرير)' : 'تأكد من الأرقام'; };
+  ['bf', 'bt', 'bc'].forEach(k => $(k).oninput = pv); pv();
+  $('bsave').onclick = e => {
+    const f = +$('bf').value, t = +$('bt').value, c = +$('bc').value;
+    if (!(t >= f) || t - f > 300 || !(c >= 1)) return mErr('تأكد من الأرقام (حد أقصى 300 غرفة مرة وحدة)');
+    const rooms = []; for (let i = f; i <= t; i++) rooms.push({ garage: $('bg').value, building: $('bb').value.trim(), no: String(i), beds: c, type: $('by').value });
+    busy(e.target, call('housingRoomSave', { rooms })).then(r => r && toast('تمت إضافة ' + r.added + ' غرفة ✅'));
+  };
+}
+
+function occDlg(iq) {
+  const o = OCC[iq], r = ROOM[o.room], d = DRV[iq] || [], s = d[RC.st];
+  modal(esc(o.name),
+    '<div class="info"><b>' + esc(DEP[r.garage] || r.garage) + ' · ' + esc(rLabel(r)) + ' · سرير ' + o.bed + '</b><br>الإقامة: <span class="mono">' + esc(iq) + '</span>' + (d[RC.emp] ? ' · الرقم الوظيفي: <span class="mono">' + esc(d[RC.emp]) + '</span>' : '') +
+    (d[RC.mob] ? '<br>الجوال: <span class="mono">' + esc(d[RC.mob]) + '</span>' : '') + '<br>ساكن من: <span class="mono">' + esc(o.date) + '</span>' + (o.note ? '<br>ملاحظة: ' + esc(o.note) : '') + '<br>الحالة: ' + stChip(s) + '</div>' +
+    (OUT.includes(s) || !DRV[iq] ? '<div class="warnbox">⚠️ حالته ' + esc((ST[s] || {}).ar || 'غير موجود في القائمة') + ' — يفضل إخلاء السرير</div>' : '') +
+    (d[RC.dep] && d[RC.dep] !== r.garage ? '<div class="warnbox">كراج السائق في إدارة السائقين: ' + esc(DEP[d[RC.dep]] || d[RC.dep]) + ' — وساكن في ' + esc(DEP[r.garage] || r.garage) + '</div>' : '') +
+    histHtml(iq),
+    canEdit() ? '<button class="btn" id="omv">🔁 نقل</button><button class="btn red" id="ovc">🚪 إخلاء</button>' : '');
+  if ($('omv')) { $('omv').onclick = () => assignDlg(iq); $('ovc').onclick = () => vacateDlg(iq); }
+}
+function histHtml(iq) {
+  const h = D.log.filter(r => r[1] === iq).slice(0, 6);
+  if (!h.length) return '';
+  return '<div><label>آخر العمليات</label><div class="info" style="line-height:1.9">' + h.map(r => '<b>' + esc(r[3]) + '</b> <span class="mono">' + esc(r[6]) + '</span> — ' + esc(gTxt(r[5] || r[4])) + (r[7] ? ' <span class="mut">(' + esc(r[7]) + ')</span>' : '')).join('<br>') + '</div></div>';
+}
+
+function assignDlg(iq, roomId, bed) {
+  const cur = iq && OCC[iq];
+  const g0 = roomId ? ROOM[roomId].garage : (iq && scopeGarages().includes(homeG(iq)) ? homeG(iq) : (G !== 'all' ? G : scopeGarages()[0]));
+  modal(cur ? 'نقل سائق' : 'تسكين سائق',
+    '<div class="sw"><label>السائق</label><input id="as" autocomplete="off" placeholder="اكتب الاسم أو رقم الإقامة"' + (iq ? ' value="' + esc((DRV[iq] || [])[RC.name] || '') + '"' + (cur ? ' disabled' : '') : '') + '><div class="sug" id="asg"></div></div>' +
+    '<div id="acur"></div>' +
+    '<div class="row3"><div><label>الكراج</label><select id="ag">' + gOpts(g0) + '</select></div><div><label>الغرفة</label><select id="ar"></select></div><div><label>السرير</label><select id="ab"></select></div></div>' +
+    '<div class="row2"><div><label>التاريخ</label><input id="ad" type="date" value="' + D.today + '"></div><div><label>ملاحظة (اختياري)</label><input id="an" placeholder="' + (cur ? 'سبب النقل' : '') + '"></div></div>',
+    '<button class="btn green" id="asave">' + (cur ? 'نقل' : 'تسكين') + '</button>');
+  let IQ = iq || '';
+  const showCur = () => {
+    const c = IQ && OCC[IQ], d = DRV[IQ];
+    $('acur').innerHTML = (c ? '<div class="warnbox">ساكن حالياً في ' + esc(DEP[ROOM[c.room].garage] || '') + ' · ' + esc(rLabel(ROOM[c.room])) + ' · سرير ' + c.bed + ' — بيتم نقله</div>' : '') +
+      (d && !NEEDS_HOUSE.includes(d[RC.st]) ? '<div class="warnbox">حالته: ' + esc((ST[d[RC.st]] || {}).ar || d[RC.st]) + '</div>' : '') +
+      (IQ && RS.usual[IQ] ? '<div class="info">كراج راحته المعتاد: <b>' + esc(DEP[RS.usual[IQ].g] || RS.usual[IQ].g) + '</b> (' + RS.usual[IQ].n + ' رحلة خلال آخر 30 يوم)</div>' : '');
+  };
+  const fillRooms = keep => {
+    const g = $('ag').value, list = Object.values(ROOM).filter(r => r.garage === g && r.type !== 'ترانزيت' && r.state !== 'صيانة' && freeBeds(r).length).sort((a, b) => natSort(a.bld + '|' + a.no.padStart(6, '0'), b.bld + '|' + b.no.padStart(6, '0')));
+    $('ar').innerHTML = list.length ? list.map(r => '<option value="' + r.id + '"' + (r.id === keep ? ' selected' : '') + '>' + esc(rLabel(r)) + ' (' + freeBeds(r).length + ' فاضي)</option>').join('') : '<option value="">ما في غرف فاضية</option>';
+    fillBeds(bed);
+  };
+  const fillBeds = keep => { const r = ROOM[$('ar').value]; $('ab').innerHTML = r ? freeBeds(r).map(i => '<option' + (i == keep ? ' selected' : '') + '>' + i + '</option>').join('') : ''; };
+  $('ag').onchange = () => fillRooms(); $('ar').onchange = () => fillBeds();
+  fillRooms(roomId); showCur();
+  if (!cur) driverSearch($('as'), $('asg'), x => { IQ = x[0]; $('as').value = x[RC.name]; showCur(); const g = homeG(x[0]); if (!roomId && scopeGarages().includes(g) && $('ag').value !== g) { $('ag').value = g; fillRooms(); } });
+  $('asave').onclick = e => {
+    if (!IQ) return mErr('اختر السائق من القائمة');
+    if (!$('ar').value || !$('ab').value) return mErr('اختر الغرفة والسرير');
+    HL = IQ;
+    busy(e.target, call('housingAssign', { iqama: IQ, room: $('ar').value, bed: $('ab').value, date: $('ad').value, note: $('an').value.trim() })).then(r => r && toast((cur ? 'تم النقل' : 'تم التسكين') + ' ✅'));
+  };
+  if (!iq) setTimeout(() => $('as').focus(), 50);
+}
+function driverSearch(inp, box, pick) {
+  let act = -1, items = [];
+  const show = () => {
+    const q = inp.value.trim().toLowerCase(); act = -1;
+    if (q.length < 2) { box.classList.remove('on'); return; }
+    items = D.drivers.filter(x => String(x[RC.name]).toLowerCase().includes(q) || String(x[0]).includes(q) || String(x[RC.emp]).includes(q))
+      .sort((a, b) => (OCC[a[0]] ? 1 : 0) - (OCC[b[0]] ? 1 : 0) || (NEEDS_HOUSE.includes(a[RC.st]) ? 0 : 1) - (NEEDS_HOUSE.includes(b[RC.st]) ? 0 : 1)).slice(0, 25);
+    box.innerHTML = items.length ? items.map((x, i) => '<div data-i="' + i + '"><b>' + esc(x[RC.name]) + '</b><small>' + esc(x[0]) + ' · ' + esc(DEP[x[RC.dep]] || x[RC.dep]) + ' · ' + esc((ST[x[RC.st]] || {}).ar || x[RC.st]) +
+      (OCC[x[0]] ? ' · 🏠 ساكن: ' + esc(rLabel(ROOM[OCC[x[0]].room])) : '') + '</small></div>').join('') : '<div class="mut">ما لقيت سائق</div>';
+    box.classList.add('on');
+  };
+  inp.addEventListener('input', show);
+  inp.addEventListener('keydown', e => {
+    const ds = box.querySelectorAll('[data-i]'); if (!ds.length) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); act = (act + (e.key === 'ArrowDown' ? 1 : -1) + ds.length) % ds.length; ds.forEach((d, i) => d.classList.toggle('act', i === act)); }
+    else if (e.key === 'Enter') { e.preventDefault(); const x = items[act < 0 ? 0 : act]; if (x) { pick(x); box.classList.remove('on'); } }
+  });
+  box.addEventListener('mousedown', e => { const d = e.target.closest('[data-i]'); if (!d) return; e.preventDefault(); pick(items[+d.dataset.i]); box.classList.remove('on'); });
+  inp.addEventListener('blur', () => setTimeout(() => box.classList.remove('on'), 150));
+}
+function vacateDlg(iq) {
+  const o = OCC[iq], r = ROOM[o.room], s = drvSt(iq);
+  const sugg = s === 'Termination of services' ? 'إنهاء خدمات' : s === 'Absconding' ? 'هروب' : '';
+  modal('إخلاء سكن — ' + esc(o.name),
+    '<div class="info">' + esc(DEP[r.garage] || r.garage) + ' · ' + esc(rLabel(r)) + ' · سرير ' + o.bed + '</div>' +
+    '<div class="row2"><div><label>السبب</label><select id="vr">' + ['إنهاء خدمات', 'استقالة', 'هروب', 'نقل لكراج آخر', 'سكن خاص', 'أخرى'].map(x => '<option value="' + x + '"' + (x === sugg ? ' selected' : '') + '>' + x + '</option>').join('') + '</select></div>' +
+    '<div><label>تاريخ الإخلاء</label><input id="vd" type="date" value="' + D.today + '"></div></div><div><label>ملاحظة (اختياري)</label><input id="vn" placeholder="مثال: سلّم المفتاح"></div>',
+    '<button class="btn red" id="vsave">تأكيد الإخلاء</button>');
+  $('vsave').onclick = e => busy(e.target, call('housingVacate', { iqama: iq, date: $('vd').value, reason: $('vr').value + ($('vn').value.trim() ? ' — ' + $('vn').value.trim() : '') })).then(r => r && toast('تم الإخلاء ✅'));
+}
+
+function csv() {
+  const rows = [['السائق', 'رقم الإقامة', 'الرقم الوظيفي', 'الجوال', 'الجنسية', 'الحالة', 'الكراج', 'المبنى', 'الغرفة', 'السرير', 'تاريخ السكن', 'ملاحظة']];
+  residents().sort((a, b) => natSort(ROOM[a.room].garage + ROOM[a.room].bld + ROOM[a.room].no.padStart(6, '0') + a.bed, ROOM[b.room].garage + ROOM[b.room].bld + ROOM[b.room].no.padStart(6, '0') + b.bed)).forEach(o => {
+    const r = ROOM[o.room], d = DRV[o.iq] || [];
+    rows.push([o.name, o.iq, d[RC.emp] || '', d[RC.mob] || '', d[RC.nat] || '', (ST[d[RC.st]] || {}).ar || d[RC.st] || '', DEP[r.garage] || r.garage, r.bld, r.no, o.bed, o.date, o.note]);
+  });
+  Object.values(ROOM).filter(r => inG(r.garage)).forEach(r => freeBeds(r).forEach(b => rows.push(['— فاضي —', '', '', '', '', r.state === 'صيانة' ? 'صيانة' : '', DEP[r.garage] || r.garage, r.bld, r.no, b, '', ''])));
+  const txt = '﻿' + rows.map(r => r.map(c => '"' + String(c == null ? '' : c).replace(/"/g, '""') + '"').join(',')).join('\r\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'text/csv;charset=utf-8' }));
+  a.download = 'سكن_السائقين_' + (G === 'all' ? 'الكل' : (DEP[G] || G)) + '_' + D.today + '.csv'; a.click();
+}
+
+/* ===== الأحداث ===== */
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-f],[data-g],[data-tab],[data-go],[data-act],[data-room],[data-bed],[data-occ],[data-assign],[data-trn],[data-tin],[data-tout],[data-x]');
+  if (!t) { if (e.target === $('ov')) closeM(); return; }
+  const ds = t.dataset;
+  if (ds.x) return closeM();
+  if (ds.f) { F = ds.f; return view(); }
+  if (ds.g) { G = ds.g; HL = ''; return render(); }
+  if (ds.tab) { TAB = ds.tab; Q = ''; F = 'all'; return render(); }
+  if (ds.go) { const [tb, f] = ds.go.split(':'); if (tb === 'bulk') return bulkDlg(); TAB = tb; F = f || 'all'; Q = ''; render(); $('tabs').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+  if (ds.act === 'room') return roomDlg('');
+  if (ds.act === 'bulk') return bulkDlg();
+  if (ds.act === 'csv') return csv();
+  if (ds.act === 'print') return window.print();
+  if (ds.room) return roomDlg(ds.room);
+  if (ds.bed) { const [id, b] = ds.bed.split(':'); return ROOM[id].type === 'ترانزيت' ? transitDlg('', id, +b) : assignDlg('', id, +b); }
+  if (ds.trn) return trnDlg(ds.trn);
+  if (ds.tin) return transitDlg(ds.tin);
+  if (ds.tout) return tOut(t, ds.tout);
+  if (ds.act === 'tin') return transitDlg('');
+  if (ds.act === 'auto') return planDlg('perm', UNLIST);
+  if (ds.act === 'trall') return planDlg('tr', needTransit());
+  if (ds.occ) return occDlg(ds.occ);
+  if (ds.assign) return assignDlg(ds.assign);
+});
+document.addEventListener('input', e => {
+  if (e.target.id === 'q') { Q = e.target.value; const p = e.target.selectionStart; view(); const q = $('q'); q.focus(); q.setSelectionRange(p, p); }
+});
+document.addEventListener('change', e => { if (e.target.id === 'f') { F = e.target.value; view(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeM(); });
+load();
+</script>
+</body>
+</html>

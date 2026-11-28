@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<script>try{var t=localStorage.getItem('nwTheme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<script src="https://hanode40-sketch.github.io/all-op/auth.js" data-tool="performance"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2c4a7a">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<title data-i="pageTitle">أداء الموظفين · أدوات التشغيل</title>
+<style>
+  :root{
+    --navy:#1f3f7a; --ink:#1a1a1a; --muted:#64748b; --line:#e5e7eb; --bg:#f4f6f9;
+    --ok:#15803d; --okbg:#e7f5ed; --bad:#b91c1c; --badbg:#fdecea; --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Tahoma,Arial,sans-serif;color:var(--ink);
+    background:#2c4a7a;position:relative;min-height:100vh;padding:20px 14px 90px}
+  /* خلفية الباصات (نفس الصفحة الرئيسية) */
+  .top h1,.top .en{text-shadow:0 2px 8px rgba(0,0,0,.45)}
+  .kpi,.card{box-shadow:0 6px 18px rgba(10,25,55,.15)}
+  .wrap{max-width:none;margin:0 auto}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#fff;margin-bottom:18px}
+  .top h1{margin:0;font-size:21px}
+  .top .en{font-size:13px;opacity:.75}
+  .back{color:#fff;text-decoration:none;font-size:14px;background:rgba(255,255,255,.15);padding:8px 14px;border-radius:999px;white-space:nowrap}
+  .filters{background:#fff;border-radius:var(--radius);padding:14px;display:grid;grid-template-columns:repeat(3,1fr) auto;gap:10px;align-items:end;box-shadow:0 6px 18px rgba(10,25,55,.12)}
+  label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600}
+  select,input{width:100%;font:inherit;font-size:15px;padding:10px;border:1px solid var(--line);border-radius:10px;background:#f8fafc}
+  .btn{font:inherit;font-size:14px;font-weight:700;border:0;border-radius:10px;padding:11px 14px;cursor:pointer;background:var(--navy);color:#fff;white-space:nowrap}
+  .btn.light{background:#eef2f7;color:var(--navy)}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+  .kpi{background:#fff;border-radius:var(--radius);padding:14px;border:1px solid var(--line)}
+  .kpi b{display:block;font-size:28px;color:var(--navy);line-height:1.1}
+  .kpi span{font-size:13px;color:var(--muted)}
+  .kpi.bad b{color:var(--bad)}
+  .card{background:#fff;border-radius:var(--radius);border:1px solid var(--line);padding:16px;margin-top:14px}
+  .card h2{margin:0 0 12px;font-size:17px;color:var(--navy);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .card h2 small{font-size:12px;color:var(--muted);font-weight:500}
+  .card h2 .sp{margin-inline-start:auto}
+  .scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:start;white-space:nowrap}
+  th{font-size:12px;color:var(--muted);font-weight:700;background:#f8fafc;position:sticky;top:0}
+  td.num,th.num{text-align:center}
+  tr.emp{cursor:pointer}
+  tr.emp:hover td{background:#f8fafc}
+  tr.emp.sel td{background:#eaf0fa}
+  .rank{display:inline-flex;width:24px;height:24px;border-radius:50%;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:#eef2f7;color:var(--navy)}
+  .rank.g1{background:#fde68a;color:#78350f}.rank.g2{background:#e5e7eb;color:#374151}.rank.g3{background:#fed7aa;color:#7c2d12}
+  .bar{display:flex;align-items:center;gap:8px;min-width:140px}
+  .bar i{display:block;height:8px;border-radius:4px;background:var(--navy);min-width:2px}
+  .bar b{font-size:14px}
+  .zero{color:#cbd5e1}
+  .tag{font-size:12px;padding:2px 8px;border-radius:999px;background:#eef2f7;color:var(--navy);font-weight:600}
+  .tag.ok{background:var(--okbg);color:var(--ok)}.tag.bad{background:var(--badbg);color:var(--bad)}
+  .muted{color:var(--muted)}
+  .msg{text-align:center;padding:30px 10px;color:var(--muted)}
+  .msg.err{color:var(--bad);font-weight:700}
+  /* الوضع الليلي */
+  html[data-theme="dark"]{--ink:#e5e7eb;--muted:#9aa6b8;--line:#263042;--bg:#0b1220;--okbg:#12301f;--badbg:#3a1e22}
+  html[data-theme="dark"] body{background:#0b1220}
+  
+  html[data-theme="dark"] .filters,html[data-theme="dark"] .kpi,html[data-theme="dark"] .card{background:#151c2b;border-color:var(--line)}
+  html[data-theme="dark"] select,html[data-theme="dark"] input{background:#0f1624;color:var(--ink);border-color:var(--line)}
+  html[data-theme="dark"] th{background:#111827}
+  html[data-theme="dark"] tr.emp:hover td{background:#1b2436}
+  html[data-theme="dark"] tr.emp.sel td{background:#1e2a44}
+  html[data-theme="dark"] .kpi b,html[data-theme="dark"] .card h2{color:#9ec1ff}
+  html[data-theme="dark"] .bar i{background:#6b9cff}
+  html[data-theme="dark"] .btn.light,html[data-theme="dark"] .tag,html[data-theme="dark"] .rank{background:#1e2a44;color:#c7d7f5}
+  html[data-theme="dark"] .zero{color:#3b4558}
+  html[data-theme="dark"] .kpi.bad b{color:#f87171}
+  html[data-theme="dark"] .rank.g1{background:#fde68a;color:#78350f}
+  html[data-theme="dark"] .rank.g2{background:#e5e7eb;color:#374151}
+  html[data-theme="dark"] .rank.g3{background:#fed7aa;color:#7c2d12}
+  @media (max-width:700px){
+    .filters{grid-template-columns:1fr 1fr}
+    .filters .btn{grid-column:span 1}
+    .kpis{grid-template-columns:1fr 1fr}
+    .top h1{font-size:18px}
+  }
+
+  /* شريط العنوان ثابت أعلى الصفحة عند النزول */
+  .top{position:sticky;top:0;z-index:50;margin:-20px -14px 18px;padding:14px 14px 12px;border-radius:0 0 16px 16px;
+    background:rgba(31,63,122,.88);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 6px 20px rgba(0,0,0,.18)}
+  html[data-theme="dark"] .top{background:rgba(11,18,32,.88);border-bottom:1px solid #263042}
+  @media print{ .top{position:static;background:none;box-shadow:none;margin:0 0 18px;padding:0} }
+
+  /* ===== التصميم الموحد (ألوان auth.js --nw-*) ===== */
+  :root,html[data-theme="dark"]{--ink:var(--nw-ink,#0f172a);--muted:var(--nw-muted,#64748b);--line:var(--nw-line,#e5e7eb);--soft:var(--nw-soft,#f8fafc)}
+  body{background:var(--nw-bg,#eef2f8)!important;color:var(--nw-ink,#0f172a);font-family:var(--nw-font,-apple-system,"Segoe UI",Tahoma,Arial,sans-serif);-webkit-font-smoothing:antialiased}
+  .top{background:var(--nw-hero,#13274f)!important;border-bottom:0!important;box-shadow:0 8px 24px rgba(19,39,79,.18)!important}
+  .top h1,.top .en{text-shadow:none!important}
+  .panel,.kpi,.md{background:var(--nw-card,#fff)!important;border:1px solid var(--nw-line,#e5e7eb)!important;box-shadow:var(--nw-shadow)!important}
+  .kpi::before{height:3px!important;opacity:.85}
+  .sec{color:var(--nw-muted,#64748b)!important;text-shadow:none!important;font-size:14px;font-weight:800}
+  .sec::after{background:var(--nw-line,#e2e8f0)!important}
+  .note,.clickhint{color:var(--nw-muted,#64748b)!important;text-shadow:none!important}
+  .btn{background:var(--nw-navy,#13274f)} .btn.light{background:var(--nw-soft,#eef2f7);color:var(--nw-ink,#13274f);border:1px solid var(--nw-line,#e2e8f0)}
+  html[data-theme="dark"] .btn.light{background:#1b2540;color:#dbe5f7;border-color:#24304a}
+  .card h2{color:var(--nw-ink,#13274f)}
+  select,input{background:var(--nw-card,#fff);color:var(--nw-ink,#0f172a)}
+  .seg,.tabs{background:var(--nw-card,#fff)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div><h1 style="display:flex;align-items:center;gap:10px"><span class="tIc">📊</span> <span data-i="title">أداء الموظفين</span></h1><div class="en" data-i="subtitle">Staff Performance</div></div>
+    <a class="back" href="./" data-i="back">← أدوات التشغيل</a>
+  </div>
+
+  <div class="filters">
+    <div><label data-i="lMonth">الشهر</label><select id="fMonth"></select></div>
+    <div><label data-i="lUser">الموظف</label><select id="fUser"><option value="" data-i="allUsers">كل الموظفين</option></select></div>
+    <div><label data-i="lTool">البرنامج</label><select id="fTool"><option value="" data-i="allTools">كل البرامج</option></select></div>
+    <div style="display:flex;gap:8px"><button class="btn light" onclick="load()" data-i="refresh">↻ تحديث</button><button class="btn" onclick="exportCsv()" data-i="export">تصدير</button></div>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><b id="kOps">–</b><span data-i="kOps">إجمالي العمليات</span></div>
+    <div class="kpi"><b id="kUsers">–</b><span data-i="kUsers">موظف نشط</span></div>
+    <div class="kpi"><b id="kLogins">–</b><span data-i="kLogins">مرات الدخول</span></div>
+    <div class="kpi bad"><b id="kFail">–</b><span data-i="kFail">محاولات دخول فاشلة</span></div>
+  </div>
+
+  <div class="card">
+    <h2><span data-i="rankTitle">ترتيب الموظفين</span> <small data-i="rankHint">اضغط على الموظف لعرض نشاطه</small></h2>
+    <div class="scroll" id="rankBox"><div class="msg" data-i="loading">جاري التحميل...</div></div>
+  </div>
+
+  <div class="card">
+    <h2><span data-i="actTitle">آخر النشاطات</span> <small id="actHint"></small><span class="sp"></span></h2>
+    <div class="scroll" id="actBox"><div class="msg" data-i="loading">جاري التحميل...</div></div>
+  </div>
+</div>
+
+<script>
+  /* ====== الإعدادات ====== */
+  const AUTH_URL = 'https://script.google.com/macros/s/AKfycbweMNQs14aIiDJ-yH9yu3KXubnfsrtFnuC58eIryvWUwLe6kB_-cA_p6a6TRazK--Ft/exec';
+
+  const LOGIN_TOOL = 'الدخول';
+  /* ====== اللغة: تتبع اختيار الصفحة الرئيسية (hubLang) ====== */
+  let LANG = (() => { try { return localStorage.getItem('hubLang') === 'en' ? 'en' : 'ar'; } catch (e) { return 'ar'; } })();
+  const I18N = {
+    ar: { pageTitle:'أداء الموظفين · أدوات التشغيل', title:'أداء الموظفين', subtitle:'Staff Performance', back:'← أدوات التشغيل',
+      lMonth:'الشهر', lUser:'الموظف', lTool:'البرنامج', allUsers:'كل الموظفين', allTools:'كل البرامج', allMonths:'كل الأشهر', refresh:'↻ تحديث', export:'تصدير',
+      kOps:'إجمالي العمليات', kUsers:'موظف نشط', kLogins:'مرات الدخول', kFail:'محاولات دخول فاشلة',
+      rankTitle:'ترتيب الموظفين', rankHint:'اضغط على الموظف لعرض نشاطه', actTitle:'آخر النشاطات', loading:'جاري التحميل...',
+      eNet:'تعذّر الاتصال — تأكد من الإنترنت ومن الرابط في الإعدادات', eAuth:'انتهت مدة الدخول — سجّل دخول ثم اضغط تحديث', eForbidden:'هذه الصفحة للمدير والمشرف فقط', eErr:'حدث خطأ: ',
+      noData:'لا توجد بيانات لهذه الفترة', hEmp:'الموظف', hLast:'آخر نشاط', last150:'(آخر 150)', noAct:'لا توجد نشاطات',
+      hTime:'الوقت', hOp:'العملية', hRef:'المرجع', hDetails:'تفاصيل',
+      csvHead:['الوقت','اسم المستخدم','الاسم','البرنامج','العملية','المرجع','تفاصيل'], csvName:'أداء_الموظفين' },
+    en: { pageTitle:'Staff Performance · Operations Tools', title:'Staff Performance', subtitle:'أداء الموظفين', back:'← Operations Tools',
+      lMonth:'Month', lUser:'Employee', lTool:'Tool', allUsers:'All employees', allTools:'All tools', allMonths:'All months', refresh:'↻ Refresh', export:'Export',
+      kOps:'Total operations', kUsers:'Active employees', kLogins:'Logins', kFail:'Failed login attempts',
+      rankTitle:'Employee ranking', rankHint:'Tap an employee to view their activity', actTitle:'Recent activity', loading:'Loading...',
+      eNet:'Connection failed — check your internet and the link in settings', eAuth:'Session expired — sign in, then tap Refresh', eForbidden:'This page is for managers and supervisors only', eErr:'Error: ',
+      noData:'No data for this period', hEmp:'Employee', hLast:'Last activity', last150:'(last 150)', noAct:'No activity',
+      hTime:'Time', hOp:'Action', hRef:'Reference', hDetails:'Details',
+      csvHead:['Time','Username','Name','Tool','Action','Reference','Details'], csvName:'staff_performance' }
+  };
+  const t_ = k => (I18N[LANG][k] ?? I18N.ar[k] ?? k);
+  const MONTHS_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const TOOL_EN = { 'الدخول':'Login', 'تقرير الحوادث':'Accident Report', 'محضر المخالفة':'Violation Report', 'تسليم الوردية':'Shift Handover',
+    'تقييم السائقين':'Driver Evaluation', 'مسار الرحلة':'Trip Route', 'استلام الزي':'Uniform Receipt', 'لوحة السائقين':'Drivers Dashboard', 'المهام':'Tasks' };
+  const OP_EN = { 'تسجيل دخول':'Login', 'محاولة دخول فاشلة':'Failed login', 'تسليم وردية':'Shift handover', 'تعديل تسليم':'Edit handover',
+    'استلام وردية':'Shift received', 'حذف تسليم':'Delete handover', 'تقرير حادث':'Accident report', 'تقييم سائق':'Driver evaluation', 'حذف تقييم':'Delete evaluation',
+    'تكليف مهمة':'Assign task', 'بدء مهمة':'Start task', 'إنجاز مهمة':'Complete task', 'إلغاء مهمة':'Cancel task', 'بند القائمة اليومية':'Checklist item',
+    'إرسال مسار رحلة':'Send trip route', 'إرسال بطاقة جدول رحلة':'Send duty card', 'اختبار السجل':'Log test' };
+  const toolName = x => LANG === 'en' ? (TOOL_EN[String(x).trim()] || x) : x;
+  const opName = x => LANG === 'en' ? (OP_EN[String(x).trim()] || x) : x;
+  function applyLang() {
+    const h = document.documentElement; h.lang = LANG; h.dir = LANG === 'en' ? 'ltr' : 'rtl';
+    document.querySelectorAll('[data-i]').forEach(e => e.textContent = t_(e.dataset.i));
+  }
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const fmt = iso => { try { return new Date(iso).toLocaleString(LANG==='en'?'en-GB':'ar-SA-u-ca-gregory-nu-latn',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}); } catch(e){ return iso; } };
+  const pad = n => String(n).padStart(2,'0');
+  const thisMonth = () => { const d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1); };
+  const MONTHS_AR = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+  const monthLabel = m => { const [y,mm]=m.split('-'); return ((LANG==='en'?MONTHS_EN:MONTHS_AR)[+mm-1]||mm)+' '+y; };
+
+  let DATA = null, selUser = '';
+
+  async function load() {
+    const month = $('fMonth').value || thisMonth();
+    $('rankBox').innerHTML = $('actBox').innerHTML = `<div class="msg">${t_('loading')}</div>`;
+    let j;
+    try {
+      const r = await fetch(AUTH_URL, { method:'POST', body: JSON.stringify({ action:'activity', token: NWAuth.token(), month }) });
+      j = await r.json();
+    } catch (e) { return fail(t_('eNet')); }
+    if (j.error === 'AUTH') { NWAuth.relogin(); return fail(t_('eAuth')); }
+    if (j.error === 'FORBIDDEN') return fail(t_('eForbidden'));
+    if (!j.ok) return fail(t_('eErr') + (j.message || j.error));
+    { const seen = {};   // الاستلام ممكن ينسجّل مرتين لنفس التسليم — نحسبه مرة وحدة
+      j.rows = (j.rows || []).slice().sort((a, b) => String(a[0]).localeCompare(String(b[0]))).filter(r => {
+        if (r[4] !== 'استلام وردية' || !String(r[5] || '').trim()) return true;
+        const k = String(r[5]).trim(); if (seen[k]) return false; seen[k] = 1; return true; }); }
+    DATA = j;
+    fillMonths(j.months, month);
+    fillFilters();
+    render();
+  }
+  function fail(m) { $('rankBox').innerHTML = $('actBox').innerHTML = `<div class="msg err">${esc(m)}</div>`; }
+
+  function fillMonths(list, cur) {
+    const set = new Set(list); set.add(thisMonth()); if (cur !== 'all') set.add(cur);
+    const ms = [...set].sort().reverse();
+    $('fMonth').innerHTML = ms.map(m => `<option value="${m}">${monthLabel(m)}</option>`).join('') + `<option value="all">${t_('allMonths')}</option>`;
+    $('fMonth').value = cur;
+  }
+  function fillFilters() {
+    const u = $('fUser').value, t = $('fTool').value;
+    const names = new Map();
+    DATA.users.forEach(x => names.set(x.u, x.n));
+    DATA.rows.forEach(r => { if (r[1] && r[2]) names.set(r[1], r[2]); });
+    $('fUser').innerHTML = `<option value="">${t_('allUsers')}</option>` +
+      [...names].sort((a,b)=>a[1].localeCompare(b[1],LANG)).map(([k,v]) => `<option value="${esc(k)}">${esc(v)}</option>`).join('');
+    const tools = [...new Set(DATA.rows.map(r => r[3]).filter(x => x && x !== LOGIN_TOOL))].sort();
+    $('fTool').innerHTML = `<option value="">${t_('allTools')}</option>` + tools.map(x => `<option value="${esc(x)}">${esc(toolName(x))}</option>`).join('');
+    $('fUser').value = [...names.keys()].includes(u) ? u : '';
+    $('fTool').value = tools.includes(t) ? t : '';
+    selUser = $('fUser').value;
+  }
+
+  function filtered() {
+    const u = $('fUser').value, t = $('fTool').value;
+    return DATA.rows.filter(r => (!u || r[1] === u) && (!t || r[3] === t || r[3] === LOGIN_TOOL));
+  }
+
+  function render() {
+    if (!DATA) return;
+    const rows = filtered();
+    const ops = rows.filter(r => r[3] !== LOGIN_TOOL);
+    const logins = rows.filter(r => r[4] === 'تسجيل دخول');
+    const fails = rows.filter(r => r[4] === 'محاولة دخول فاشلة');
+
+    $('kOps').textContent = ops.length;
+    $('kUsers').textContent = new Set(ops.map(r => r[1])).size;
+    $('kLogins').textContent = logins.length;
+    $('kFail').textContent = fails.length;
+
+    // ترتيب الموظفين
+    const tools = [...new Set(ops.map(r => r[3]))].sort();
+    const by = new Map();
+    const get = (u, n) => { if (!by.has(u)) by.set(u, { u, n: n || u, total: 0, tools: {}, logins: 0, last: '' }); const o = by.get(u); if (n) o.n = n; return o; };
+    const fu = $('fUser').value;
+    DATA.users.filter(x => x.active && (!fu || x.u === fu)).forEach(x => get(x.u, x.n));
+    ops.forEach(r => { const o = get(r[1], r[2]); o.total++; o.tools[r[3]] = (o.tools[r[3]] || 0) + 1; if (r[0] > o.last) o.last = r[0]; });
+    logins.forEach(r => { const o = get(r[1], r[2]); o.logins++; if (r[0] > o.last) o.last = r[0]; });
+    const list = [...by.values()].filter(o => o.u).sort((a, b) => b.total - a.total || b.logins - a.logins || a.n.localeCompare(b.n, 'ar'));
+    const max = Math.max(1, ...list.map(o => o.total));
+
+    $('rankBox').innerHTML = !list.length ? `<div class="msg">${t_('noData')}</div>` :
+      `<table><thead><tr><th class="num">#</th><th>${t_('hEmp')}</th><th>${t_('kOps')}</th>
+        ${tools.map(t => `<th class="num">${esc(toolName(t))}</th>`).join('')}
+        <th class="num">${t_('kLogins')}</th><th>${t_('hLast')}</th></tr></thead><tbody>
+      ${list.map((o, i) => `<tr class="emp ${selUser === o.u ? 'sel' : ''}" onclick="pickUser('${esc(o.u)}')">
+        <td class="num"><span class="rank ${o.total && i < 3 ? 'g' + (i + 1) : ''}">${i + 1}</span></td>
+        <td><b>${esc(o.n)}</b><div class="muted" style="font-size:12px" dir="ltr">${esc(o.u)}</div></td>
+        <td><div class="bar"><i style="width:${Math.round(o.total / max * 110)}px;${o.total ? '' : 'background:#e5e7eb'}"></i><b class="${o.total ? '' : 'zero'}">${o.total}</b></div></td>
+        ${tools.map(t => `<td class="num ${o.tools[t] ? '' : 'zero'}">${o.tools[t] || 0}</td>`).join('')}
+        <td class="num ${o.logins ? '' : 'zero'}">${o.logins}</td>
+        <td class="muted">${o.last ? esc(fmt(o.last)) : '—'}</td></tr>`).join('')}
+      </tbody></table>`;
+
+    // آخر النشاطات
+    const act = rows.filter(r => !selUser || r[1] === selUser).sort((a, b) => b[0].localeCompare(a[0])).slice(0, 150);
+    $('actHint').textContent = selUser ? '— ' + ((by.get(selUser) || {}).n || selUser) : t_('last150');
+    $('actBox').innerHTML = !act.length ? `<div class="msg">${t_('noAct')}</div>` :
+      `<table><thead><tr><th>${t_('hTime')}</th><th>${t_('hEmp')}</th><th>${t_('lTool')}</th><th>${t_('hOp')}</th><th>${t_('hRef')}</th><th>${t_('hDetails')}</th></tr></thead><tbody>
+      ${act.map(r => `<tr><td class="muted">${esc(fmt(r[0]))}</td><td>${esc(r[2] || r[1])}</td><td>${esc(toolName(r[3]))}</td>
+        <td><span class="tag ${r[4] === 'محاولة دخول فاشلة' ? 'bad' : r[3] === LOGIN_TOOL ? '' : 'ok'}">${esc(opName(r[4]))}</span></td>
+        <td dir="ltr" style="text-align:${LANG==='en'?'left':'right'}">${esc(r[5])}</td><td class="muted" style="white-space:normal;min-width:160px">${esc(r[6])}</td></tr>`).join('')}
+      </tbody></table>`;
+  }
+
+  function pickUser(u) {
+    selUser = selUser === u ? '' : u;
+    render();
+    if (selUser) $('actBox').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function exportCsv() {
+    if (!DATA) return;
+    const rows = filtered();
+    const head = t_('csvHead');
+    const csv = '﻿' + [head, ...rows.map(r => [fmt(r[0]), r[1], r[2], toolName(r[3]), opName(r[4]), r[5], r[6]])]
+      .map(r => r.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+    a.download = `${t_('csvName')}_${$('fMonth').value}.csv`;
+    a.click();
+  }
+
+  $('fMonth').addEventListener('change', load);
+  $('fUser').addEventListener('change', () => { selUser = $('fUser').value; render(); });
+  $('fTool').addEventListener('change', render);
+
+  $('fMonth').innerHTML = `<option value="${thisMonth()}">${monthLabel(thisMonth())}</option>`;
+  applyLang();
+  window.addEventListener('storage', e => { if (e.key === 'hubLang') { LANG = e.newValue === 'en' ? 'en' : 'ar'; applyLang(); if (DATA) { const m=$('fMonth').value; fillMonths(DATA.months, m); fillFilters(); render(); } } });
+  if (window.NWAuth) load();
+</script>
+<script>try{if(window.NWIcon)document.querySelectorAll(".tIc").forEach(function(e){e.innerHTML=NWIcon("performance",26)})}catch(e){}</script>
+</body>
+</html>
